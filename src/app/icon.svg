@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Agregador 26">
+  <!-- Marca do produto: cursor ▊ da urna + "26" em dígitos de pixel (tela fósforo).
+       Geometria pura — sem fonte, sem asset externo, sem símbolo partidário (R4). -->
+  <rect width="64" height="64" rx="12" fill="#0E241A"/>
+  <rect x="1.5" y="1.5" width="61" height="61" rx="10.5" fill="none" stroke="#1E3A2C" stroke-width="3"/>
+  <!-- cursor ▊ -->
+  <rect x="8" y="18" width="11" height="28" fill="#A7EFBB"/>
+  <!-- dígito 2 (grade 3×5, célula 5) -->
+  <g fill="#D8FBE2">
+    <rect x="23" y="20" width="15" height="5"/>
+    <rect x="33" y="25" width="5" height="5"/>
+    <rect x="23" y="30" width="15" height="5"/>
+    <rect x="23" y="35" width="5" height="5"/>
+    <rect x="23" y="40" width="15" height="5"/>
+  </g>
+  <!-- dígito 6 -->
+  <g fill="#D8FBE2">
+    <rect x="42" y="20" width="15" height="5"/>
+    <rect x="42" y="25" width="5" height="5"/>
+    <rect x="42" y="30" width="15" height="5"/>
+    <rect x="42" y="35" width="5" height="5"/>
+    <rect x="52" y="35" width="5" height="5"/>
+    <rect x="42" y="40" width="15" height="5"/>
+  </g>
+</svg>

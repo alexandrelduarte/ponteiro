@@ -1,9 +1,11 @@
 @import "tailwindcss";
 @import "./tokens.css";
 
-/* Base do produto: papel de boletim, tinta, Archivo (via next/font no layout). */
+/* Base do produto: papel de boletim, tinta, Archivo (via next/font no layout).
+   O grão do papel (public/grao-papel.svg, feTurbulence a 5% de alfa) é decorativo
+   e quase imperceptível — a cor de fundo segura a identidade se a imagem faltar. */
 body {
-  background: var(--color-papel);
+  background: var(--color-papel) url("/grao-papel.svg") repeat;
   color: var(--color-tinta);
   font-family: var(--font-sans);
 }

@@ -13,6 +13,7 @@ Raciocine em profundidade máxima antes de agir: enumere alternativas, escolha j
 e verifique o próprio trabalho antes de devolver.
 
 Princípios inegociáveis do projeto:
+
 - Mobile-first (390px é o viewport primário); tipografia como personalidade; acessibilidade AA como piso.
 - A identidade é "boletim de urna / apuração brasileira": papel `#E8E8DF`, tela fósforo verde
   da urna eletrônica como moldura do número-manchete, IBM Plex Mono para TODO dado numérico,

@@ -11,6 +11,7 @@ Raciocine em profundidade máxima antes de agir: enumere alternativas, escolha j
 e verifique o próprio trabalho antes de devolver.
 
 Regras que você nunca viola:
+
 - O modelo estatístico é INTOCÁVEL: `normCdf`, `meioCampo`, `mediaEm`, `tendenciaPareada`,
   `rodarModelo`, `calcVies`, o bloco `replay` e as constantes `ERRO_2022`, `PARAMS_PADRAO`,
   `CENARIOS_VIES` são portados com paridade numérica exata (tolerância 1e-9). Você NÃO melhora

@@ -65,6 +65,7 @@ frescor + gatilho no /admin), a mudança está anotada como **[MUDA: …]** conf
 ## 3. Seções da página (paridade funcional — Fase 4)
 
 ### 3.1 Cabeçalho
+
 - [x] Sobretítulo "Apuração de pesquisas · registro obrigatório no TSE".
 - [x] Título "PRESIDENTE 2026" (Archivo black).
 - [x] Subtítulo: "Lula (PT) × Flávio Bolsonaro (PL) · N pesquisas na série · base editorial de dd/mm/aaaa".
@@ -74,6 +75,7 @@ frescor + gatilho no /admin), a mudança está anotada como **[MUDA: …]** conf
 - [x] Contadores "dias p/ 1º turno 04/10" e "dias p/ 2º turno 25/10".
 
 ### 3.2 Tela da urna (elemento-assinatura)
+
 - [x] Moldura verde-escura com sombra interna; cabeçalho fósforo "CHANCE DE SER ELEITO · LULA
       (esq.) × FLÁVIO (dir.)" + "LEITURA DOS DADOS · NÃO É PREVISÃO" + cursor piscante ▊
       (com prefers-reduced-motion).
@@ -86,6 +88,7 @@ frescor + gatilho no /admin), a mudança está anotada como **[MUDA: …]** conf
 - [x] Nota externa: "A diferença entre as duas linhas é o tempo… Probabilidade não é previsão…".
 
 ### 3.3 Abas Disputa principal × Todos os candidatos
+
 - [x] Toggle com contagem dinâmica; par principal DEFINIDO PELOS DADOS (top2 do 1ºT).
 - [x] Aviso âmbar se o par líder mudar (parPadrao false).
 - [x] Aba "todos": barras horizontais por candidato (cor própria, % média, nº de pesquisas,
@@ -94,6 +97,7 @@ frescor + gatilho no /admin), a mudança está anotada como **[MUDA: …]** conf
       média, texto "Por que o painel modela só o confronto líder" (gap3).
 
 ### 3.4 Cartões 1ºT / 2ºT
+
 - [x] 1ºT: médias estimuladas L×F, três tendências pareadas (Lula/Flávio/Margem com ▲▼▬ e nº de
       pares), válidos de Lula, mini-cartões "definição no 1ºT hoje/04-10", chance de Flávio no 1ºT.
 - [x] 2ºT: médias L×F, margem + válidos, tendências, "N de M pesquisas recentes apontam empate
@@ -101,6 +105,7 @@ frescor + gatilho no /admin), a mudança está anotada como **[MUDA: …]** conf
       de Lula no 2ºT hoje/25-10", faixa 80% da margem.
 
 ### 3.5 Gráficos
+
 - [x] Evolução: ComposedChart com toggle 1ºT/2ºT, linhas de média ponderada + scatter por
       pesquisa, tooltip customizado (instituto, campo, valores), domínio Y [30,55]/[20,50],
       nota sobre série mais curta no 1ºT.
@@ -108,10 +113,12 @@ frescor + gatilho no /admin), a mudança está anotada como **[MUDA: …]** conf
       referência em 0, legenda "espaço de virada".
 
 ### 3.6 Contexto social
+
 - [x] 5 cartões de CONTEXTO (titulo, dado em mono, leitura, link fonte) + 6º cartão
       "Síntese do contexto" em tela verde.
 
 ### 3.7 Parâmetros do modelo
+
 - [x] 4 sliders (Deslizador): meia-vida 7–45 passo 1; erro sistemático 0–6 passo 0,5; deriva
       0,1–0,7 passo 0,05; viés −3–+10 passo 0,1 — cada um com valor formatado e dica completa
       (textos preservados).
@@ -121,6 +128,7 @@ frescor + gatilho no /admin), a mudança está anotada como **[MUDA: …]** conf
 - [x] **[MUDA: estado dos parâmetros serializado na URL `?vies=…&sys=…` — links compartilháveis]**
 
 ### 3.8 Histórico de erros
+
 - [x] Tabela dos 5 pleitos (urna × véspera × erro).
 - [x] Cartões "Por que pode se repetir" (âmbar) / "Por que pode ser menor" (verde).
 - [x] Bloco "Por que o erro do 1º turno importa AGORA" (2 parágrafos completos, incl. crenças →
@@ -137,6 +145,7 @@ frescor + gatilho no /admin), a mudança está anotada como **[MUDA: …]** conf
 - [x] `<details>` Fontes do histórico de erros (6 links).
 
 ### 3.9 Cenário-base
+
 - [x] Título dinâmico (reeleição/vitória, margem apertada/moderada, probabilidade combinada).
 - [x] 3 cartões da linha do tempo: 04/10 (P ir a 2ºT, Lula em 1º), 25/10 (P vitória na decisão,
       decomposição combinada), placar central projetado (placarL, faixa 80%).
@@ -146,6 +155,7 @@ frescor + gatilho no /admin), a mudança está anotada como **[MUDA: …]** conf
 - [x] Nota de rodapé: "1 vez a cada N eleições parecidas".
 
 ### 3.10 Tabela de pesquisas
+
 - [x] Colunas: Instituto (link p/ fonte, badges "(usuário)"/"(auto — confira a fonte)"), Campo
       (dd/mm–dd/mm), n (pt-BR), ±MoE, 1ºT L×F, 2ºT L×F, chip Leitura 2ºT (empate técnico /
       Lula à frente / Flávio à frente), Peso, Registro TSE, botão × remover (aria-label).
@@ -157,16 +167,19 @@ frescor + gatilho no /admin), a mudança está anotada como **[MUDA: …]** conf
 - [x] **[MUDA R4/md: abaixo de md a tabela vira cartões empilhados]**
 
 ### 3.11 Metodologia (vira página /metodologia — conteúdo preservado)
+
 - [x] `<details>`: Média, pesos e as duas probabilidades · Como a tendência é calculada ·
       Classificação dos cenários (50–60/60–75/75–90/90+) · Limitações que você deve conhecer ·
       Botão «Atualizar agora» e o viés histórico **[MUDA: texto adaptado ao fluxo com aprovação]** ·
       Fontes da série (13 links com campo e TSE).
 
 ### 3.12 Rodapé
+
 - [x] Aviso legal completo (ferramenta estatística e educacional, sem vínculo…, datas das
       eleições) **[MUDA: ampliado; instrução "digite atualizar no chat" removida]**.
 
 ## 4. Comportamentos globais
+
 - [x] Recharts com isAnimationActive={false} nos gráficos; tooltips custom em mono.
 - [x] Focus-visible com outline verde em inputs/botões/links.
 - [x] Fontes Archivo (400/600/700/900) e IBM Plex Mono (400/500/600) **[MUDA: self-host via

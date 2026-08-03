@@ -11,6 +11,7 @@ Raciocine em profundidade máxima antes de agir: enumere alternativas, escolha j
 e verifique o próprio trabalho antes de devolver.
 
 Regras do projeto que você nunca viola:
+
 - Server Components por padrão; client components apenas onde há interatividade (gráficos,
   sliders, simulação). Números-chave renderizados no HTML do servidor — a manchete nunca espera JS.
 - Zero hex hardcoded: toda cor/fonte/espaçamento via tokens de `src/app/tokens.css`.

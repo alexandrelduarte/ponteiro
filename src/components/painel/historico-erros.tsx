@@ -16,11 +16,43 @@ export function HistoricoErros() {
   return (
     <Cartao
       idTitulo="titulo-historico-erros"
-      titulo="Histórico de erros das pesquisas (urna × véspera) — e se repetir em 2026?"
+      titulo="Histórico de erros das pesquisas (urna × véspera)"
+      descricao="E se repetir em 2026?"
       destaque="tinta"
     >
+      {/* ---------- 390px: cartões empilhados (§7.5) ----------
+          A coluna ERRO é a razão de existir do bloco: em tabela ela sumia por
+          completo abaixo de md, sem afordância de rolagem. Como cartão, ela é o
+          par rótulo→valor mais forte, sempre visível. */}
+      <ul className="flex flex-col gap-3 md:hidden" aria-label="Histórico de erros por pleito">
+        {HISTORICO_ERROS.map((h) => (
+          <li key={h.pleito} className="rounded-cartao border border-linha bg-cartao p-cartao">
+            <h3 className="text-sm font-bold text-tinta">{h.pleito}</h3>
+            <dl className="mt-2 space-y-2">
+              <div>
+                <dt className="font-mono text-xs tracking-etiqueta text-cinza uppercase">
+                  Urna (válidos)
+                </dt>
+                <dd className="mt-0.5 font-mono text-xs leading-compacto text-tinta">{h.urna}</dd>
+              </div>
+              <div>
+                <dt className="font-mono text-xs tracking-etiqueta text-cinza uppercase">
+                  Pesquisas de véspera
+                </dt>
+                <dd className="mt-0.5 font-mono text-xs leading-compacto text-tinta">{h.pesq}</dd>
+              </div>
+              <div className="border-t border-dashed border-linha pt-2">
+                <dt className="font-mono text-xs tracking-etiqueta text-cinza uppercase">Erro</dt>
+                <dd className="mt-0.5 text-sm leading-compacto text-tinta">{h.erro}</dd>
+              </div>
+            </dl>
+          </li>
+        ))}
+      </ul>
+
+      {/* ---------- md+: tabela completa ---------- */}
       <div
-        className="overflow-x-auto"
+        className="relative hidden overflow-x-auto md:block rolagem-x"
         role="group"
         tabIndex={0}
         aria-labelledby="titulo-historico-erros"

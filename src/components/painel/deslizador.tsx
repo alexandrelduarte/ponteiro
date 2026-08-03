@@ -7,7 +7,7 @@
  * de plataforma) e `aria-valuetext` em português COM unidade — `aria-valuenow`
  * sozinho lê "4" e não significa nada.
  */
-import { useId, type CSSProperties } from "react";
+import { useId, type CSSProperties, type ReactNode } from "react";
 import { fmt } from "@/lib/modelo";
 import type { FaixaSlider } from "./parametros-url";
 
@@ -19,6 +19,7 @@ export function Deslizador({
   unidadeLeitura,
   dica,
   idTeste,
+  className,
   onChange,
 }: {
   rotulo: string;
@@ -28,8 +29,10 @@ export function Deslizador({
   sufixo: string;
   /** unidade por extenso, lida por leitor de tela */
   unidadeLeitura: string;
-  dica: string;
+  /** ênfase da dica é NEGRITO (§4.3) — nunca caixa alta no meio da prosa */
+  dica: ReactNode;
   idTeste?: string;
+  className?: string;
   onChange: (v: number) => void;
 }) {
   const id = useId();
@@ -38,7 +41,7 @@ export function Deslizador({
   const preenchido = ((valor - faixa.min) / (faixa.max - faixa.min)) * 100;
 
   return (
-    <div>
+    <div className={className}>
       <div className="flex items-baseline justify-between gap-2">
         <label htmlFor={id} className="text-sm font-semibold text-tinta">
           {rotulo}

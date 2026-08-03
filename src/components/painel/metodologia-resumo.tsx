@@ -4,6 +4,7 @@
  */
 import Link from "next/link";
 import { Cartao } from "@/components/ui/cartao";
+import { DEF_EMPATE_TECNICO } from "@/components/ui/textos";
 
 export function MetodologiaResumo() {
   return (
@@ -24,7 +25,7 @@ export function MetodologiaResumo() {
         <p>
           <b className="text-tinta">Classificação</b> da chance projetada: 50–60% empate técnico
           projetado · 60–75% leve favoritismo · 75–90% favorito · 90%+ amplamente favorito. Em cada
-          pesquisa isolada, «empate técnico» = diferença ≤ 2× a margem de erro.
+          pesquisa isolada, {DEF_EMPATE_TECNICO}.
         </p>
       </div>
       <p className="mt-3">

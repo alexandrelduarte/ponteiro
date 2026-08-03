@@ -10,7 +10,9 @@
  *
  * Renderizada no servidor com os parâmetros padrão: a manchete nunca espera JS.
  */
+import type { ReactNode } from "react";
 import { fmt, fmtSinal, pct } from "@/lib/modelo";
+import { pctComPiso } from "@/components/ui/textos";
 import { usePainel } from "./estado";
 
 function LinhaProbabilidade({
@@ -19,7 +21,7 @@ function LinhaProbabilidade({
   grande,
   idTeste,
 }: {
-  rotulo: string;
+  rotulo: ReactNode;
   pl: number;
   grande: boolean;
   idTeste: string;
@@ -30,12 +32,14 @@ function LinhaProbabilidade({
   return (
     <div className={grande ? "" : "opacity-90"}>
       <div className="font-mono text-xs tracking-dado text-fosforo uppercase">{rotulo}</div>
-      <div className="mt-1 flex items-end justify-between gap-3">
+      {/* `items-center`: a barra é centrada nos numerais nas DUAS linhas. Com
+          `items-end` o desvio crescia com o corpo do número (21px em 1140+). */}
+      <div className="mt-1 flex items-center justify-between gap-3">
         <div data-testid={`${idTeste}-lula`} className={`${tamanho} font-mono text-fosforo-forte`}>
           {pct(pl)}
         </div>
         <div
-          className="mb-2 flex h-2.5 min-w-24 flex-1 overflow-hidden rounded-full bg-tela-fundo"
+          className="flex h-2.5 min-w-24 flex-1 overflow-hidden rounded-full bg-tela-fundo"
           role="img"
           aria-label={`Lula ${larguraLula}%, Flávio ${100 - larguraLula}%`}
         >
@@ -60,7 +64,11 @@ export function TelaUrna() {
   return (
     <>
       <div className="tela-urna rounded-tela border border-tela-borda bg-tela p-tela shadow-tela md:p-tela-md">
-        <div className="flex flex-col gap-1 font-mono text-xs tracking-tela text-fosforo uppercase sm:flex-row sm:items-center sm:justify-between">
+        {/* As duas frases só dividem a linha quando cabem inteiras (lg). Entre
+            640 e 1139 elas quebravam ao mesmo tempo dentro do `justify-between`
+            e colidiam com ~13px — o disclaimer central de P1/P3 lido em varredura
+            saía embaralhado. Empilhadas, cada uma fica com a linha inteira. */}
+        <div className="flex flex-col gap-1 font-mono text-xs tracking-tela text-fosforo uppercase lg:flex-row lg:items-center lg:justify-between">
           <span>CHANCE DE SER ELEITO · LULA (esq.) × FLÁVIO (dir.)</span>
           <span data-testid="disclaimer">
             LEITURA DOS DADOS · NÃO É PREVISÃO
@@ -71,14 +79,28 @@ export function TelaUrna() {
         </div>
 
         <div className="mt-4 space-y-5">
+          {/* O parêntese com a incerteza é inquebrável: é o rótulo do número
+              manchete e não pode partir «(04–» / «25/10,» entre linhas. */}
           <LinhaProbabilidade
-            rotulo={`Projetado para o dia da votação (04–25/10, incerteza ±${fmt(M.sigmaDia2)} p.p.)`}
+            rotulo={
+              <>
+                Projetado para o dia da votação{" "}
+                <span className="whitespace-nowrap">
+                  (04–25/10, incerteza ±{fmt(M.sigmaDia2)} p.p.)
+                </span>
+              </>
+            }
             pl={M.eleito.dia.l}
             grande
             idTeste="manchete"
           />
           <LinhaProbabilidade
-            rotulo={`No cenário atual — se a votação fosse hoje (incerteza ±${fmt(M.sigmaHoje)} p.p.)`}
+            rotulo={
+              <>
+                No cenário atual — se a votação fosse hoje{" "}
+                <span className="whitespace-nowrap">(incerteza ±{fmt(M.sigmaHoje)} p.p.)</span>
+              </>
+            }
             pl={M.eleito.hoje.l}
             grande={false}
             idTeste="hoje"
@@ -102,9 +124,13 @@ export function TelaUrna() {
           <h2 data-testid="veredito-titulo" className="text-veredito text-fosforo-forte uppercase">
             {M.titulo}
           </h2>
+          {/* §4.1: número que muda quando o modelo recalcula é mono, inclusive
+              dentro da prosa. `pctComPiso` evita imprimir zero absoluto (P2 manda
+              arredondar, não transformar improbabilidade em impossibilidade). */}
           <p className="mt-1 max-w-texto text-sm leading-compacto text-fosforo">
-            {M.texto} Caminho mais provável: {pct(M.p2Tacontece)} de chance de decisão no 2º turno
-            em 25/10; definição já no 1º turno tem {pct(definicao1T)} de probabilidade.
+            {M.texto} Caminho mais provável: <span className="font-mono">{pct(M.p2Tacontece)}</span>{" "}
+            de chance de decisão no 2º turno em 25/10; definição já no 1º turno tem{" "}
+            <span className="font-mono">{pctComPiso(definicao1T)}</span> de probabilidade.
           </p>
         </div>
       </div>

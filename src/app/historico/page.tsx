@@ -117,7 +117,9 @@ export default async function Historico() {
         </Secao>
 
         <Secao>
-          <Cartao titulo="Linha do tempo — o que entrou e o que saiu da série" destaque="confirma">
+          {/* Mesmo filete do cartão irmão: não há diferença semântica entre os
+              dois blocos que justifique cores diferentes de régua. */}
+          <Cartao titulo="Linha do tempo — o que entrou e o que saiu da série" destaque="tinta">
             {feed.length ? (
               <>
                 <p className="mb-3 text-xs text-cinza">

@@ -6,7 +6,6 @@
  * Ordem obrigatória no primeiro scroll de 390px: sobretítulo → h1 → subtítulo →
  * selo de frescor → contadores em UMA linha. A tela da urna começa logo abaixo.
  */
-import { ULTIMA_ATUALIZACAO } from "@/data/constantes";
 import type { SeloFrescor } from "./frescor";
 import { usePainel } from "./estado";
 
@@ -23,10 +22,11 @@ export function Cabecalho({ selo }: { selo: SeloFrescor }) {
           <h1 className="mt-1 text-titulo">
             PRESIDENTE <span className="text-cinza">2026</span>
           </h1>
+          {/* A data-base NÃO se repete aqui: o selo de frescor abaixo é a única
+              origem dessa informação (docs/DESIGN.md §8.5). */}
           <p className="mt-1 text-sm text-cinza">
             Lula (PT) × Flávio Bolsonaro (PL) ·{" "}
-            <b className="font-mono text-tinta">{pesquisas.length}</b> pesquisas na série · base
-            editorial de <b className="font-mono text-tinta">{ULTIMA_ATUALIZACAO}</b>
+            <b className="font-mono text-tinta">{pesquisas.length}</b> pesquisas na série
           </p>
 
           <p
@@ -56,10 +56,12 @@ function Contador({ numero, rotulo, data }: { numero: number; rotulo: string; da
   return (
     <div className="flex flex-1 items-baseline gap-2 rounded-controle border border-linha bg-cartao px-3 py-2 md:block md:flex-none md:text-center">
       <span className="text-dado">{numero}</span>
+      {/* O ponto médio é colado ao rótulo por espaço inquebrável: nenhuma linha
+          pode começar com «·» quando o contador quebra em 390px. */}
       <span className="text-xs text-cinza md:mt-1 md:block">
-        {rotulo}{" "}
+        {rotulo}
         <span aria-hidden="true" className="md:hidden">
-          ·
+          {"\u00a0·"}
         </span>{" "}
         <span className="md:block">{data}</span>
       </span>

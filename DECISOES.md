@@ -109,3 +109,26 @@ Registro de decisões ambíguas (R6): contexto → decisão → porquê. Uma lin
   eletrônica) em vez de gerada por IA → modelos de imagem deformam glifos; geometria pura é
   nítida em 16px e não depende de fonte; rasterizações (apple-icon 180px, favicon 32px) feitas
   com o Chromium do Playwright já instalado.
+
+## Fase 6 — loop de qualidade (iteração 1: 2 BLOCKER · 7 MAJOR · 15 MINOR · 5 NIT)
+
+- Gráficos vazios nos prints e LCP simulado 4,8s tinham a mesma origem (montagem/peso do
+  Recharts) → gate de viewport via IntersectionObserver nos 4 gráficos + script de screenshots
+  rola a página antes do fullPage e espera os `<path>` do SVG → perf mobile 82→94 e prints
+  auditáveis.
+- Série a 768px: mesmo com colunas corrigidas a tabela pede 808px → rolagem DENTRO do wrapper
+  com afordância de sombra/tampão (`.rolagem-x`, background-attachment local/scroll) → é o
+  padrão prescrito pelo DESIGN §7.5; encolher a 12px violaria o piso tipográfico §4.2. A causa
+  do estouro da PÁGINA era um `sr-only` com position:absolute escapando de wrapper não
+  posicionado (canvas 858px) — corrigida com `relative`.
+- Thumb dos sliders media 19–20px apesar dos 24px declarados → o UA desconta a `border` do
+  diâmetro → anel por `box-shadow` de blur zero (pintado fora da caixa) + `border: 0` →
+  `--spacing-thumb` volta a ser o diâmetro visível literal (medido 24,0px em Chromium/Firefox).
+- Alfa necessário na sombra de rolagem sem token novo → `color-mix(in srgb,
+  var(--color-linha-forte) 55%, transparent)` → mantém "zero hex em componente".
+- Etiquetas de cartão carregavam frases inteiras em caixa alta → prop `Cartao.descricao`
+  (texto em caixa normal abaixo da etiqueta; `aria-labelledby` continua na etiqueta curta).
+- "0%" absoluto em prosa → helper de UI `pctComPiso` ("<1%"/">99%") APENAS na prosa; `pct` do
+  modelo intocado (paridade) e manchete da urna continua com `pct` puro.
+- Números recalculáveis em prosa (92%, 17%, "1 vez a cada 6") → todos em IBM Plex Mono
+  (direção do DESIGN §4.1); números fixos editoriais (erros de 2022, datas) ficam em Archivo.

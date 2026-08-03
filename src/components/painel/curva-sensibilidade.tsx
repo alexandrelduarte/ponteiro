@@ -32,9 +32,15 @@ export function CurvaSensibilidade() {
 
   return (
     <div className="mt-4">
-      <p className="mb-2 font-mono text-xs tracking-dado text-cinza uppercase">
-        Curva de sensibilidade — chance de ser eleito (dia da votação) conforme o viés assumido.
-        Toque na curva para aplicar aquele viés ao painel:
+      {/* Etiqueta curta em caixa alta + a instrução em caixa normal (§4.3): o
+          estilo de rótulo é dimensionado para rótulo, e a frase inteira dentro
+          dele virava um bloco caixa-alta de 4 linhas em 390px, logo acima do
+          gráfico mais interativo da página. A instrução continua ACIMA do
+          gráfico, como o §7.8 exige. */}
+      <p className="font-mono text-xs tracking-dado text-cinza uppercase">Curva de sensibilidade</p>
+      <p className="mt-1 mb-2 max-w-texto text-sm leading-compacto text-cinza">
+        Chance de ser eleito (dia da votação) conforme o viés assumido.{" "}
+        <b className="text-tinta">Toque na curva</b> para aplicar aquele viés ao painel.
       </p>
 
       <CaixaGrafico altura={ALTURA.sensibilidade}>
@@ -86,12 +92,15 @@ export function CurvaSensibilidade() {
         <span className="inline-flex items-center gap-1">
           <Amostra cor="lula" /> Lula
         </span>
+        {/* Sem ponto final: pontuação assimétrica entre os dois lados é
+            exatamente o que a §5.1 proíbe. */}
         <span className="inline-flex items-center gap-1">
-          <Amostra cor="flavio" /> Flávio.
+          <Amostra cor="flavio" /> Flávio
         </span>
         <span>
           O ponto preto é a <b className="text-tinta">virada</b>: as linhas cruzam os 50% quando o
-          viés assumido iguala a margem bruta ({fmtSinal(M.margem)} p.p.) — qualquer erro pró-Lula
+          viés assumido iguala a margem bruta (
+          <span className="font-mono">{fmtSinal(M.margem)} p.p.</span>) — qualquer erro pró-Lula
           maior que isso na disputa decisiva inverte o favorito. Toque no gráfico ou nos cartões
           para aplicar o cenário ao painel inteiro.
         </span>

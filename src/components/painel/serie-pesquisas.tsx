@@ -55,6 +55,24 @@ function NomeInstituto({ l }: { l: LinhaModelo }) {
   );
 }
 
+/**
+ * Hierarquia de peso sem tocar em contraste (P8 / §7.5): linhas com `w < 0,15`
+ * recuam para `--color-cinza` (4,64:1 sobre papel, 4,94:1 sobre o mini) em vez
+ * de perder opacidade — `opacity-55` derrubava o texto abaixo do piso AA. O
+ * fundo `bg-mini` e o rótulo «peso baixo» completam os três canais.
+ */
+const tomLinha = (baixo: boolean) => ({
+  nome: baixo ? "text-cinza" : "text-tinta",
+  lula: baixo ? "text-cinza" : "text-lula-escuro",
+  flavio: baixo ? "text-cinza" : "text-flavio-escuro",
+  fundo: baixo ? "bg-mini" : "bg-cartao",
+});
+
+/** O registro do TSE é inquebrável; a exceção textual («registrada (nº n/d na
+ *  fonte)») pode quebrar — era ela que inflava a coluna em 90px e empurrava a
+ *  página inteira para a rolagem horizontal em 768. */
+const classeTse = (tse: string) => (tse.includes(" ") ? "" : "whitespace-nowrap");
+
 export function SeriePesquisas() {
   const { M, pesquisas, removerPesquisa, restaurarSerie, adicionarPesquisa, serieAlterada } =
     usePainel();
@@ -83,19 +101,11 @@ export function SeriePesquisas() {
         {linhas.map((l) => {
           const chip = leitura(l);
           const baixo = l.w < PESO_BAIXO;
+          const tom = tomLinha(baixo);
           return (
-            <li
-              key={l.id}
-              className={[
-                "rounded-cartao border border-linha p-cartao",
-                // Peso baixo: fundo recuado + o texto "peso baixo" (1.4.1).
-                // O `opacity-55` do protótipo derrubava o contraste do texto
-                // para ~4,2:1 — abaixo do piso AA de docs/DESIGN.md §9.
-                baixo ? "bg-mini" : "bg-cartao",
-              ].join(" ")}
-            >
+            <li key={l.id} className={`rounded-cartao border border-linha p-cartao ${tom.fundo}`}>
               <div className="flex items-start justify-between gap-2">
-                <p className="text-sm font-semibold text-tinta">
+                <p className={`text-sm font-semibold ${tom.nome}`}>
                   <NomeInstituto l={l} />
                 </p>
                 <p className="font-mono text-xs whitespace-nowrap text-cinza">
@@ -110,10 +120,19 @@ export function SeriePesquisas() {
               <p className="mt-2 font-mono text-xs tracking-etiqueta text-cinza uppercase">
                 2º turno
               </p>
-              <p className="text-dado font-mono">
-                <span className="text-lula-escuro">Lula {fmt(l.t2.lula)}%</span>
-                <span className="text-cinza"> × </span>
-                <span className="text-flavio-escuro">Flávio {fmt(l.t2.flavio)}%</span>
+              {/* Os dois candidatos ficam LADO A LADO em uma linha só (§7.5):
+                  cada nome viaja colado ao seu número (`whitespace-nowrap`) e o
+                  nome recua um degrau para o par caber em 390px. */}
+              <p className="flex items-baseline justify-between gap-2 font-mono">
+                <span className={`whitespace-nowrap ${tom.lula}`}>
+                  <span className="text-sm">Lula</span>{" "}
+                  <span className="text-dado">{fmt(l.t2.lula)}%</span>
+                </span>
+                <span className="text-cinza">×</span>
+                <span className={`whitespace-nowrap ${tom.flavio}`}>
+                  <span className="text-sm">Flávio</span>{" "}
+                  <span className="text-dado">{fmt(l.t2.flavio)}%</span>
+                </span>
               </p>
               <p className="mt-2">
                 <Chip tom={chip.tom}>{chip.texto}</Chip>
@@ -124,7 +143,10 @@ export function SeriePesquisas() {
                 {l.t1 && l.t1.lula != null ? `${fmt(l.t1.lula)}% × ${fmt(l.t1.flavio)}%` : "n/d"} ·
                 n {fmtInt(l.n)}
               </p>
-              <div className="flex items-end justify-between gap-2">
+              {/* `items-center`: o botão de 44px define a altura da linha e o
+                  metadado se assenta ao lado dele, sempre — antes o `items-end`
+                  deixava uma faixa vazia acima em quase todos os cartões. */}
+              <div className="flex items-center justify-between gap-2">
                 <p className="font-mono text-xs text-cinza">
                   ±{fmt(l.moe, 1)} p.p. · {l.tse}
                 </p>
@@ -132,7 +154,7 @@ export function SeriePesquisas() {
                   type="button"
                   onClick={() => removerPesquisa(l.id)}
                   aria-label={rotuloRemover(l)}
-                  className="min-h-toque min-w-toque rounded-controle text-cinza"
+                  className="min-h-toque min-w-toque shrink-0 rounded-controle text-cinza"
                 >
                   ×
                 </button>
@@ -142,9 +164,16 @@ export function SeriePesquisas() {
         })}
       </ul>
 
-      {/* ---------- md+: tabela completa ---------- */}
+      {/* ---------- md+: tabela completa ----------
+          `relative` não é decoração: sem posicionar o wrapper, o `sr-only` do
+          último `<th>` (que é `position:absolute`) escapa do recorte da região
+          rolável, tem a viewport como bloco contêiner e empurrava o
+          `documentElement.scrollWidth` para 858px em um viewport de 768 —
+          rolagem horizontal na PÁGINA, que o §11 proíbe. Com o wrapper
+          posicionado, a rolagem fica onde deve: dentro dele, com a afordância
+          de borda de `.rolagem-x`. */}
       <div
-        className="hidden overflow-x-auto md:block"
+        className="relative hidden overflow-x-auto md:block rolagem-x"
         role="group"
         tabIndex={0}
         aria-labelledby="titulo-serie"
@@ -172,7 +201,7 @@ export function SeriePesquisas() {
                   key={t}
                   scope="col"
                   className={[
-                    "py-2 pr-3 font-medium",
+                    "py-2 pr-2 lg:pr-3 font-medium",
                     linhas.length > 15 ? "sticky top-0 bg-cartao" : "",
                   ]
                     .filter(Boolean)
@@ -190,41 +219,44 @@ export function SeriePesquisas() {
             {linhas.map((l) => {
               const chip = leitura(l);
               const baixo = l.w < PESO_BAIXO;
+              const tom = tomLinha(baixo);
               return (
                 <tr key={l.id} className={`border-t border-linha ${baixo ? "bg-mini" : ""}`}>
                   <th
                     scope="row"
-                    className="py-2 pr-3 text-left font-sans font-semibold text-tinta"
+                    className={`py-2 pr-2 lg:pr-3 text-left font-sans font-semibold ${tom.nome}`}
                   >
                     <NomeInstituto l={l} />
                   </th>
-                  <td className="py-2 pr-3 whitespace-nowrap">
+                  <td className="py-2 pr-2 lg:pr-3 whitespace-nowrap">
                     {fmtData(l.inicio)}–{fmtData(l.fim)}
                   </td>
-                  <td className="py-2 pr-3 text-right">{fmtInt(l.n)}</td>
-                  <td className="py-2 pr-3 text-right">{fmt(l.moe, 1)}</td>
-                  <td className="py-2 pr-3 whitespace-nowrap">
+                  <td className="py-2 pr-2 lg:pr-3 text-right">{fmtInt(l.n)}</td>
+                  <td className="py-2 pr-2 lg:pr-3 text-right">{fmt(l.moe, 1)}</td>
+                  <td className="py-2 pr-2 lg:pr-3 whitespace-nowrap">
                     {l.t1 && l.t1.lula != null ? (
                       <>
-                        <span className="text-lula-escuro">{fmt(l.t1.lula)}</span>×
-                        <span className="text-flavio-escuro">{fmt(l.t1.flavio)}</span>
+                        <span className={tom.lula}>{fmt(l.t1.lula)}</span>×
+                        <span className={tom.flavio}>{fmt(l.t1.flavio)}</span>
                       </>
                     ) : (
                       "n/d"
                     )}
                   </td>
-                  <td className="py-2 pr-3 whitespace-nowrap">
-                    <span className="text-lula-escuro">{fmt(l.t2.lula)}</span>×
-                    <span className="text-flavio-escuro">{fmt(l.t2.flavio)}</span>
+                  <td className="py-2 pr-2 lg:pr-3 whitespace-nowrap">
+                    <span className={tom.lula}>{fmt(l.t2.lula)}</span>×
+                    <span className={tom.flavio}>{fmt(l.t2.flavio)}</span>
                   </td>
-                  <td className="py-2 pr-3">
-                    <Chip tom={chip.tom}>{chip.texto}</Chip>
+                  <td className="py-2 pr-2 lg:pr-3">
+                    <Chip tom={chip.tom} className="whitespace-nowrap">
+                      {chip.texto}
+                    </Chip>
                   </td>
-                  <td className="py-2 pr-3 text-right">
+                  <td className="py-2 pr-2 lg:pr-3 text-right whitespace-nowrap">
                     {fmt(l.w, 2)}
                     {baixo ? <span className="block text-xs">peso baixo</span> : null}
                   </td>
-                  <td className="py-2 pr-3 text-xs whitespace-nowrap">{l.tse}</td>
+                  <td className={`py-2 pr-2 lg:pr-3 text-xs ${classeTse(l.tse)}`}>{l.tse}</td>
                   <td className="py-2 text-right">
                     <button
                       type="button"

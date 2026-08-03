@@ -12,7 +12,11 @@ const FILETE: Record<Destaque, string> = {
 };
 
 export interface CartaoProps {
+  /** ETIQUETA curta, caixa alta. Nunca prosa: o §4.3 dimensiona este estilo
+   *  para rótulo — frase inteira vai em `descricao`. */
   titulo: ReactNode;
+  /** Frase de apoio/instrução, caixa normal em `text-sm` logo abaixo da etiqueta. */
+  descricao?: ReactNode;
   /** id do título — use para `aria-labelledby` de tabelas e regiões roláveis */
   idTitulo?: string;
   destaque?: Destaque;
@@ -21,7 +25,14 @@ export interface CartaoProps {
 }
 
 /** Cartão-canhoto: papel mais claro, filete fino e rótulo mono em caixa alta. */
-export function Cartao({ titulo, idTitulo, destaque, className, children }: CartaoProps) {
+export function Cartao({
+  titulo,
+  descricao,
+  idTitulo,
+  destaque,
+  className,
+  children,
+}: CartaoProps) {
   return (
     <div
       className={[
@@ -32,8 +43,13 @@ export function Cartao({ titulo, idTitulo, destaque, className, children }: Cart
         .filter(Boolean)
         .join(" ")}
     >
-      <div id={idTitulo} className="mb-3 font-mono text-xs tracking-etiqueta text-cinza uppercase">
-        {titulo}
+      <div className="mb-3">
+        <div id={idTitulo} className="font-mono text-xs tracking-etiqueta text-cinza uppercase">
+          {titulo}
+        </div>
+        {descricao ? (
+          <p className="mt-1 max-w-texto text-sm leading-compacto text-cinza">{descricao}</p>
+        ) : null}
       </div>
       {children}
     </div>

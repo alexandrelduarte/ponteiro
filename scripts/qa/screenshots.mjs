@@ -63,8 +63,28 @@ try {
     });
     for (const pg of PAGINAS) {
       await page.goto(BASE + pg.caminho, { waitUntil: "networkidle" });
-      // espera os gráficos hidratarem (skeletons saem)
-      await page.waitForTimeout(1200);
+      // Os gráficos só montam ao entrar no viewport (IntersectionObserver):
+      // rola a página inteira em passos para disparar todos e volta ao topo.
+      await page.evaluate(async () => {
+        const passo = window.innerHeight * 0.8;
+        for (let y = 0; y < document.body.scrollHeight; y += passo) {
+          window.scrollTo(0, y);
+          await new Promise((r) => setTimeout(r, 120));
+        }
+        window.scrollTo(0, 0);
+      });
+      // espera TODOS os canvases do Recharts terem conteúdo desenhado
+      await page
+        .waitForFunction(
+          () => {
+            const superficies = document.querySelectorAll(".recharts-surface");
+            if (!superficies.length) return true; // página sem gráfico
+            return [...superficies].every((s) => s.querySelector("path"));
+          },
+          { timeout: 15000 },
+        )
+        .catch(() => console.warn(`gráficos não pintaram em ${pg.nome}-${vp.nome}`));
+      await page.waitForTimeout(400);
       await page.screenshot({
         path: join(DIR, `${pg.nome}-${vp.nome}-full.png`),
         fullPage: true,
@@ -74,11 +94,26 @@ try {
           const alvo = page.getByText(a.texto, { exact: false }).first();
           try {
             await alvo.scrollIntoViewIfNeeded();
-            await page.waitForTimeout(250);
+            await page.waitForTimeout(350);
             await page.screenshot({ path: join(DIR, `home-${vp.nome}-${a.nome}.png`) });
           } catch {
             console.warn(`âncora não encontrada: ${a.nome} em ${vp.nome}px`);
           }
+        }
+        // aba "Todos os candidatos" (contrastes das 9 cores; §5.5 do DESIGN)
+        try {
+          await page.evaluate(() => window.scrollTo(0, 0));
+          await page.getByRole("button", { name: /Todos os candidatos/ }).click();
+          await page.waitForTimeout(400);
+          const ranking = page.getByText("disputa principal", { exact: false }).first();
+          await ranking.scrollIntoViewIfNeeded();
+          await page.waitForTimeout(250);
+          await page.screenshot({
+            path: join(DIR, `home-${vp.nome}-candidatos.png`),
+            fullPage: true,
+          });
+        } catch {
+          console.warn(`aba candidatos não capturada em ${vp.nome}px`);
         }
       }
     }

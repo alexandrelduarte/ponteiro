@@ -6,10 +6,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LinkExterno } from "@/components/ui/basicos";
+import { DEF_EMPATE_TECNICO } from "@/components/ui/textos";
 import { Rodape } from "@/components/site/rodape";
 import { FONTES_ERROS } from "@/data/fontes-erros";
 import { getPesquisasPublicadas } from "@/lib/dados";
-import { fmtData } from "@/lib/modelo";
+import { fmtData, meioCampo } from "@/lib/modelo";
 
 export const revalidate = 300;
 
@@ -43,6 +44,11 @@ function Bloco({
 
 export default async function Metodologia() {
   const pesquisas = await getPesquisasPublicadas();
+
+  // MESMA ordem da tabela da série no painel (da mais recente para a mais
+  // antiga, pelo meio do campo): a lista existe para o leitor conferir linha a
+  // linha (P9) — com ordens divergentes ele teria de procurar cada item.
+  const fontes = [...pesquisas].sort((a, b) => meioCampo(b) - meioCampo(a));
 
   return (
     <>
@@ -92,10 +98,9 @@ export default async function Metodologia() {
           <Bloco id="classificacao" titulo="Classificação dos cenários">
             <p>
               Sobre a chance de eleição projetada: 50–60% empate técnico projetado · 60–75% leve
-              favoritismo · 75–90% favorito · 90%+ amplamente favorito. Em cada pesquisa isolada,
-              «empate técnico» = diferença ≤ 2× margem de erro. O modelo assume que os dois
-              primeiros colocados vão ao 2º turno — nas pesquisas atuais o 3º colocado tem no máximo
-              8%.
+              favoritismo · 75–90% favorito · 90%+ amplamente favorito. Em cada pesquisa isolada,{" "}
+              {DEF_EMPATE_TECNICO}. O modelo assume que os dois primeiros colocados vão ao 2º turno
+              — nas pesquisas atuais o 3º colocado tem no máximo 8%.
             </p>
             <p>
               A régua acima é publicada de propósito e usada literalmente: o título do veredito, na
@@ -159,18 +164,27 @@ export default async function Metodologia() {
             id="fontes-serie"
             titulo={`Fontes da série (${pesquisas.length}) · registro no TSE`}
           >
-            {/* Cada fonte é um alvo de toque de 44px (docs/DESIGN.md §9). */}
+            {/* Cada fonte é um alvo de toque de 44px (docs/DESIGN.md §9).
+                Sem pontos médios entre os blocos: quando o item não cabia numa
+                linha, o «·» descia sozinho para o começo da linha seguinte. Cada
+                bloco é inquebrável e o respiro vem do `gap`, não da pontuação. */}
             <ul className="font-mono text-xs">
-              {pesquisas.map((p) => (
-                <li key={p.id} className="flex min-h-toque flex-wrap items-center gap-x-1">
+              {fontes.map((p) => (
+                <li
+                  key={p.id}
+                  className="flex min-h-toque flex-wrap items-center gap-x-3 gap-y-0.5 py-1"
+                >
                   {p.fonte ? (
-                    <LinkExterno href={p.fonte}>{p.instituto}</LinkExterno>
+                    <LinkExterno href={p.fonte} className="whitespace-nowrap">
+                      {p.instituto}
+                    </LinkExterno>
                   ) : (
-                    <span className="text-tinta">{p.instituto}</span>
+                    <span className="whitespace-nowrap text-tinta">{p.instituto}</span>
                   )}
-                  <span>
-                    · campo {fmtData(p.inicio)}–{fmtData(p.fim)}/2026 · {p.tse}
+                  <span className="whitespace-nowrap">
+                    campo {fmtData(p.inicio)}–{fmtData(p.fim)}/2026
                   </span>
+                  <span className="whitespace-nowrap">{p.tse}</span>
                 </li>
               ))}
             </ul>
@@ -188,7 +202,7 @@ export default async function Metodologia() {
         </div>
       </main>
 
-      <Rodape />
+      <Rodape medida="texto" />
     </>
   );
 }

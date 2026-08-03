@@ -6,6 +6,7 @@
  * a legenda quebra para a linha de baixo e nunca disputa espaço com o placar.
  */
 import { Cartao } from "@/components/ui/cartao";
+import { pctComPiso } from "@/components/ui/textos";
 import { fmt, fmtSinal, pct } from "@/lib/modelo";
 import { usePainel } from "./estado";
 import { Tendencia } from "./tendencia";
@@ -53,13 +54,16 @@ export function CartoesTurnos() {
             <MiniCartao valor={pct(M.p1?.lulaDia)} rotulo="definição no 1ºT · em 04/10" />
           </div>
           <p className="mt-2 text-xs">
-            Chance de Flávio vencer no 1º turno: {pct(M.p1?.flavioDia)} (precisa de mais de 50% dos
-            válidos).
+            Chance de Flávio vencer no 1º turno:{" "}
+            <span className="font-mono">{pctComPiso(M.p1?.flavioDia)}</span> (precisa de mais de 50%
+            dos válidos).
           </p>
         </div>
       </Cartao>
 
-      <Cartao titulo="2º turno · 25 de outubro (disputa decisiva)" destaque="lula">
+      {/* Filete NEUTRO: `--color-lula` aqui era a única régua larga em cor de
+          candidato da página, sem espelho azul do outro lado (R4 / §5.2). */}
+      <Cartao titulo="2º turno · 25 de outubro (disputa decisiva)" destaque="tinta">
         <div>
           <p className="flex items-baseline gap-2">
             <span data-testid="media-2t-lula" className="text-placar font-mono text-lula-escuro">
@@ -82,15 +86,20 @@ export function CartoesTurnos() {
         </div>
 
         <div className="mt-3 border-t border-dashed border-linha pt-3 text-sm text-cinza">
-          {M.qtdEmpate} de {M.qtdRecentes} pesquisas recentes apontam empate técnico; a Gerp chega a
-          mostrar Flávio à frente. Dispersão entre institutos: ±{fmt(M.sdEntre)} p.p.
+          <span className="font-mono">{M.qtdEmpate}</span> de{" "}
+          <span className="font-mono">{M.qtdRecentes}</span> pesquisas recentes apontam empate
+          técnico; a Gerp chega a mostrar Flávio à frente. Dispersão entre institutos:{" "}
+          <span className="font-mono">±{fmt(M.sdEntre)} p.p.</span>
           <div className="mt-2 grid grid-cols-2 gap-2">
             <MiniCartao valor={pct(M.pL2hoje)} rotulo="vitória de Lula no 2ºT · hoje" />
             <MiniCartao valor={pct(M.pL2dia)} rotulo="vitória de Lula no 2ºT · em 25/10" />
           </div>
           <p className="mt-2 text-xs">
-            Faixa provável (80%) da margem final: {fmt(M.int80[0])} a {fmtSinal(M.int80[1])} p.p. —
-            inclui vitória apertada de Flávio no limite inferior.
+            Faixa provável (80%) da margem final:{" "}
+            <span className="font-mono">
+              {fmt(M.int80[0])} a {fmtSinal(M.int80[1])} p.p.
+            </span>{" "}
+            — inclui vitória apertada de Flávio no limite inferior.
           </p>
         </div>
       </Cartao>

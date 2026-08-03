@@ -75,8 +75,10 @@ export function TodosCandidatos() {
         nomes testados (Hertz Dias, Rui C. Pimenta, Edmilson Costa, Heró Bezerra) somam ≤1% cada.
       </p>
 
+      {/* `relative` + `.rolagem-x`: recorta os `sr-only` (position:absolute) do
+          conteúdo rolável dentro do wrapper e mostra a borda de rolagem. */}
       <div
-        className="mt-4 overflow-x-auto"
+        className="relative mt-4 overflow-x-auto rolagem-x"
         role="group"
         tabIndex={0}
         aria-labelledby="titulo-todos-candidatos"
@@ -129,11 +131,11 @@ export function TodosCandidatos() {
 
       <p className="mt-4 text-sm leading-compacto text-cinza">
         <b className="text-tinta">Por que o painel modela só o confronto líder:</b> o 3º colocado (
-        {linhas[2]?.nome}, {fmt(linhas[2]?.media)}%) está{" "}
-        <b className="text-tinta">{fmt(gap3)} pontos</b> atrás do 2º — uma distância sem precedente
-        de reversão na série de 2026. Enquanto isso valer, a eleição se decide entre os dois
-        primeiros, e é para esse par que os institutos simulam o 2º turno. «–» na tabela = nome não
-        testado ou não divulgado naquela rodada (a Datafolha, por exemplo, só divulgou os dois
+        {linhas[2]?.nome}, <span className="font-mono">{fmt(linhas[2]?.media)}%</span>) está{" "}
+        <b className="font-mono text-tinta">{fmt(gap3)} pontos</b> atrás do 2º — uma distância sem
+        precedente de reversão na série de 2026. Enquanto isso valer, a eleição se decide entre os
+        dois primeiros, e é para esse par que os institutos simulam o 2º turno. «–» na tabela = nome
+        não testado ou não divulgado naquela rodada (a Datafolha, por exemplo, só divulgou os dois
         líderes em julho).
       </p>
     </Cartao>

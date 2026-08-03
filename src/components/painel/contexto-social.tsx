@@ -12,7 +12,8 @@ import { CONTEXTO, SINTESE_CONTEXTO } from "@/data/contexto";
 export function ContextoSocial() {
   return (
     <Cartao
-      titulo="Contexto social — indicadores medidos que sustentam a leitura (não é achismo)"
+      titulo="Contexto social"
+      descricao="Indicadores medidos que sustentam a leitura — não é achismo."
       destaque="alerta"
     >
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

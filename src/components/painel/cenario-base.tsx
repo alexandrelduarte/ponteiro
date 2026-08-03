@@ -10,6 +10,7 @@
  */
 import { useMemo } from "react";
 import { Cartao } from "@/components/ui/cartao";
+import { pctComPiso } from "@/components/ui/textos";
 import { calcCenarioBase, fmt, fmtSinal, pct } from "@/lib/modelo";
 import { usePainel } from "./estado";
 
@@ -27,7 +28,8 @@ export function CenarioBase() {
 
   return (
     <Cartao
-      titulo="Cenário-base — o desfecho mais provável segundo o modelo (recalcula com seus parâmetros)"
+      titulo="Cenário-base"
+      descricao="O desfecho mais provável segundo o modelo — recalcula com seus parâmetros."
       destaque="tinta"
     >
       <h2 className="text-secao uppercase" data-testid="cenario-base-titulo">
@@ -38,10 +40,15 @@ export function CenarioBase() {
         </span>
       </h2>
 
+      {/* §4.1: «17%» e «1 vez a cada 6» mudam quando o modelo recalcula → mono. */}
       <p className="mt-2 rounded-controle bg-mini p-2 text-xs text-cinza">
         Leitura estatística do agregado — não é previsão determinística nem endosso. Um cenário com{" "}
-        {pct(contra)} de probabilidade contrária acontece, no longo prazo,{" "}
-        <b className="text-tinta">1 vez a cada {umaEmN} eleições parecidas</b>.
+        <span className="font-mono">{pctComPiso(contra)}</span> de probabilidade contrária acontece,
+        no longo prazo,{" "}
+        <b className="text-tinta">
+          1 vez a cada <span className="font-mono">{umaEmN}</span> eleições parecidas
+        </b>
+        .
       </p>
 
       <div className="mt-4 grid gap-2 font-mono text-sm md:grid-cols-3">
@@ -111,17 +118,17 @@ export function CenarioBase() {
         <b>Por que este é o cenário-base:</b>{" "}
         <span className="text-cinza">
           (1) a vantagem é consistente — 6 dos 7 institutos de julho mostram Lula à frente ou
-          empatado, margem agregada de {fmtSinal(M.margem)} p.p., tendência pareada estável com leve
-          inclinação pró-Lula; (2) o contexto medido favorece o incumbente competitivo — aprovação
-          ~empatada (1º saldo positivo na Quaest desde dez/24), rejeição de Flávio igual ou maior
-          que a de Lula em todos os institutos, potencial de voto 47%×38%; (3) a estrutura
-          polarizada, com ~2/3 de voto fechado de cada lado, faz a série andar em décimos — virar
-          exige movimento fora do padrão de 2026; (4) mas a margem fica «apertada» no placar central
-          porque a direção histórica do erro (2018, 2022 e Datafolha/Quaest em SP-2024) é subestimar
-          a direita, e a réplica fiel de 2022 entrega exatamente ~51×49. O que derrubaria o cenário:
-          novas rodadas levando a margem bruta para baixo de ~+2 (viraria «leve favoritismo»), três
-          institutos seguidos com Flávio à frente fora da margem, ou um erro de pesquisa acima do já
-          observado no estado calibrado.
+          empatado, margem agregada de <span className="font-mono">{fmtSinal(M.margem)} p.p.</span>,
+          tendência pareada estável com leve inclinação pró-Lula; (2) o contexto medido favorece o
+          incumbente competitivo — aprovação ~empatada (1º saldo positivo na Quaest desde dez/24),
+          rejeição de Flávio igual ou maior que a de Lula em todos os institutos, potencial de voto
+          47%×38%; (3) a estrutura polarizada, com ~2/3 de voto fechado de cada lado, faz a série
+          andar em décimos — virar exige movimento fora do padrão de 2026; (4) mas a margem fica
+          «apertada» no placar central porque a direção histórica do erro (2018, 2022 e
+          Datafolha/Quaest em SP-2024) é subestimar a direita, e a réplica fiel de 2022 entrega
+          exatamente ~51×49. O que derrubaria o cenário: novas rodadas levando a margem bruta para
+          baixo de ~+2 (viraria «leve favoritismo»), três institutos seguidos com Flávio à frente
+          fora da margem, ou um erro de pesquisa acima do já observado no estado calibrado.
         </span>
       </div>
 
@@ -130,15 +137,17 @@ export function CenarioBase() {
         <p className="mt-1 text-sm leading-compacto text-cinza">
           O cenário-base é o <b>caminho modal</b> da árvore de probabilidades do próprio modelo, nos
           parâmetros atuais do painel: em cada bifurcação, o ramo mais provável — definição no 1º
-          turno? (não, {pct(M.p2Tacontece)}); quem lidera a largada? (
-          {cen.pLulaEm1 >= 0.5 ? "Lula" : "Flávio"}, {pct(Math.max(cen.pLulaEm1, 1 - cen.pLulaEm1))}
-          ); quem vence a decisão? ({cen.liderLula ? "Lula" : "Flávio"}, {pct(cen.pV2)}); em qual
-          faixa de margem? (banda modal acima). As bandas vêm da distribuição normal projetada
-          N(margem ajustada; ±{fmt(M.sigmaDia2)}), a mesma do gráfico de distribuição; a
-          probabilidade combinada soma o caminho direto no 1º turno com o caminho via 2º turno. Nada
-          aqui é opinião fixa: mude o viés para +6,3 no painel de parâmetros e esta seção passará,
-          sozinha, a descrever a vitória de Flávio — o «cenário mais provável» é uma função dos
-          dados e das premissas, não um palpite.
+          turno? (não, <span className="font-mono">{pct(M.p2Tacontece)}</span>); quem lidera a
+          largada? ({cen.pLulaEm1 >= 0.5 ? "Lula" : "Flávio"},{" "}
+          <span className="font-mono">{pct(Math.max(cen.pLulaEm1, 1 - cen.pLulaEm1))}</span>); quem
+          vence a decisão? ({cen.liderLula ? "Lula" : "Flávio"},{" "}
+          <span className="font-mono">{pct(cen.pV2)}</span>); em qual faixa de margem? (banda modal
+          acima). As bandas vêm da distribuição normal projetada N(margem ajustada;{" "}
+          <span className="font-mono">±{fmt(M.sigmaDia2)}</span>), a mesma do gráfico de
+          distribuição; a probabilidade combinada soma o caminho direto no 1º turno com o caminho
+          via 2º turno. Nada aqui é opinião fixa: mude o viés para +6,3 no painel de parâmetros e
+          esta seção passará, sozinha, a descrever a vitória de Flávio — o «cenário mais provável» é
+          uma função dos dados e das premissas, não um palpite.
         </p>
       </details>
     </Cartao>

@@ -29,7 +29,9 @@ function Amostra({ cor, children }: { cor: "lula" | "flavio"; children: React.Re
           cor === "lula" ? "bg-lula" : "bg-flavio"
         }`}
       />
-      {children}
+      {/* Um só filho ao lado da amostra: o `gap-1` do flex separa CADA filho, e
+          com o número em `<span>` próprio apareciam folgas dentro do parêntese. */}
+      <span>{children}</span>
     </span>
   );
 }
@@ -84,15 +86,21 @@ export function Graficos() {
           {turnoGrafico === 1
             ? " Nem todo instituto divulgou o 1º turno nas rodadas antigas — a série é mais curta."
             : ""}{" "}
-          Hoje a média do {turnoGrafico}º turno está em {fmt(serie.at(-1)?.l)}% para Lula e{" "}
-          {fmt(serie.at(-1)?.f)}% para Flávio. Toque no gráfico para ver os valores de cada ponto.
+          Hoje a média do {turnoGrafico}º turno está em{" "}
+          <span className="font-mono">{fmt(serie.at(-1)?.l)}%</span> para Lula e{" "}
+          <span className="font-mono">{fmt(serie.at(-1)?.f)}%</span> para Flávio. Toque no gráfico
+          para ver os valores de cada ponto.
         </p>
       </Cartao>
 
       <Cartao titulo="Distribuição projetada da margem no dia da eleição (2º turno)">
         <Legenda>
-          <Amostra cor="lula">Lula vence ({pct(M.pL2dia)})</Amostra>
-          <Amostra cor="flavio">Flávio vence ({pct(1 - M.pL2dia)})</Amostra>
+          <Amostra cor="lula">
+            Lula vence (<span className="font-mono">{pct(M.pL2dia)}</span>)
+          </Amostra>
+          <Amostra cor="flavio">
+            Flávio vence (<span className="font-mono">{pct(1 - M.pL2dia)}</span>)
+          </Amostra>
           <span>eixo: margem Lula−Flávio (p.p.)</span>
         </Legenda>
         <CaixaGrafico altura={ALTURA.distribuicao}>
@@ -100,9 +108,11 @@ export function Graficos() {
         </CaixaGrafico>
         <p className="mt-1 text-xs text-cinza">
           Eixo: margem Lula−Flávio (p.p.). Área vermelha = cenários em que Lula vence o 2º turno (
-          {pct(M.pL2dia)}); azul = Flávio ({pct(1 - M.pL2dia)}). A área azul existente à esquerda do
-          zero é exatamente o «espaço de virada» que os dados ainda comportam. O centro da
-          distribuição está em {fmt(M.margemAj)} p.p., com desvio de ±{fmt(M.sigmaDia2)} p.p.
+          <span className="font-mono">{pct(M.pL2dia)}</span>); azul = Flávio (
+          <span className="font-mono">{pct(1 - M.pL2dia)}</span>). A área azul existente à esquerda
+          do zero é exatamente o «espaço de virada» que os dados ainda comportam. O centro da
+          distribuição está em <span className="font-mono">{fmt(M.margemAj)} p.p.</span>, com desvio
+          de <span className="font-mono">±{fmt(M.sigmaDia2)} p.p.</span>
         </p>
       </Cartao>
     </div>

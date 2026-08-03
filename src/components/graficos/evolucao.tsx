@@ -41,9 +41,11 @@ export default function GraficoEvolucao({
           interval="preserveStartEnd"
           minTickGap={48}
         />
+        {/* Passo REGULAR: o `tickCount` do Recharts entregava 30·37·44·51·55,
+            com o último degrau quebrado. Domínio fixo preservado (P2). */}
         <YAxis
           domain={turno === 2 ? [30, 55] : [20, 50]}
-          tickCount={5}
+          ticks={turno === 2 ? [30, 35, 40, 45, 50, 55] : [20, 25, 30, 35, 40, 45, 50]}
           tick={TICK}
           stroke={COR.linha}
         />

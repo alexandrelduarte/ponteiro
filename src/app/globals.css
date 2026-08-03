@@ -41,15 +41,21 @@ details > summary {
   );
 }
 
+/* O disco VISÍVEL tem que medir --spacing-thumb (24px) de verdade: com
+   `border` o Chrome desconta a borda do próprio diâmetro (box-sizing do UA) e
+   sobravam 20px de verde. O anel de separação do trilho vira `box-shadow` de
+   blur zero — pintado FORA da caixa, sem comer o raio (docs/DESIGN.md §7.7). */
 .deslizador::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
+  box-sizing: border-box;
   width: var(--spacing-thumb);
   height: var(--spacing-thumb);
   margin-top: calc((6px - var(--spacing-thumb)) / 2);
+  border: 0;
   border-radius: 999px;
   background: var(--color-confirma);
-  border: 2px solid var(--color-cartao);
+  box-shadow: 0 0 0 2px var(--color-cartao);
 }
 
 .deslizador::-moz-range-track {
@@ -65,11 +71,42 @@ details > summary {
 }
 
 .deslizador::-moz-range-thumb {
+  box-sizing: border-box;
   width: var(--spacing-thumb);
   height: var(--spacing-thumb);
   border-radius: 999px;
   background: var(--color-confirma);
-  border: 2px solid var(--color-cartao);
+  border: 0;
+  box-shadow: 0 0 0 2px var(--color-cartao);
+}
+
+/* ===========================================================================
+   ROLAGEM HORIZONTAL COM AFORDÂNCIA — docs/DESIGN.md §7.5
+   Quando a tabela não cabe na coluna, o leitor precisa VER que há mais conteúdo
+   à direita. Truque clássico de duas camadas: os "tampões" cor-do-cartão rolam
+   com o conteúdo (`local`) e cobrem a sombra quando a borda correspondente está
+   no fim do curso; as sombras ficam presas ao contêiner (`scroll`). Nada aqui é
+   gradiente decorativo (§3.3): é o único indicador de conteúdo cortado, e as
+   duas cores saem de token (`color-mix` só ajusta o alfa da linha-forte).
+   =========================================================================== */
+.rolagem-x {
+  background:
+    linear-gradient(to right, var(--color-cartao) 35%, transparent) left center / 28px 100%
+      no-repeat local,
+    linear-gradient(to left, var(--color-cartao) 35%, transparent) right center / 28px 100%
+      no-repeat local,
+    linear-gradient(
+        to right,
+        color-mix(in srgb, var(--color-linha-forte) 55%, transparent),
+        transparent
+      )
+      left center / 14px 100% no-repeat scroll,
+    linear-gradient(
+        to left,
+        color-mix(in srgb, var(--color-linha-forte) 55%, transparent),
+        transparent
+      )
+      right center / 14px 100% no-repeat scroll;
 }
 
 /* ===========================================================================

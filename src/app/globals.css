@@ -7,3 +7,74 @@ body {
   color: var(--color-tinta);
   font-family: var(--font-sans);
 }
+
+/* Afordância de abrir/fechar nos blocos <details>. */
+details > summary {
+  cursor: pointer;
+}
+
+/* ===========================================================================
+   DESLIZADOR (input[type=range]) — docs/DESIGN.md §7.7
+   Thumb visível de 24px (--spacing-thumb) dentro de um alvo de toque de 44px
+   (--spacing-toque). O preenchimento do trilho vem da variável --preenchido,
+   escrita pelo componente (é um percentual, não uma cor).
+   =========================================================================== */
+.deslizador {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  min-height: var(--spacing-toque);
+  padding-block: calc((var(--spacing-toque) - var(--spacing-thumb)) / 2);
+  background: transparent;
+  cursor: pointer;
+}
+
+.deslizador::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--color-confirma) 0 var(--preenchido, 0%),
+    var(--color-linha-forte) var(--preenchido, 0%) 100%
+  );
+}
+
+.deslizador::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: var(--spacing-thumb);
+  height: var(--spacing-thumb);
+  margin-top: calc((6px - var(--spacing-thumb)) / 2);
+  border-radius: 999px;
+  background: var(--color-confirma);
+  border: 2px solid var(--color-cartao);
+}
+
+.deslizador::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-linha-forte);
+}
+
+.deslizador::-moz-range-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-confirma);
+}
+
+.deslizador::-moz-range-thumb {
+  width: var(--spacing-thumb);
+  height: var(--spacing-thumb);
+  border-radius: 999px;
+  background: var(--color-confirma);
+  border: 2px solid var(--color-cartao);
+}
+
+/* ===========================================================================
+   GRÁFICOS — o wrapper do Recharts não deve capturar o foco do teclado nem
+   deixar o SVG estourar a coluna em 390px.
+   =========================================================================== */
+.recharts-wrapper,
+.recharts-surface {
+  outline: none;
+}

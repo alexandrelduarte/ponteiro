@@ -1,0 +1,52 @@
+[
+  {
+    "id": "atlasintel",
+    "nome": "AtlasIntel",
+    "aliases": ["Atlas Intel", "Atlas", "AtlasIntel/Bloomberg"]
+  },
+  {
+    "id": "poderdata",
+    "nome": "PoderData",
+    "aliases": ["Poder Data", "Poder360/PoderData"]
+  },
+  {
+    "id": "nexus",
+    "nome": "Nexus",
+    "aliases": ["Nexus/BTG", "Nexus BTG Pactual"]
+  },
+  {
+    "id": "datafolha",
+    "nome": "Datafolha",
+    "aliases": ["Data Folha", "Instituto Datafolha"]
+  },
+  {
+    "id": "gerp",
+    "nome": "Gerp",
+    "aliases": ["GERP"]
+  },
+  {
+    "id": "indexa",
+    "nome": "Indexa",
+    "aliases": ["Indexa Pesquisas"]
+  },
+  {
+    "id": "quaest",
+    "nome": "Genial/Quaest",
+    "aliases": ["Quaest", "Genial Quaest", "Quaest/Genial", "Genial"]
+  },
+  {
+    "id": "ipec",
+    "nome": "Ipec",
+    "aliases": ["IPEC", "Ipec Inteligência"]
+  },
+  {
+    "id": "rtbd",
+    "nome": "Real Time Big Data",
+    "aliases": ["RTBD", "RealTime Big Data", "Real Time/Record"]
+  },
+  {
+    "id": "parana",
+    "nome": "Paraná Pesquisas",
+    "aliases": ["Parana Pesquisas", "Paraná"]
+  }
+]

@@ -1,0 +1,6 @@
+.next
+node_modules
+pnpm-lock.yaml
+.qa
+agregador-presidencial-2026.jsx
+tests/reference

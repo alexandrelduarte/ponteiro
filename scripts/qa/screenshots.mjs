@@ -103,11 +103,8 @@ try {
         // aba "Todos os candidatos" (contrastes das 9 cores; §5.5 do DESIGN)
         try {
           await page.evaluate(() => window.scrollTo(0, 0));
-          await page.getByRole("button", { name: /Todos os candidatos/ }).click();
-          await page.waitForTimeout(400);
-          const ranking = page.getByText("disputa principal", { exact: false }).first();
-          await ranking.scrollIntoViewIfNeeded();
-          await page.waitForTimeout(250);
+          await page.getByRole("tab", { name: /Todos os candidatos/ }).click();
+          await page.waitForTimeout(600);
           await page.screenshot({
             path: join(DIR, `home-${vp.nome}-candidatos.png`),
             fullPage: true,

@@ -1,0 +1,235 @@
+/**
+ * tokens.css — sistema de design "boletim de urna" · Tailwind CSS v4
+ * ---------------------------------------------------------------------------
+ * Fonte da verdade: `agregador-presidencial-2026.jsx` (paleta CORES) e
+ * `docs/DESIGN.md` (princípios, contrastes verificados e specs por breakpoint).
+ *
+ * REGRAS DE USO
+ *  - Nenhum componente escreve hex. Só `text-*`, `bg-*`, `border-*`, `fill-*`,
+ *    `stroke-*` ou `var(--color-*)` (necessário nos inline styles do Recharts).
+ *  - `@theme static` garante que TODA variável seja emitida em `:root`, mesmo
+ *    sem classe utilitária correspondente — o Recharts consome as cores por
+ *    `var()` em props (fill/stroke/tick), fora do alcance do scanner.
+ *  - Famílias tipográficas vêm de `next/font` no layout (`--font-archivo`,
+ *    `--font-plex-mono`). Proibido `@import` de fonte por URL (self-host).
+ *  - Contraste AA (4,5:1 texto · 3:1 não-texto) é PISO: ver a tabela de
+ *    contrastes em docs/DESIGN.md §5.4 antes de criar qualquer par novo.
+ */
+
+@theme static {
+  /* ======================================================================
+     1. SUPERFÍCIES — o papel do boletim e a tela da urna
+     ====================================================================== */
+  --color-papel: #e8e8df; /* fundo da página (CORES.papel) */
+  --color-cartao: #f6f6f0; /* cartão sobre o papel (CORES.cartao) */
+  --color-mini: #efefe6; /* mini-cartão / caixa de nota dentro do cartão */
+  --color-campo: #ffffff; /* fundo de input */
+
+  --color-tela: #0e241a; /* tela fósforo da urna (CORES.tela) */
+  --color-tela-fundo: #0a1a12; /* trilho/sulco interno da tela */
+  --color-tela-borda: #1e3a2c; /* moldura e filetes internos (decorativo) */
+
+  /* ======================================================================
+     2. TINTA — texto e filetes sobre papel
+     ====================================================================== */
+  --color-tinta: #181c18; /* texto principal (CORES.tinta) */
+  --color-cinza: #63685f; /* texto secundário (CORES.cinza) — AA por 0,14 */
+  --color-linha: #c6c6b8; /* filete DECORATIVO (CORES.linha) — 1,40:1 */
+  --color-linha-forte: #727267; /* borda SIGNIFICATIVA — 3,95:1 sobre papel */
+  --color-texto-inverso: #f2f2ea; /* texto sobre tinta (tooltip escuro) */
+
+  /* ======================================================================
+     3. FÓSFORO — só dentro da tela da urna
+     ====================================================================== */
+  --color-fosforo: #a7efbb; /* rótulos e corpo na tela (CORES.fosforo) */
+  --color-fosforo-forte: #d8fbe2; /* manchete e números (CORES.fosforoForte) */
+  --color-tela-alerta: #f0b27a; /* aviso de viés dentro da tela */
+
+  /* ======================================================================
+     4. CANDIDATOS — escalas espelhadas (R4: peso perceptual equivalente)
+     Cada degrau tem par vermelho/azul com mesma clareza OKLCH e mesmo papel.
+     `--color-lula` / `--color-flavio` são as cores de MARCA (barras, linhas,
+     pontos) e vêm literais de CORES — nunca use para texto: ver `-escuro`.
+     ====================================================================== */
+  --color-lula: #c4122f; /* marca (CORES.lula) · L 0,524 */
+  --color-lula-escuro: #b30026; /* TEXTO/numeral · 5,79:1 no papel · L 0,484 */
+  --color-lula-medio: #d96a7a; /* banda "Lula 5–10" · L 0,659 */
+  --color-lula-suave: #e8a4ae; /* banda "Lula 10+" · L 0,786 */
+  --color-lula-claro: #ff9aa8; /* sobre tela/tooltip escuro · L 0,794 */
+  --color-lula-fundo: #ffdfdd; /* tinta de fundo (área, realce) · L 0,929 */
+
+  --color-flavio: #16418c; /* marca (CORES.flavio) · L 0,393 */
+  --color-flavio-escuro: #2a55a2; /* TEXTO/numeral · 5,84:1 no papel · L 0,462 */
+  --color-flavio-medio: #648fe7; /* espelho da banda média · L 0,659 */
+  --color-flavio-suave: #9ebaee; /* espelho da banda suave · L 0,787 */
+  --color-flavio-claro: #9fc0ff; /* sobre tela/tooltip escuro · L 0,807 */
+  --color-flavio-fundo: #dbe9ff; /* tinta de fundo (área, realce) · L 0,930 */
+
+  /* ======================================================================
+     5. SEMÂNTICAS — alerta (âmbar) e confirmação (verde)
+     `--color-alerta` e `--color-confirma` são cores de PREENCHIMENTO/BORDA.
+     Para texto sobre papel use sempre as variantes `-texto`.
+     ====================================================================== */
+  --color-alerta: #d96a1b; /* borda/marca (CORES.alerta) · 2,83:1 → não é texto */
+  --color-alerta-texto: #8a4510; /* texto âmbar · 5,80:1 no papel */
+  --color-alerta-fundo: #f7e4d2; /* chip/aviso âmbar */
+
+  --color-confirma: #1e7a46; /* botão primário, borda (CORES.confirma) */
+  --color-confirma-texto: #155a34; /* texto verde · 6,70:1 no papel */
+  --color-confirma-fundo: #dff0e5; /* chip/aviso verde */
+
+  --color-rodape-fundo: #f3e7d9; /* faixa do aviso legal */
+  --color-rodape-texto: #6b3a0e; /* aviso legal · 7,71:1 */
+
+  /* Anel de foco: verde escuro no papel, fósforo dentro da tela. */
+  --color-foco: #155a34;
+  --color-foco-tela: #a7efbb;
+
+  /* ======================================================================
+     6. TIPOGRAFIA — famílias (self-host via next/font, Fase 4)
+     ====================================================================== */
+  --font-sans:
+    var(--font-archivo), "Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono:
+    var(--font-plex-mono), "IBM Plex Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+    Consolas, "Liberation Mono", monospace;
+
+  /* ---- Escala fluida (390px → 1140px). Um único elemento usa `manchete`. --- */
+  --text-manchete: clamp(2.4rem, 8vw, 4.4rem); /* % na tela da urna */
+  --text-manchete--line-height: 1;
+  --text-manchete--font-weight: 600;
+
+  --text-manchete-2: clamp(1.3rem, 4vw, 2rem); /* linha "se fosse hoje" */
+  --text-manchete-2--line-height: 1;
+  --text-manchete-2--font-weight: 600;
+
+  --text-titulo: clamp(1.8rem, 5vw, 3rem); /* h1 "PRESIDENTE 2026" */
+  --text-titulo--line-height: 1;
+  --text-titulo--letter-spacing: -0.02em;
+  --text-titulo--font-weight: 900;
+
+  --text-veredito: clamp(1.05rem, 3vw, 1.5rem); /* título do veredito na tela */
+  --text-veredito--line-height: 1.2;
+  --text-veredito--letter-spacing: 0.02em;
+  --text-veredito--font-weight: 900;
+
+  --text-secao: clamp(1rem, 2.6vw, 1.35rem); /* título do cenário-base */
+  --text-secao--line-height: 1.35;
+  --text-secao--font-weight: 900;
+
+  --text-placar: clamp(1.5rem, 5.5vw, 1.875rem); /* 48,3% × 43,6% nos cartões */
+  --text-placar--line-height: 1.05;
+  --text-placar--font-weight: 900;
+
+  --text-dado: 1.25rem; /* número de mini-cartão / contador */
+  --text-dado--line-height: 1.1;
+  --text-dado--font-weight: 600;
+
+  /* ---- Tracking (todos observados no protótipo) ---- */
+  --tracking-titulo: -0.02em;
+  --tracking-botao: 0.06em;
+  --tracking-dado: 0.1em;
+  --tracking-etiqueta: 0.12em;
+  --tracking-tela: 0.14em;
+  --tracking-sobretitulo: 0.18em;
+
+  /* ---- Leading para blocos de leitura ---- */
+  --leading-leitura: 1.6;
+  --leading-compacto: 1.5;
+
+  /* ======================================================================
+     7. ESPAÇAMENTO — base 4px; nomes só para o ritmo estrutural
+     ====================================================================== */
+  --spacing: 0.25rem; /* p-1 = 4px, p-2 = 8px, … tudo múltiplo de 4 */
+
+  --spacing-goteira: 1rem; /* 16 — px lateral da página (390px) */
+  --spacing-goteira-lg: 1.5rem; /* 24 — px lateral em lg */
+  --spacing-cartao: 1rem; /* 16 — padding de cartão no mobile */
+  --spacing-cartao-md: 1.25rem; /* 20 — padding de cartão em md+ */
+  --spacing-tela: 1.25rem; /* 20 — padding da tela da urna no mobile */
+  --spacing-tela-md: 1.75rem; /* 28 — padding da tela em md+ */
+  --spacing-secao: 1.5rem; /* 24 — respiro entre seções no mobile */
+  --spacing-secao-md: 2rem; /* 32 — respiro entre seções em md+ */
+  --spacing-secao-lg: 2.5rem; /* 40 — respiro entre seções em lg */
+  --spacing-toque: 2.75rem; /* 44 — alvo mínimo de toque (WCAG 2.5.5 AAA) */
+  --spacing-thumb: 1.5rem; /* 24 — diâmetro visível do thumb do slider */
+
+  /* ======================================================================
+     8. LARGURAS DE LEITURA
+     ====================================================================== */
+  --container-leitura: 64rem; /* 1024 — coluna principal (max-w-5xl do protótipo) */
+  --container-texto: 48rem; /* 768 — parágrafos longos (medida de leitura) */
+
+  /* ======================================================================
+     9. RAIOS
+     ====================================================================== */
+  --radius-controle: 0.25rem; /* botão, input, chip retangular */
+  --radius-cartao: 0.375rem; /* cartão */
+  --radius-tela: 0.5rem; /* moldura da tela da urna */
+
+  /* ======================================================================
+     10. SOMBRAS — sem "elevação"; só o relevo físico do boletim
+     ====================================================================== */
+  --shadow-tela:
+    inset 0 0 60px rgba(0, 0, 0, 0.55), 0 2px 0 rgba(255, 255, 255, 0.35); /* vinheta do CRT + brilho da borda */
+  --shadow-botao: 0 2px 0 rgba(0, 0, 0, 0.25); /* tecla de urna, sem blur */
+  --shadow-ativo: 0 1px 0 rgba(0, 0, 0, 0.2); /* cartão de cenário selecionado */
+  --shadow-tip: 0 1px 3px rgba(0, 0, 0, 0.35); /* tooltip do gráfico */
+
+  /* ======================================================================
+     11. MOVIMENTO — só o cursor pisca; o resto é estático
+     ====================================================================== */
+  --duracao-cursor: 1.1s;
+  --duracao-transicao: 180ms;
+  --default-transition-duration: 180ms;
+  --animate-cursor: pisca var(--duracao-cursor) infinite;
+
+  /* ======================================================================
+     12. BREAKPOINTS — mobile 390 → md 768 → lg 1140
+     Valores em rem para acompanharem o zoom de fonte do usuário.
+     ====================================================================== */
+  --breakpoint-sm: 40rem; /* 640 */
+  --breakpoint-md: 48rem; /* 768 — tabela completa reaparece aqui */
+  --breakpoint-lg: 71.25rem; /* 1140 — coluna de 1024 + goteiras confortáveis */
+}
+
+/* ===========================================================================
+   REGRAS GLOBAIS MÍNIMAS
+   Só o que não cabe em token: os keyframes do cursor, o piso de foco visível
+   e a desativação global de movimento. Nada mais deve morar aqui.
+   =========================================================================== */
+
+@keyframes pisca {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Foco sempre visível (o :focus-visible do navegador some sobre papel bege). */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-foco);
+  outline-offset: 2px;
+}
+
+/* Dentro da tela da urna o anel escuro desaparece: usa fósforo. */
+:where(.tela-urna) :where(a, button, [tabindex]):focus-visible {
+  outline-color: var(--color-foco-tela);
+}
+
+/* Respeita quem pediu menos movimento: o cursor para de piscar. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

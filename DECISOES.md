@@ -132,3 +132,20 @@ Registro de decisões ambíguas (R6): contexto → decisão → porquê. Uma lin
   modelo intocado (paridade) e manchete da urna continua com `pct` puro.
 - Números recalculáveis em prosa (92%, 17%, "1 vez a cada 6") → todos em IBM Plex Mono
   (direção do DESIGN §4.1); números fixos editoriais (erros de 2022, datas) ficam em Archivo.
+
+## Fase 6 — loop de qualidade (iteração 2: 0 BLOCKER · 4 MAJOR · 4 MINOR · 3 NIT)
+
+- Institutos fatiados em 7 chars vinham do `.slice(0,7)` do protótipo → abreviações intencionais
+  ("PoderD.", "Atlas", "Datafol.") abaixo de md e nome completo em md+ → a UI é livre (§2.4);
+  fatiar no meio mutila a procedência (P9). "Genial/Quaest" sai inteiro em md+ (não
+  `split("/")[0]` = "GENIAL"): Quaest é o instituto de campo, Genial o contratante — a coluna não
+  pode nomear duas casas diferentes conforme o viewport.
+- Anotações da curva de sensibilidade colidiam a 390 → escalonamento em 2 fileiras com os textos
+  INTEIROS (não encurtamento): medido que, em mono, mesmo rótulos curtos ainda colidiriam −8px.
+- Rótulos de anotação de gráfico ganham halo `paint-order: stroke` na cor do cartão → linhas não
+  atravessam glifos; anotação de gráfico é dado → mono (§4.1).
+- Tabela da série entre md e lg: colunas `n` e `±MoE` ocultas (continuam nos cartões <md e em
+  lg+) → o registro TSE inteiro fica visível sem gesto a 768 (antes: cortado em todas as linhas).
+- Verificação adversarial de mão dupla: o corretor provou por CDP (fonte rasterizada) que 4
+  subpontos da crítica de mono/Archivo estavam errados (mini-cartões, contadores e 92%/8% já eram
+  mono); os pontos verdadeiros (83%, anotações, 25/10) foram corrigidos.

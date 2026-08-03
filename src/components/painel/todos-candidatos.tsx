@@ -13,6 +13,30 @@ import { Vazio } from "@/components/ui/basicos";
 import { fmt, fmtData, valCand } from "@/lib/modelo";
 import { usePainel } from "./estado";
 
+/**
+ * Abreviação INTENCIONAL do nome do instituto para o cabeçalho da matriz
+ * cruzada abaixo de `md`, onde as 7 colunas + candidato + média disputam 326px.
+ *
+ * O `slice(0,7)` anterior era corte cego de string: entregava `PODERDA`,
+ * `ATLASIN`, `DATAFOL` e `GENIAL` — palavra mutilada onde o §P9 pede a
+ * procedência do número. Abreviação com ponto é convenção de imprensa e diz ao
+ * leitor que faltam letras. Em `md+` o nome sai inteiro (o espaço sobra: a
+ * 1440 mediram-se ~60px livres por coluna), e o nome completo continua no
+ * rótulo acessível em qualquer largura.
+ *
+ * «Genial/Quaest» abrevia para «Quaest» — o instituto de campo; «Genial» é o
+ * contratante, e é o nome que o `split("/")[0]` entregaria.
+ */
+const ABREV_INSTITUTO: Record<string, string> = {
+  PoderData: "PoderD.",
+  AtlasIntel: "Atlas",
+  Datafolha: "Datafol.",
+  "Genial/Quaest": "Quaest",
+  Nexus: "Nexus",
+  Gerp: "Gerp",
+  Indexa: "Indexa",
+};
+
 export function TodosCandidatos() {
   const { campoCompleto } = usePainel();
 
@@ -48,8 +72,14 @@ export function TodosCandidatos() {
                     {i + 1}º · {c.nome}
                   </b>{" "}
                   <span className="text-xs text-cinza">({c.partido})</span>
+                  {/* A 390px o selo cabia na linha do nome para «Lula» e
+                      quebrava para «Flávio Bolsonaro», deixando o `●` órfão no
+                      fim da primeira linha: as duas fileiras do topo ficavam
+                      com estruturas diferentes no único bloco em que os nove
+                      candidatos aparecem lado a lado (§5.1). Abaixo de `sm` o
+                      selo tem linha própria NOS DOIS, e nunca se parte. */}
                   {i < 2 ? (
-                    <span className="ml-1 text-xs font-semibold text-confirma-texto">
+                    <span className="mt-0.5 block text-xs font-semibold whitespace-nowrap text-confirma-texto sm:mt-0 sm:ml-1 sm:inline">
                       ● disputa principal
                     </span>
                   ) : null}
@@ -59,9 +89,13 @@ export function TodosCandidatos() {
                   <span className="text-xs font-normal text-cinza">· {c.k} pesq.</span>
                 </span>
               </div>
+              {/* §5.5 pede o preenchimento com CONTORNO de 1px em
+                  `--color-linha-forte` — o contorno inteiro, não só a tampa
+                  direita: é ele que garante o limite discernível (1.4.11) para
+                  as cores que não alcançam 3:1 sobre o trilho (Zema, 2,53:1). */}
               <div className="mt-0.5 h-4 overflow-hidden rounded-controle border border-linha bg-mini">
                 <div
-                  className="h-full border-r border-linha-forte"
+                  className="h-full border border-linha-forte"
                   style={{ width: `${largura}%`, background: c.cor }}
                 />
               </div>
@@ -95,7 +129,12 @@ export function TodosCandidatos() {
               </th>
               {pollsCampo.map((p) => (
                 <th key={p.id} scope="col" className="py-2 pr-3 font-medium whitespace-nowrap">
-                  {p.instituto.split("/")[0].slice(0, 7)}
+                  {/* O nome inteiro é o rótulo acessível em toda largura; a
+                      abreviação é só a forma visível abaixo de `md`. */}
+                  <span aria-hidden="true" className="md:hidden">
+                    {ABREV_INSTITUTO[p.instituto] ?? p.instituto}
+                  </span>
+                  <span className="sr-only md:not-sr-only">{p.instituto}</span>
                   <br />
                   {fmtData(p.fim)}
                 </th>

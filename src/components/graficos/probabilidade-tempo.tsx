@@ -45,7 +45,9 @@ function Dica({ active, payload }: PropsDica) {
 export default function GraficoProbabilidadeTempo({ dados }: { dados: PontoProbabilidade[] }) {
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={dados} margin={{ top: 10, right: 10, bottom: 0, left: -18 }}>
+      {/* `right: 26` pela mesma razão da evolução: o rótulo `dd/mm` do último
+          tick é centrado no limite do domínio e vazava do `<svg>`. */}
+      <LineChart data={dados} margin={{ top: 10, right: 26, bottom: 0, left: -18 }}>
         <CartesianGrid stroke={COR.linha} strokeDasharray="2 4" />
         <XAxis
           dataKey="x"

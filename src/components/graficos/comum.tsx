@@ -12,11 +12,17 @@ import type { ReactNode } from "react";
 import { Esqueleto } from "@/components/ui/basicos";
 import { fmt, fmtData } from "@/lib/modelo";
 
-/** Alturas por breakpoint — o esqueleto usa AS MESMAS classes (CLS 0). */
+/**
+ * Alturas por breakpoint — o esqueleto usa AS MESMAS classes (CLS 0).
+ *
+ * A sensibilidade ganha +28px sobre o par distribuição: é a folga da banda de
+ * anotação em duas fileiras (ver `sensibilidade.tsx`), somada de propósito à
+ * caixa para que a área de plotagem NÃO encolha ao separar os rótulos.
+ */
 export const ALTURA = {
   evolucao: "h-[220px] md:h-[260px] lg:h-[300px]",
   distribuicao: "h-[200px] md:h-[240px]",
-  sensibilidade: "h-[200px] md:h-[240px]",
+  sensibilidade: "h-[228px] md:h-[268px]",
   historico: "h-[220px] md:h-[260px]",
 } as const;
 

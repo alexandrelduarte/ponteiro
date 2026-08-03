@@ -52,7 +52,13 @@ export default function GraficoDistribuicao({ dados }: { dados: PontoDist[] }) {
           x={0}
           stroke={COR.cinza}
           strokeWidth={1.5}
-          label={{ value: "0 · virada", position: "top", fontSize: 12, fill: COR.tinta }}
+          label={{
+            value: "0 · virada",
+            position: "top",
+            fontSize: 12,
+            fill: COR.tinta,
+            className: "rotulo-grafico",
+          }}
         />
         <Area
           dataKey="flavio"

@@ -57,7 +57,10 @@ export function CurvaSensibilidade() {
         {fmtSinal(params.vies)} p.p.
       </p>
 
-      <div className="mt-3 grid gap-2 md:grid-cols-3">
+      {/* As três faixas (título · viés→placar · descrição) que os cartões-filho
+          adotam por `subgrid`. `auto` e não `1fr`: cada faixa mede o próprio
+          conteúdo — com `1fr` as três ficariam iguais e o cartão inflaria. */}
+      <div className="mt-3 grid gap-2 md:grid-cols-3 md:grid-rows-[repeat(3,auto)]">
         {CENARIOS_VIES.map((c) => {
           const r = calcVies(M, c.vies);
           const pl = Math.round(r.elD * 100);
@@ -70,7 +73,18 @@ export function CurvaSensibilidade() {
               onClick={() => definirParam("vies", c.vies)}
               aria-pressed={ativo}
               className={[
-                "min-h-toque rounded-controle bg-mini p-3 text-left",
+                // O UA do Chrome centra verticalmente o conteúdo de um
+                // `<button>` esticado pela grade: os três cartões — irmãos de
+                // mesma altura e mesma estrutura — saíam com títulos e linhas
+                // de viés escalonados em 33–36px, e o olho não conseguia
+                // varrer a linha dos três viéses, que é o dado que existe para
+                // ser comparado. `grid` desliga a centralização do UA;
+                // `grid-rows-subgrid` + `row-span-3` fazem as três faixas
+                // internas (título · viés→placar · descrição) compartilharem
+                // as MESMAS linhas da grade externa, então as três linhas
+                // homólogas caem no mesmo `y` mesmo com títulos de alturas
+                // diferentes, e a folga sobra embaixo.
+                "grid min-h-toque grid-rows-[repeat(3,auto)] content-start rounded-controle bg-mini p-3 text-left md:row-span-3 md:grid-rows-subgrid",
                 ativo ? "border-2 border-tinta shadow-ativo" : "border border-linha",
               ].join(" ")}
             >

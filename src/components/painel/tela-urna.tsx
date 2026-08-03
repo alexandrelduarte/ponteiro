@@ -129,7 +129,8 @@ export function TelaUrna() {
               arredondar, não transformar improbabilidade em impossibilidade). */}
           <p className="mt-1 max-w-texto text-sm leading-compacto text-fosforo">
             {M.texto} Caminho mais provável: <span className="font-mono">{pct(M.p2Tacontece)}</span>{" "}
-            de chance de decisão no 2º turno em 25/10; definição já no 1º turno tem{" "}
+            de chance de decisão no 2º turno em <span className="font-mono">25/10</span>; definição
+            já no 1º turno tem{" "}
             <span className="font-mono">{pctComPiso(definicao1T)}</span> de probabilidade.
           </p>
         </div>

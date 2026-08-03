@@ -44,7 +44,11 @@ export function Graficos() {
   const serie = turnoGrafico === 2 ? M.serie2 : M.serie1;
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
+    // `items-start`: os dois cartões dimensionam por CONTEÚDO. Esticados à
+    // mesma altura, o de distribuição (gráfico mais baixo e nota mais curta)
+    // terminava ~110px antes da base — o mesmo espaço morto já corrigido no
+    // bloco REPLAY.
+    <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
       <Cartao
         titulo={
           <span className="flex flex-wrap items-center gap-3">

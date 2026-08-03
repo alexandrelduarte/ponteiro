@@ -32,21 +32,27 @@ export function CenarioBase() {
       descricao="O desfecho mais provável segundo o modelo — recalcula com seus parâmetros."
       destaque="tinta"
     >
+      {/* §4.1: o «83%» do título e o «17%» da nota são a MESMA probabilidade,
+          vista dos dois lados, a 40px de distância — precisam sair na mesma
+          família. Os dois recalculam com os parâmetros do leitor, logo mono. */}
       <h2 className="text-secao uppercase" data-testid="cenario-base-titulo">
         {cen.liderLula ? "Reeleição de Lula" : "Vitória de Flávio Bolsonaro"} decidida no 2º turno,
         por margem {Math.abs(M.margemAj) < 5 ? "apertada" : "moderada"} — probabilidade combinada:{" "}
-        <span className={cen.liderLula ? "text-lula-escuro" : "text-flavio-escuro"}>
+        <span
+          className={`font-mono ${cen.liderLula ? "text-lula-escuro" : "text-flavio-escuro"}`}
+          data-testid="cenario-base-probabilidade"
+        >
           {pct(cen.pElei)}
         </span>
       </h2>
 
-      {/* §4.1: «17%» e «1 vez a cada 6» mudam quando o modelo recalcula → mono. */}
       <p className="mt-2 rounded-controle bg-mini p-2 text-xs text-cinza">
         Leitura estatística do agregado — não é previsão determinística nem endosso. Um cenário com{" "}
         <span className="font-mono">{pctComPiso(contra)}</span> de probabilidade contrária acontece,
         no longo prazo,{" "}
         <b className="text-tinta">
-          1 vez a cada <span className="font-mono">{umaEmN}</span> eleições parecidas
+          <span className="font-mono">1</span> vez a cada{" "}
+          <span className="font-mono">{umaEmN}</span> eleições parecidas
         </b>
         .
       </p>
@@ -92,7 +98,7 @@ export function CenarioBase() {
           {cen.bandas.map((b, i) => (
             <div
               key={b.rot}
-              className={`flex items-center justify-center text-xs font-bold ${ROTULO_BANDA[i]}`}
+              className={`flex items-center justify-center font-mono text-xs font-bold ${ROTULO_BANDA[i]}`}
               style={{ width: `${Math.max(b.p * 100, 0)}%`, background: b.cor }}
             >
               {b.p >= 0.12 ? `${Math.round(b.p * 100)}%` : ""}
@@ -107,7 +113,7 @@ export function CenarioBase() {
                 className="inline-block h-3 w-3 rounded-[2px] border border-linha-forte"
                 style={{ background: b.cor }}
               />
-              {b.rot}: {Math.round(b.p * 100)}%
+              {b.rot}: <span className="font-mono">{Math.round(b.p * 100)}%</span>
               {b === cen.modal ? <b className="text-tinta"> ● mais provável</b> : null}
             </li>
           ))}
@@ -117,7 +123,8 @@ export function CenarioBase() {
       <div className="mt-4 text-sm leading-leitura">
         <b>Por que este é o cenário-base:</b>{" "}
         <span className="text-cinza">
-          (1) a vantagem é consistente — 6 dos 7 institutos de julho mostram Lula à frente ou
+          (1) a vantagem é consistente — <span className="font-mono">6</span> dos{" "}
+          <span className="font-mono">7</span> institutos de julho mostram Lula à frente ou
           empatado, margem agregada de <span className="font-mono">{fmtSinal(M.margem)} p.p.</span>,
           tendência pareada estável com leve inclinação pró-Lula; (2) o contexto medido favorece o
           incumbente competitivo — aprovação ~empatada (1º saldo positivo na Quaest desde dez/24),

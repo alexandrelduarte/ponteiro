@@ -29,7 +29,12 @@ export default function GraficoEvolucao({
 }) {
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <ComposedChart data={serie} margin={{ top: 10, right: 10, bottom: 0, left: -18 }}>
+      {/* `right: 26`: o último tick do eixo X cai EXATAMENTE no limite direito
+          do domínio, e o `<text>` centrado nele vazava 2px além do `<svg>` do
+          ResponsiveContainer nos três viewports — o `8` de «06/08» (a data mais
+          recente da série) saía sem a haste direita. A margem reserva a metade
+          do rótulo mais largo (`dd/mm` em mono de 12px ≈ 36px) e sobra folga. */}
+      <ComposedChart data={serie} margin={{ top: 10, right: 26, bottom: 0, left: -18 }}>
         <CartesianGrid stroke={COR.linha} strokeDasharray="2 4" />
         <XAxis
           dataKey="x"

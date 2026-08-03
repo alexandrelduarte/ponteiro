@@ -117,3 +117,20 @@ details > summary {
 .recharts-surface {
   outline: none;
 }
+
+/* ---------------------------------------------------------------------------
+   ANOTAÇÃO DENTRO DA ÁREA DE PLOTAGEM — docs/DESIGN.md §4.1 e §7.8
+   Anotação de gráfico É dado: sai em IBM Plex Mono, como o tick e o tooltip.
+   E, por ficar sobre a plotagem, ganha contorno na cor do papel do cartão via
+   `paint-order: stroke` — sem isso a própria curva atravessa o glifo («virada
+   (+4,7)» cortado pelas duas linhas, «◆ atual» partido pela linha verde). O
+   contorno é pintado ANTES do preenchimento, então não engorda a letra: só
+   abre a folga que separa o texto do traço.
+   --------------------------------------------------------------------------- */
+.rotulo-grafico {
+  font-family: var(--font-mono);
+  paint-order: stroke;
+  stroke: var(--color-cartao);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}

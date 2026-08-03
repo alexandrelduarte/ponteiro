@@ -21,6 +21,56 @@ import { CENARIOS_VIES } from "@/data/constantes";
 import { fmt, fmtSinal, type PontoSens } from "@/lib/modelo";
 import { COR, DicaSensibilidade, TICK } from "./comum";
 
+/**
+ * Banda de anotação acima da plotagem, em DUAS fileiras.
+ *
+ * Com os três rótulos na mesma altura, «réplica 2022» e «teste-limite +6,3» se
+ * sobrepunham a 390px (−8px de folga medidos, e a troca para mono os alarga
+ * ainda mais). Descer o rótulo do meio uma fileira separa exatamente o par que
+ * colide e preserva os três textos inteiros nos três viewports — nenhuma
+ * palavra é encurtada. O deslocamento é fixo em px, não depende da largura.
+ *
+ * `MARGEM_TOPO` é a altura da banda; as duas fileiras se assentam a partir do
+ * topo da plotagem (`viewBox.y`), então mexer na margem move as duas juntas.
+ * A altura do contêiner (`ALTURA.sensibilidade`) já foi acrescida da mesma
+ * folga, para a área de plotagem não encolher.
+ */
+const MARGEM_TOPO = 44;
+const RECUO_FILEIRA = [30, 4] as const;
+/** Fileira de cada cenário, na ordem de `CENARIOS_VIES` (o do meio desce). */
+const FILEIRA_CENARIO = [0, 1, 0] as const;
+
+interface CaixaRotulo {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+}
+
+function RotuloCenario({
+  viewBox,
+  texto,
+  fileira,
+}: {
+  viewBox?: CaixaRotulo;
+  texto: string;
+  fileira: 0 | 1;
+}) {
+  if (viewBox?.x == null || viewBox.y == null) return null;
+  return (
+    <text
+      className="rotulo-grafico"
+      x={viewBox.x}
+      y={viewBox.y - RECUO_FILEIRA[fileira]}
+      textAnchor="middle"
+      fontSize={12}
+      fill={COR.cinza}
+    >
+      {texto}
+    </text>
+  );
+}
+
 export default function GraficoSensibilidade({
   serie,
   margem,
@@ -43,7 +93,7 @@ export default function GraficoSensibilidade({
     <ResponsiveContainer width="100%" height="100%">
       <ComposedChart
         data={serie}
-        margin={{ top: 18, right: 10, bottom: 0, left: -22 }}
+        margin={{ top: MARGEM_TOPO, right: 10, bottom: 0, left: -22 }}
         onClick={aoClicar}
         style={{ cursor: "pointer" }}
       >
@@ -66,13 +116,13 @@ export default function GraficoSensibilidade({
         />
         <Tooltip trigger="click" content={<DicaSensibilidade />} />
         <ReferenceLine y={50} stroke={COR.cinza} strokeDasharray="4 3" />
-        {CENARIOS_VIES.map((c) => (
+        {CENARIOS_VIES.map((c, i) => (
           <ReferenceLine
             key={c.vies}
             x={c.vies}
             stroke={COR.tinta}
             strokeDasharray="3 3"
-            label={{ value: c.rotulo, position: "top", fontSize: 12, fill: COR.cinza }}
+            label={<RotuloCenario texto={c.rotulo} fileira={FILEIRA_CENARIO[i] ?? 0} />}
           />
         ))}
         <ReferenceDot
@@ -87,13 +137,20 @@ export default function GraficoSensibilidade({
             position: "bottom",
             fontSize: 12,
             fill: COR.tinta,
+            className: "rotulo-grafico",
           }}
         />
         <ReferenceLine
           x={vies}
           stroke={COR.confirma}
           strokeWidth={2}
-          label={{ value: "◆ atual", position: "insideBottom", fontSize: 12, fill: COR.confirma }}
+          label={{
+            value: "◆ atual",
+            position: "insideBottom",
+            fontSize: 12,
+            fill: COR.confirma,
+            className: "rotulo-grafico",
+          }}
         />
         <Line
           dataKey="l"

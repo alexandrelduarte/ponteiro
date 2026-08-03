@@ -23,6 +23,19 @@ const fmtInt = (n: number | null | undefined): string =>
 
 const PESO_BAIXO = 0.15;
 
+/**
+ * `n` e `±MoE` só a partir de `lg` (docs/DESIGN.md §7.5).
+ *
+ * Entre `md` (768) e `lg` (1140) as 10 colunas somavam 808px de conteúdo em um
+ * wrapper de 694px: o registro do TSE — dado obrigatório de P9 — aparecia como
+ * `BR-07…` em todas as 13 linhas e o `×` ficava fora da área visível, no
+ * retrato de iPad, que é justamente a largura em que a spec manda a tabela
+ * completa voltar. Amostra e margem de erro são as duas colunas SECUNDÁRIAS da
+ * linha (continuam nos cartões abaixo de `md` e voltam inteiras em `lg`),
+ * então são elas que cedem para o resto caber sem gesto.
+ */
+const COLUNA_SECUNDARIA = "hidden lg:table-cell";
+
 function leitura(l: LinhaModelo) {
   if (l.empate2) return { texto: "empate técnico", tom: "alerta" as const };
   return {
@@ -187,21 +200,22 @@ export function SeriePesquisas() {
           <thead>
             <tr className="text-left text-xs text-cinza uppercase">
               {[
-                "Instituto",
-                "Campo",
-                "n",
-                "±MoE",
-                "1ºT L×F",
-                "2ºT L×F",
-                "Leitura 2ºT",
-                "Peso",
-                "Registro TSE",
-              ].map((t) => (
+                { t: "Instituto" },
+                { t: "Campo" },
+                { t: "n", secundaria: true },
+                { t: "±MoE", secundaria: true },
+                { t: "1ºT L×F" },
+                { t: "2ºT L×F" },
+                { t: "Leitura 2ºT" },
+                { t: "Peso" },
+                { t: "Registro TSE" },
+              ].map(({ t, secundaria }) => (
                 <th
                   key={t}
                   scope="col"
                   className={[
-                    "py-2 pr-2 lg:pr-3 font-medium",
+                    "py-2 pr-1.5 lg:pr-3 font-medium",
+                    secundaria ? COLUNA_SECUNDARIA : "",
                     linhas.length > 15 ? "sticky top-0 bg-cartao" : "",
                   ]
                     .filter(Boolean)
@@ -224,16 +238,20 @@ export function SeriePesquisas() {
                 <tr key={l.id} className={`border-t border-linha ${baixo ? "bg-mini" : ""}`}>
                   <th
                     scope="row"
-                    className={`py-2 pr-2 lg:pr-3 text-left font-sans font-semibold ${tom.nome}`}
+                    className={`py-2 pr-1.5 lg:pr-3 text-left font-sans font-semibold ${tom.nome}`}
                   >
                     <NomeInstituto l={l} />
                   </th>
-                  <td className="py-2 pr-2 lg:pr-3 whitespace-nowrap">
+                  <td className="py-2 pr-1.5 lg:pr-3 whitespace-nowrap">
                     {fmtData(l.inicio)}–{fmtData(l.fim)}
                   </td>
-                  <td className="py-2 pr-2 lg:pr-3 text-right">{fmtInt(l.n)}</td>
-                  <td className="py-2 pr-2 lg:pr-3 text-right">{fmt(l.moe, 1)}</td>
-                  <td className="py-2 pr-2 lg:pr-3 whitespace-nowrap">
+                  <td className={`py-2 pr-1.5 lg:pr-3 text-right ${COLUNA_SECUNDARIA}`}>
+                    {fmtInt(l.n)}
+                  </td>
+                  <td className={`py-2 pr-1.5 lg:pr-3 text-right ${COLUNA_SECUNDARIA}`}>
+                    {fmt(l.moe, 1)}
+                  </td>
+                  <td className="py-2 pr-1.5 lg:pr-3 whitespace-nowrap">
                     {l.t1 && l.t1.lula != null ? (
                       <>
                         <span className={tom.lula}>{fmt(l.t1.lula)}</span>×
@@ -243,20 +261,24 @@ export function SeriePesquisas() {
                       "n/d"
                     )}
                   </td>
-                  <td className="py-2 pr-2 lg:pr-3 whitespace-nowrap">
+                  <td className="py-2 pr-1.5 lg:pr-3 whitespace-nowrap">
                     <span className={tom.lula}>{fmt(l.t2.lula)}</span>×
                     <span className={tom.flavio}>{fmt(l.t2.flavio)}</span>
                   </td>
-                  <td className="py-2 pr-2 lg:pr-3">
+                  <td className="py-2 pr-1.5 lg:pr-3">
                     <Chip tom={chip.tom} className="whitespace-nowrap">
                       {chip.texto}
                     </Chip>
                   </td>
-                  <td className="py-2 pr-2 lg:pr-3 text-right whitespace-nowrap">
-                    {fmt(l.w, 2)}
+                  {/* Só o NÚMERO é inquebrável: com o `nowrap` na célula, o
+                      rótulo «peso baixo» fixava a coluna em 80px — mais que o
+                      dobro do valor — e era parte do que empurrava o registro
+                      do TSE para fora da área visível em 768. */}
+                  <td className="py-2 pr-1.5 lg:pr-3 text-right">
+                    <span className="whitespace-nowrap">{fmt(l.w, 2)}</span>
                     {baixo ? <span className="block text-xs">peso baixo</span> : null}
                   </td>
-                  <td className={`py-2 pr-2 lg:pr-3 text-xs ${classeTse(l.tse)}`}>{l.tse}</td>
+                  <td className={`py-2 pr-1.5 lg:pr-3 text-xs ${classeTse(l.tse)}`}>{l.tse}</td>
                   <td className="py-2 text-right">
                     <button
                       type="button"

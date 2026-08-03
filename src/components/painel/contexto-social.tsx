@@ -16,7 +16,11 @@ export function ContextoSocial() {
       descricao="Indicadores medidos que sustentam a leitura — não é achismo."
       destaque="alerta"
     >
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {/* `items-start`: cada cartãozinho mede o próprio conteúdo. Esticados
+          pela linha da grade, os mais curtos sobravam até 62px de espaço morto
+          embaixo (medido a 768 e a 1440) — o mesmo efeito já corrigido no
+          bloco REPLAY. */}
+      <div className="grid items-start gap-4 md:grid-cols-2 lg:grid-cols-3">
         {CONTEXTO.map((c) => (
           <div key={c.titulo} className="rounded-controle border border-linha bg-mini p-3">
             <h3 className="text-sm font-bold">{c.titulo}</h3>

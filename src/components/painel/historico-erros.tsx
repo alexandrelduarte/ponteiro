@@ -116,16 +116,22 @@ export function HistoricoErros() {
       </div>
 
       <div className="mt-3 rounded-controle border border-dashed border-cinza bg-mini p-3">
-        <h3 className="text-sm font-bold text-tinta">
-          Por que o erro do 1º turno importa AGORA (mesmo sendo o do 2ºT o menor)
+        {/* §4.3: ênfase é <b>, não caixa alta — mesmo padrão do «calibrado». O
+            título fica em `font-semibold` para que o `<b>` de «agora» tenha um
+            degrau de peso acima dele e a ênfase apareça de fato. */}
+        <h3 className="text-sm font-semibold text-tinta">
+          Por que o erro do 1º turno importa <b>agora</b> (mesmo sendo o do 2ºT o menor)
         </h3>
+        {/* §4.3: «negrito reservado a números e a ~3 palavras por parágrafo».
+            O trecho em negrito aqui tinha 13 palavras — deixa de ser ênfase e
+            vira um segundo corpo de texto. Nenhuma palavra foi cortada: só o
+            recorte do negrito encolheu para o núcleo da frase. */}
         <p className="mt-1 text-xs leading-leitura text-cinza">
           O erro pequeno da decisão de 2022 (+3,1) só existiu porque, entre os turnos, os institutos
-          ganharam um gabarito perfeito — o resultado real do 1º turno — e recalibraram com ele.{" "}
-          <b className="text-tinta">
-            As pesquisas que alimentam este painel hoje ainda não passaram por calibragem nenhuma
-          </b>
-          : são o mesmo tipo de instrumento que produziu o +6,3. Por isso o erro do 1ºT entra três
+          ganharam um gabarito perfeito — o resultado real do 1º turno — e recalibraram com ele. As
+          pesquisas que alimentam este painel hoje ainda não passaram por{" "}
+          <b className="text-tinta">calibragem nenhuma</b>: são o mesmo tipo de instrumento que
+          produziu o +6,3. Por isso o erro do 1ºT entra três
           vezes no modelo: (1) ancora a incerteza sistemática do retrato atual, pré-calibragem
           (padrão 4,0, entre os estados calibrado e não calibrado); (2) muda a cara do 1º turno
           projetado — folga de ~9 p.p. vira chegada de ~2,5, alterando a chance de definição em
@@ -138,16 +144,20 @@ export function HistoricoErros() {
           em parte. Ajustes estruturais (pesos de escolaridade, religião, amostragem) são
           permanentes — mas a arma que salvou o 2ºT de 2022, reponderar pelo voto real
           recém-apurado, não é portátil: o gabarito envelhece e o viés de não-resposta é alvo móvel.
-          Os dois testes disponíveis: <b className="text-tinta">2018→2022</b> — apesar dos ajustes
-          pós-2018, o erro do 1º turno voltou em 2022, na mesma direção e tamanho parecido; e{" "}
-          <b className="text-tinta">2024 (SP, 2ºT)</b> — dois anos após a correção, Datafolha e
-          Quaest subestimaram a margem de Nunes em 4,7 e 8,7 p.p. (Futura cravou). Correção parcial
-          e desigual, não regressão total nem cura. Traduzindo em crença → número (chance de Lula no
-          dia da votação):{" "}
-          <b className="text-tinta">
+          {/* Os dois rótulos de teste e a régua de crenças deixam o negrito: são
+              marcadores de estrutura e um bloco de números, não ênfase. Ficam
+              distintos pela tinta cheia (e a régua, por ser leitura de valores,
+              recua para uma caixa própria em vez de um trecho em negrito). */}{" "}
+          Os dois testes disponíveis: <span className="text-tinta">2018→2022</span> — apesar dos
+          ajustes pós-2018, o erro do 1º turno voltou em 2022, na mesma direção e tamanho parecido;
+          e <span className="text-tinta">2024 (SP, 2ºT)</span> — dois anos após a correção,
+          Datafolha e Quaest subestimaram a margem de Nunes em 4,7 e 8,7 p.p. (Futura cravou).
+          Correção parcial e desigual, não regressão total nem cura. Traduzindo em crença → número
+          (chance de Lula no dia da votação):{" "}
+          <span className="text-tinta">
             correção mantida (σ≈3) → ~86% · parcial (σ=4, padrão) → ~83% · regressão ao 1ºT (σ≈6) →
             ~79%
-          </b>
+          </span>
           . Escolha a sua no slider de erro sistemático, logo acima.
         </p>
       </div>

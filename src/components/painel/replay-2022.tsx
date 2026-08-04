@@ -79,7 +79,10 @@ export function Replay2022() {
           </p>
         </Nicho>
 
-        <Nicho tom="faixa">
+        {/* Tom neutro de propósito: sobre o lilás da faixa, o carmim dos números
+            fica em 4,47:1 — 0,03 abaixo do piso AA (axe reprova). O lilás segue
+            reservado às formas de incerteza; a síntese destaca pelo título. */}
+        <Nicho>
           <p className="text-secao text-tinta">Somando os dois turnos nesta hipótese</p>
           <p className="mt-2 text-dado numeros">
             <span className="text-lula">Lula {elDia} em 100</span>

@@ -41,9 +41,13 @@ export function Termo({
   idTeste?: string;
 }) {
   const verbete = GLOSSARIO[chave];
+  /* WCAG 2.5.3: o nome acessível CONTÉM o rótulo visível. Quando o chip mostra
+     um texto próprio (ex.: "folga da medida" para a chave margemErro), o nome
+     deriva DELE — a API passa a impor a invariante que antes era só comentário. */
+  const rotuloVisivel = typeof children === "string" ? children : verbete.termo;
   return (
     <Revelador
-      rotuloAcessivel={`o que é ${verbete.termo}`}
+      rotuloAcessivel={`o que é ${rotuloVisivel}`}
       titulo={verbete.termo}
       classeGatilho={CLASSE_CHIP}
       idTeste={idTeste}

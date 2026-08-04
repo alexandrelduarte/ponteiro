@@ -37,6 +37,16 @@ const ANCORAS = [
   { nome: "cenario-base", texto: "mais provável acontecer em outubro?" },
 ];
 
+// A porta PRECISA estar livre: um `next start` zumbi de execução anterior
+// responde 200 com BUILD VELHO e a captura fotografa o produto errado.
+try {
+  await fetch(BASE);
+  console.error(`porta 3100 já ocupada — mate o servidor antigo (lsof -ti :3100 | xargs kill).`);
+  process.exit(1);
+} catch {
+  /* livre — é o que queremos */
+}
+
 // sobe o servidor de produção
 const servidor = spawn("pnpm", ["exec", "next", "start", "-p", "3100"], {
   stdio: "pipe",

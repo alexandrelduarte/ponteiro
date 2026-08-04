@@ -17,7 +17,26 @@
  * pintura: o painel só nasce depois de um toque.
  */
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
+import { createPortal } from "react-dom";
+
+/* Montado no cliente? SSR-safe sem setState-em-efeito: snapshot do servidor é
+   false, do cliente é true — o portal só tenta tocar em `document` no cliente. */
+const assinaturaVazia = () => () => {};
+const useMontado = () =>
+  useSyncExternalStore(
+    assinaturaVazia,
+    () => true,
+    () => false,
+  );
 import { duracaoDoToken, easeDoToken } from "./movimento";
 import { ACOES } from "./textos";
 
@@ -39,16 +58,22 @@ export function Revelador({
   idTeste?: string;
 }) {
   const [aberto, setAberto] = useState(false);
+  const montado = useMontado();
   const gatilhoRef = useRef<HTMLButtonElement>(null);
   const painelRef = useRef<HTMLDivElement>(null);
   const fecharRef = useRef<HTMLButtonElement>(null);
   const id = useId();
 
-  /* A 768–1440 o painel é absoluto com a esquerda no chip e 22rem de largura:
-     chip perto da borda direita fazia a página inteira rolar de lado (medido:
-     +101px no pior chip a 768). O deslocamento é medido ao abrir e escrito
-     DIRETO no DOM (CSS var no próprio painel) — sem setState: o efeito só
-     sincroniza o sistema externo, e o painel morre com a var ao fechar. */
+  /* O painel vive num PORTAL no <body> (aprendizado da iter-8 do loop): dentro
+     do fluxo, qualquer ancestral com transform persistido vira bloco contentor
+     de `position: fixed` — a folha mobile ficava presa no parágrafo animado, o
+     z-index quebrava contra vizinhos, e a fileira da régua do enxame recebia o
+     toque por cima da definição, fechando-a na mão do leitor. No body, nada
+     disso existe (e o <div role="dialog"> sai de dentro do <p>).
+
+     Em md+ o painel é posicionado por medição, em coordenadas de DOCUMENTO
+     (rola junto com o conteúdo), com a borda direita clampada ao viewport −16px
+     (o estouro de +101px da iter-6). Escrita direta no DOM — sem setState. */
   useLayoutEffect(() => {
     if (!aberto) return;
     if (!window.matchMedia("(min-width: 48rem)").matches) return;
@@ -56,11 +81,9 @@ export function Revelador({
     const painel = painelRef.current;
     const larguraPainel = painel?.getBoundingClientRect().width;
     if (!gatilho || !painel || !larguraPainel) return;
-    const estouro = gatilho.left + larguraPainel - (window.innerWidth - 16);
-    if (estouro > 0) {
-      const desloc = -Math.min(estouro, Math.max(gatilho.left - 16, 0));
-      painel.style.setProperty("--desloc-popover", `${desloc}px`);
-    }
+    const esquerda = Math.max(16, Math.min(gatilho.left, window.innerWidth - 16 - larguraPainel));
+    painel.style.top = `${window.scrollY + gatilho.bottom + 8}px`;
+    painel.style.left = `${window.scrollX + esquerda}px`;
   }, [aberto]);
 
   const fechar = (devolverFoco: boolean) => {
@@ -107,62 +130,69 @@ export function Revelador({
         {conteudoGatilho}
       </button>
 
-      <AnimatePresence>
-        {aberto ? (
-          <>
-            <motion.span
-              aria-hidden="true"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: duracaoDoToken("--dur-rapida", 120) }}
-              className="fixed inset-0 z-40 bg-veu md:hidden"
-            />
-            <motion.div
-              ref={painelRef}
-              id={`${id}-painel`}
-              role="dialog"
-              aria-label={titulo}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{
-                opacity: 0,
-                y: 8,
-                transition: {
-                  duration: duracaoDoToken("--dur-rapida", 120),
-                  ease: easeDoToken("--ease-saida"),
-                },
-              }}
-              transition={{
-                duration: duracaoDoToken("--dur-base", 200),
-                ease: easeDoToken("--ease-padrao"),
-              }}
-              className={[
-                "fixed inset-x-0 bottom-0 z-50 max-h-[85svh] overflow-y-auto",
-                "rounded-t-bloco bg-placa p-bloco text-left shadow-erguido",
-                "md:absolute md:inset-x-auto md:top-full md:bottom-auto md:mt-2",
-                "md:left-[var(--desloc-popover,0px)]",
-                "md:w-[22rem] md:max-w-[calc(100vw-2rem)] md:rounded-bloco",
-              ].join(" ")}
-            >
-              <span
-                aria-hidden="true"
-                className="mx-auto mb-3 block h-1 w-10 rounded-plena bg-contorno md:hidden"
-              />
-              <p className="text-secao text-tinta">{titulo}</p>
-              <div className="mt-2 text-corpo text-tinta-media">{children}</div>
-              <button
-                ref={fecharRef}
-                type="button"
-                onClick={() => fechar(true)}
-                className="mt-4 inline-flex min-h-toque items-center rounded-plena bg-ameixa-bruma px-4 text-corpo font-semibold text-tinta"
-              >
-                {ACOES.fecharFolha}
-              </button>
-            </motion.div>
-          </>
-        ) : null}
-      </AnimatePresence>
+      {/* O portal fica SEMPRE montado (no cliente) e o AnimatePresence vive
+          DENTRO dele: como filho direto do AnimatePresence, um portal não é
+          reconhecido e nada renderiza; por dentro, a saída anima normalmente. */}
+      {montado
+        ? createPortal(
+            <AnimatePresence>
+              {aberto ? (
+                <>
+                  <motion.span
+                    aria-hidden="true"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: duracaoDoToken("--dur-rapida", 120) }}
+                    className="fixed inset-0 z-40 bg-veu md:hidden"
+                  />
+                  <motion.div
+                    ref={painelRef}
+                    id={`${id}-painel`}
+                    role="dialog"
+                    aria-label={titulo}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{
+                      opacity: 0,
+                      y: 8,
+                      transition: {
+                        duration: duracaoDoToken("--dur-rapida", 120),
+                        ease: easeDoToken("--ease-saida"),
+                      },
+                    }}
+                    transition={{
+                      duration: duracaoDoToken("--dur-base", 200),
+                      ease: easeDoToken("--ease-padrao"),
+                    }}
+                    className={[
+                      "fixed inset-x-0 bottom-0 z-50 max-h-[85svh] overflow-y-auto",
+                      "rounded-t-bloco bg-placa p-bloco text-left shadow-erguido",
+                      "md:absolute md:inset-x-auto md:bottom-auto",
+                      "md:w-[22rem] md:max-w-[calc(100vw-2rem)] md:rounded-bloco",
+                    ].join(" ")}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="mx-auto mb-3 block h-1 w-10 rounded-plena bg-contorno md:hidden"
+                    />
+                    <p className="text-secao text-tinta">{titulo}</p>
+                    <div className="mt-2 text-corpo text-tinta-media">{children}</div>
+                    <button
+                      ref={fecharRef}
+                      type="button"
+                      onClick={() => fechar(true)}
+                      className="mt-4 inline-flex min-h-toque items-center rounded-plena bg-ameixa-bruma px-4 text-corpo font-semibold text-tinta"
+                    >
+                      {ACOES.fecharFolha}
+                    </button>
+                  </motion.div>
+                </>
+              ) : null}
+            </AnimatePresence>,
+            document.body,
+          )
+        : null}
     </span>
   );
 }

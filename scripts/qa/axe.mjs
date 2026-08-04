@@ -38,7 +38,7 @@ try {
       await page.goto(BASE + caminho, { waitUntil: "networkidle" });
       await page.waitForTimeout(800);
       const resultado = await new AxeBuilder({ page })
-        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
         .analyze();
       const graves = resultado.violations.filter((v) =>
         ["serious", "critical"].includes(v.impact ?? ""),

@@ -292,6 +292,48 @@ test.describe("painel", () => {
     expect(naDobra.length, "nenhuma palavra de dúvida dentro dos 844px").toBeGreaterThan(0);
   });
 
+  /* ------------------------------------------------------------------ *
+   * Fase 7 — o que a crítica da iteração 2 reprovou                      *
+   * ------------------------------------------------------------------ */
+
+  test("«isto não é previsão» cabe inteiro na dobra de 390, não só as ascendentes", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+
+    // §5.1 lista os seis elementos do primeiro scroll "sem exceção"; este
+    // começava em y=839 de 844 e a dobra o cortava pela primeira linha.
+    const linhas = await page.getByTestId("disclaimer").evaluate((el) => {
+      const alcance = document.createRange();
+      alcance.selectNodeContents(el);
+      return [...alcance.getClientRects()].map((r) => Math.round(r.bottom));
+    });
+    const dentro = linhas.filter((b) => b <= 844);
+    expect(dentro.length, `linhas do parágrafo: ${linhas.join(", ")}`).toBeGreaterThanOrEqual(2);
+  });
+
+  test("a ponte «folga da medida — a margem de erro» é impressa nas duas superfícies", async ({
+    page,
+  }) => {
+    // Quem chega com "margem de erro" na cabeça — que é como a TV fala —
+    // precisa encostar o termo em algum lugar VISÍVEL, não só no glossário.
+    await page.goto("/");
+    await painelPronto(page);
+    await expect(page.getByText("folga da medida — a margem de erro").first()).toBeVisible();
+
+    await page.goto("/metodologia");
+    await expect(page.getByText("folga da medida — a margem de erro").first()).toBeVisible();
+  });
+
+  test("a legenda do mini-enxame ensina a ler a LARGURA da pilha", async ({ page }) => {
+    await page.goto("/");
+    await painelPronto(page);
+    await expect(page.getByTestId("legenda-mini-enxame")).toContainText(
+      "A largura da pilha é o tamanho da dúvida",
+    );
+  });
+
   test("as barras dos candidatos usam régua fixa, não o líder", async ({ page }) => {
     await page.goto("/");
     await painelPronto(page);

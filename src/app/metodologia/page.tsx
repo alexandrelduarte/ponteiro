@@ -9,14 +9,7 @@
  * Zero cartão decorativo, coluna na medida de leitura, corpo em 16–18px.
  */
 import type { Metadata } from "next";
-import {
-  Bloco,
-  LinkExterno,
-  LinkInterno,
-  Pergunta,
-  Secao,
-  Subtitulo,
-} from "@/components/ui/blocos";
+import { LinkExterno, LinkInterno, Pergunta, Subtitulo } from "@/components/ui/blocos";
 import { SeletorMetodologia } from "@/components/site/seletor-metodologia";
 import { FONTES_TRADUZIDAS } from "@/components/painel/copia-erros";
 import { GLOSSARIO, ORDEM_GLOSSARIO, registroTse } from "@/components/ui/textos";
@@ -40,13 +33,19 @@ const SO_SIMPLES = "group-data-[modo=tecnica]:hidden";
 const SO_TECNICA = "group-data-[modo=simples]:hidden";
 
 /**
- * Uma seção de prosa — SEM placa própria.
+ * Uma seção de prosa — SEM PLACA NENHUMA.
  *
  * §5.7 é explícito: a /metodologia é "página de prosa, coluna na medida de
- * leitura, ZERO cartão decorativo". A página entregue era uma pilha de placas
- * brancas sobre bruma, igual à home, e cada placa era pura decoração: aqui o
- * conteúdo é texto corrido, e texto corrido não precisa de moldura. As seções
- * agora dividem uma folha só (a `<Folha>` abaixo), separadas por filete.
+ * leitura, ZERO cartão decorativo". A página entregue continuava sendo placa
+ * branca sobre bruma, e era ela que fabricava a faixa morta: a 1440 a folha
+ * media 1 005px enquanto a prosa respeitava a medida de leitura (~512px) —
+ * 45 a 50% de cartão vazio em dez dos treze blocos, um deles de 2 390px de
+ * altura.
+ *
+ * A correção é a mesma coisa dita de dois jeitos: sem a placa, a página inteira
+ * passa a ser uma coluna de leitura sobre a bruma. Não existe mais "largura do
+ * cartão" para sobrar. O `max-w-texto` de cada parágrafo sai daqui e sobe para
+ * a coluna, que é onde ele agora vale para tudo — inclusive listas e tabelas.
  */
 function BlocoMetodo({
   id,
@@ -60,27 +59,18 @@ function BlocoMetodo({
   children?: React.ReactNode;
 }) {
   return (
-    <section aria-labelledby={id} className="mt-8 first:mt-0">
+    <section aria-labelledby={id} className="mt-8">
       <Pergunta id={id}>{titulo}</Pergunta>
-      <div className={`mt-2 max-w-texto text-corpo text-tinta-media ${SO_SIMPLES}`}>{simples}</div>
+      <div className={`mt-2 text-corpo text-tinta-media ${SO_SIMPLES}`}>{simples}</div>
       {children ? (
         <div className={SO_TECNICA}>
-          <p className="mt-2 max-w-texto text-micro text-tinta-media">
+          <p className="mt-2 text-micro text-tinta-media">
             Abaixo, o texto técnico completo — é ele que vale para quem quiser conferir a conta.
           </p>
-          <div className="mt-2 max-w-texto space-y-3 text-corpo text-tinta-media">{children}</div>
+          <div className="mt-2 space-y-3 text-corpo text-tinta-media">{children}</div>
         </div>
       ) : null}
     </section>
-  );
-}
-
-/** A folha única de prosa: uma placa para a página inteira, não uma por bloco. */
-function Folha({ children }: { children: React.ReactNode }) {
-  return (
-    <Secao>
-      <Bloco>{children}</Bloco>
-    </Secao>
   );
 }
 
@@ -93,11 +83,13 @@ export default async function Metodologia() {
   const fontes = [...pesquisas].sort((a, b) => meioCampo(b) - meioCampo(a));
 
   return (
-    <main>
-      <Secao>
-        <Bloco>
+    /* A coluna de leitura É a página (§5.7): uma medida só, centrada sobre a
+       bruma, sem moldura em volta de nada. */
+    <main className="mx-auto w-full max-w-pagina px-goteira md:px-goteira-md lg:px-goteira-lg">
+      <div className="mx-auto max-w-texto pt-respiro md:pt-respiro-md">
+        <header>
           <h1 className="text-pergunta text-tinta">De onde vêm os números desta página?</h1>
-          <p className="mt-2 max-w-texto text-intro text-tinta">
+          <p className="mt-2 text-intro text-tinta">
             O modelo inteiro cabe em três ideias: uma média que dá mais peso ao que é recente e
             maior, uma dúvida que cresce com o tempo que falta, e uma chance que é a fração de
             cenários compatíveis com os dados.
@@ -107,11 +99,9 @@ export default async function Metodologia() {
               ← voltar ao painel
             </LinkInterno>
           </p>
-        </Bloco>
-      </Secao>
+        </header>
 
-      <SeletorMetodologia>
-        <Folha>
+        <SeletorMetodologia>
           <BlocoMetodo
             id="medias"
             titulo="Média, pesos e as duas chances"
@@ -168,8 +158,8 @@ export default async function Metodologia() {
                 São quatro faixas para descrever a chance: de 50 a 60 em 100{" "}
                 <b className="font-semibold text-tinta">está em aberto</b>; de 60 a 75, na frente
                 por pouco; de 75 a 90, na frente; acima de 90, bem na frente — e nem aí é garantia.
-                Numa pesquisa isolada, empate técnico é quando a diferença é menor que o dobro da
-                folga da medida.
+                Numa pesquisa isolada, empate técnico é quando a diferença é menor que o dobro da{" "}
+                <b className="font-semibold text-tinta">folga da medida — a margem de erro</b>.
               </p>
             }
           >
@@ -271,7 +261,7 @@ export default async function Metodologia() {
             <Subtitulo id="glossario-lista" className="sr-only">
               Lista das palavras explicadas
             </Subtitulo>
-            <dl className="max-w-texto space-y-4">
+            <dl className="space-y-4">
               {ORDEM_GLOSSARIO.map((chave) => (
                 <div key={chave}>
                   <dt className="text-secao text-tinta">{GLOSSARIO[chave].termo}</dt>
@@ -342,8 +332,8 @@ export default async function Metodologia() {
               ))}
             </ul>
           </section>
-        </Folha>
-      </SeletorMetodologia>
+        </SeletorMetodologia>
+      </div>
     </main>
   );
 }

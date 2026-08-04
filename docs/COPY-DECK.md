@@ -1536,30 +1536,16 @@ _Nota:_ o selo é informativo — não é botão e não tem cara de clicável (R
 
 ## T. Rodapé
 
-**`rodape.simples.titulo`**
+_Despacho da Fase 7/iteração 2 (MAJOR do aviso legal 3×): as chaves `rodape.simples.p1..p4` estão
+**DESCONTINUADAS** — cada afirmação delas já existia dentro do bloco jurídico, e a tela dizia o
+mesmo três vezes. O rodapé passa a ter UMA fonte: o bloco jurídico íntegro, com o parágrafo da
+chance promovido a primeiro e liderado por "**Isto não é previsão.**" em negrito. Título:_
 
-> Antes de sair, três coisas
+**`rodape.titulo`**
 
-**`rodape.simples.p1`**
+> Antes de sair
 
-> **Isto não é previsão.** O que está aqui é uma chance: em quantas eleições parecidas com esta
-> cada candidato termina eleito. Chance alta não é garantia, e chance baixa não é impossibilidade
-> — um resultado de 20 em 100 acontece uma vez a cada cinco disputas parecidas.
-
-**`rodape.simples.p2`**
-
-> **Os números não são nossos.** Cada pesquisa é de um instituto, tem registro na Justiça Eleitoral
-> e link para a publicação original. Se a nossa leitura discordar da publicação, vale a publicação.
-
-**`rodape.simples.p3`**
-
-> **Ninguém aqui torce.** Esta é uma ferramenta de estudo, sem ligação com candidato, partido,
-> instituto de pesquisa ou jornal. As suposições ficam à vista e você pode mexer em todas.
-
-**`rodape.simples.p4`**
-
-> **A lista só cresce com gente conferindo.** Pesquisa encontrada automaticamente fica esperando
-> aprovação de uma pessoa, e toda entrada e saída fica registrada numa lista pública.
+**`rodape.datas`**
 
 **`rodape.datas`**
 

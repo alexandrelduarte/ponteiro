@@ -195,20 +195,25 @@ export function Parametros() {
         <div className="mt-4">
           <Enxame
             layout={layout}
-            compacto
+            escala="mini"
             idTeste="enxame-simulacao"
             rotuloAcessivel={`Cem bolinhas, uma por cenário da decisão de 25 de outubro: ${layout.nLula} do lado de Lula e ${layout.nFlavio} do lado de Flávio.`}
           />
           {/* A frase colada no desenho usa O NÚMERO DO DESENHO (§10.1c). O
               mini-enxame desenha os quantis da margem do 2º turno; a frase
               acima soma também o caminho que acaba em 4 de outubro. Sem esta
-              reconciliação, escrito e desenhado discordavam sem aviso (H3). */}
+              reconciliação, escrito e desenhado discordavam sem aviso (H3).
+              A cláusula do meio ensina a ler a FORMA, não só a contar os lados:
+              o desenho carregava a dúvida na largura da pilha e nenhuma legenda
+              do produto dizia isso — o leitor aprendia a contar as bolinhas de
+              cada lado e ia embora sem saber o que o espalhamento significa. */}
           <p
             data-testid="legenda-mini-enxame"
             className="mt-3 max-w-texto text-micro text-tinta-media"
           >
             As bolinhas mostram só a decisão de 25 de outubro: {layout.nLula} caem do lado de Lula e{" "}
-            {layout.nFlavio} do lado de Flávio. A frase acima soma também quem ganha já em 4 de
+            {layout.nFlavio} do lado de Flávio. A largura da pilha é o tamanho da dúvida: quanto
+            mais espalhadas, maior a margem de erro. A frase acima soma também quem ganha já em 4 de
             outubro — por isso dá outro número.
           </p>
         </div>
@@ -217,19 +222,22 @@ export function Parametros() {
       {/* ---------------- as contas ---------------- */}
       <div className="mt-5">
         <Subtitulo>As contas, em uma linha cada</Subtitulo>
-        <div className="mt-2 max-w-texto space-y-2 text-corpo text-tinta-media numeros">
-          <p>
+        {/* Duas colunas a partir de lg: em coluna única as três contas
+            deixavam 32% da placa de 936px em branco à direita. Cada coluna
+            continua na medida de leitura. */}
+        <div className="mt-2 space-y-2 text-corpo text-tinta-media numeros lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-10 lg:gap-y-2 lg:space-y-0">
+          <p className="max-w-texto">
             Diferença nas pesquisas: {fmtSinal(M.margem)} menos a puxada suposta (
             {fmtSinal(params.vies)}) ={" "}
             <b className="font-semibold text-tinta">{fmtSinal(M.margemAj)} pontos</b>.
           </p>
-          <p>
+          <p className="max-w-texto">
             Dúvida de hoje: o quanto a média das pesquisas ainda pode variar, combinado com o erro
             que todas podem cometer juntas — dá{" "}
             <b className="font-semibold text-tinta">± {fmt(M.sigmaHoje)} pontos</b>. As duas dúvidas
             não se somam: juntas dão menos que a soma.
           </p>
-          <p>
+          <p className="max-w-texto">
             Dúvida no dia da votação: a dúvida de hoje combinada com o quanto a corrida ainda pode
             andar — dá <b className="font-semibold text-tinta">± {fmt(M.sigmaDia2)} pontos</b>. Aqui
             também não se somam: {fmt(M.sigmaHoje)} e {derivaPt} juntos dão {fmt(M.sigmaDia2)}, não

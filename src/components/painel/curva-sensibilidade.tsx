@@ -69,7 +69,12 @@ export function CurvaSensibilidade() {
       </p>
 
       <div className="mt-3">
-        <p className="text-micro text-tinta-media">chance de ser eleito, em cada 100</p>
+        {/* A legenda do eixo y nomeia também a linha tracejada do 50: dentro da
+            plotagem não sobrou canto livre para esse rótulo, e rótulo riscado
+            por curva é pior que rótulo do lado de fora. */}
+        <p className="text-micro text-tinta-media">
+          chance de ser eleito, em cada 100 — a linha tracejada no 50 é a metade a metade
+        </p>
         <CaixaGrafico altura={ALTURA.sensibilidade}>
           <SensibilidadeLazy
             serie={serie}

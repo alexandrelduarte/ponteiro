@@ -47,8 +47,14 @@ details > summary {
  * desenho cresce — então ela ganha um degrau por breakpoint. Continua sendo a
  * MESMA régua: muda a espessura, nunca a posição (§7.2).
  */
+/* `crisp-edges` porque a régua cai numa fração de pixel (`xEmpate` é
+   `-min * passo`, e `passo` é 318/nº de colunas): com antialiasing, os 3px de
+   traço viravam 2px de tinta cheia mais dois meios-pixels, e o que se mede na
+   tela a 390 é 2px — abaixo dos 3 que §4.1 especifica. Sem AA, a borda encosta
+   na grade de pixels e a espessura medida passa a ser a declarada. */
 .regua-empate {
   stroke-width: 3px;
+  shape-rendering: crispEdges;
 }
 @media (min-width: 48rem) {
   .regua-empate {

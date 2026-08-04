@@ -5,7 +5,9 @@
  *
  * Ordem obrigatória no primeiro scroll de 390px, sem exceção:
  *   wordmark + tagline (cabeçalho do site) → linha de tempo → manchete serif
- *   → enxame → micro-legenda do enxame → parágrafo de procedência.
+ *   → enxame → micro-legenda do enxame → "isto não é previsão".
+ * Os três últimos moram na MESMA placa: fora dela, o "isto não é previsão"
+ * começava em y=839 de 844 e a dobra o cortava pelas ascendentes.
  *
  * A manchete é SEMPRE a chance de ser eleito (`eleito.dia`) — o número que o
  * OG, o JSON-LD e o compartilhamento também publicam. O enxame logo abaixo é
@@ -46,7 +48,7 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
   const faixa = faixaVeredito(Math.max(M.eleito.dia.l, M.eleito.dia.f));
 
   return (
-    <div className="mx-auto w-full max-w-pagina px-goteira pt-4 md:px-goteira-md lg:px-goteira-lg">
+    <div className="mx-auto w-full max-w-pagina px-goteira pt-3 md:px-goteira-md lg:px-goteira-lg">
       {/* 1. Linha de tempo */}
       <p className="entra text-etiqueta text-tinta-media numeros">
         2º turno · 25 de outubro · faltam {M.dias2T} dias
@@ -72,7 +74,7 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
         .
       </p>
 
-      <p className="entra mt-3 max-w-texto text-corpo text-tinta-media">
+      <p className="entra mt-2 max-w-texto text-corpo text-tinta-media">
         o mesmo que dizer {eleitoL}% de{" "}
         <Termo chave="chance" idTeste="chip-glossario-chance">
           chance
@@ -81,42 +83,47 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
       </p>
 
       {/* 4. O enxame, dentro da placa (é contra ela que a bolinha faz o 3:1).
-             Em lg a legenda fica AO LADO do desenho: no cartão de 1000px o
-             conjunto deixava 46% de faixa morta à direita. */}
-      <Bloco className="mt-5">
-        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-8">
-          <Enxame
-            layout={layout}
-            idTeste="enxame"
-            rotuloAcessivel={`Cem bolinhas, uma por cenário da decisão de 25 de outubro: ${nLula} caem do lado de Lula e ${nFlavio} do lado de Flávio.`}
-          />
+             Ele ocupa a PLACA INTEIRA em qualquer largura: a versão de duas
+             colunas (desenho | legenda) resolvia a faixa morta a 1440, mas
+             cobrava o preço errado — travava a bolinha do hero em 16px contra
+             20px do enxame de "Isso ainda pode virar?", e a fazia ENCOLHER
+             quando o viewport crescia (18px a 768 → 16px a 1440). O
+             elemento-assinatura não pode ser o menor da página. A faixa morta
+             não volta: quem chega à borda direita agora é o próprio desenho. */}
+      <Bloco className="mt-4">
+        <Enxame
+          layout={layout}
+          escala="hero"
+          idTeste="enxame"
+          rotuloAcessivel={`Cem bolinhas, uma por cenário da decisão de 25 de outubro: ${nLula} caem do lado de Lula e ${nFlavio} do lado de Flávio.`}
+        />
 
-          {/* 5. A micro-legenda, na redação assinada pelo data-scientist
-                 (AUDITORIA-COPY §10.2): 55 palavras, com DUAS marcas de dúvida
-                 dentro — "nenhuma é o resultado" e a cláusula literal de H2,
-                 "até outubro isso ainda pode mudar". É ela que garante que a
-                 primeira dobra de 390px carregue dúvida mesmo quando o
-                 veredito desce para baixo da linha do horizonte.
-                 Os fechos condicionais por líder ficaram APOSENTADOS: duas
-                 fontes para o mesmo fato foi como o 83 ↔ 82 nasceu. */}
-          <p
-            data-testid="legenda-enxame"
-            className="mt-4 max-w-texto text-corpo text-tinta-media lg:mt-0"
-          >
-            Cada bolinha é um resultado possível: nenhuma é o resultado —{" "}
-            <b className="font-semibold text-tinta">até outubro isso ainda pode mudar</b>. Aqui, só
-            a decisão de 25 de outubro: {nLula} do lado de Lula, {nFlavio} do lado de Flávio. Em{" "}
-            {p1tDef} de cada 100 cenários não há 2º turno; esses entram na frase de cima, que dá{" "}
-            {eleitoL} e {eleitoF}.
-          </p>
-        </div>
+        {/* 5. A micro-legenda, na redação assinada pelo data-scientist
+               (AUDITORIA-COPY §10.2): 55 palavras, com DUAS marcas de dúvida
+               dentro — "nenhuma é o resultado" e a cláusula literal de H2,
+               "até outubro isso ainda pode mudar". É ela que garante que a
+               primeira dobra de 390px carregue dúvida mesmo quando o
+               veredito desce para baixo da linha do horizonte.
+               Os fechos condicionais por líder ficaram APOSENTADOS: duas
+               fontes para o mesmo fato foi como o 83 ↔ 82 nasceu. */}
+        <p data-testid="legenda-enxame" className="mt-3 max-w-texto text-corpo text-tinta-media">
+          Cada bolinha é um resultado possível: nenhuma é o resultado —{" "}
+          <b className="font-semibold text-tinta">até outubro isso ainda pode mudar</b>. Aqui, só a
+          decisão de 25 de outubro: {nLula} do lado de Lula, {nFlavio} do lado de Flávio. Em{" "}
+          {p1tDef} de cada 100 cenários não há 2º turno; esses entram na frase de cima, que dá{" "}
+          {eleitoL} e {eleitoF}.
+        </p>
+
+        {/* 6. "Não é previsão" — nunca some a 390px (H4), e §5.1 pede os seis
+               elementos no primeiro scroll "sem exceção". Ele ficava FORA da
+               placa e começava em y=839 dos 844: sobravam 5px de ascendentes.
+               Dentro da placa ele sobe o vão de 16px mais o respiro de 20px do
+               fim do cartão — e passa a caber inteiro. */}
+        <p data-testid="disclaimer" className="mt-3 max-w-texto text-intro text-tinta">
+          Isto não é previsão. É o que as {pesquisas.length} pesquisas registradas no TSE dizem
+          hoje, mais o tanto que a corrida ainda pode andar até outubro.
+        </p>
       </Bloco>
-
-      {/* 6. "Não é previsão" — nunca some a 390px (H4). */}
-      <p data-testid="disclaimer" className="mt-4 max-w-texto text-intro text-tinta">
-        Isto não é previsão. É o que as {pesquisas.length} pesquisas registradas no TSE dizem hoje,
-        mais o tanto que a corrida ainda pode andar até outubro.
-      </p>
 
       <Bloco className="mt-4">
         {params.vies !== 0 ? (
@@ -203,15 +210,23 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
           </Nicho>
         </div>
 
-        <p className="mt-4 max-w-texto text-corpo text-tinta-media">
-          Chance não é resultado. O painel monta 100 cenários compatíveis com as pesquisas de hoje{" "}
-          <b className="font-semibold text-tinta">
-            e com o quanto a corrida ainda pode andar até outubro
-          </b>
-          , e conta em quantos deles cada um termina eleito. Um resultado que aparece em{" "}
-          {M.eleito.dia.l >= 0.5 ? eleitoF : eleitoL} de 100 cenários é pouco provável — não é
-          impossível.
-        </p>
+        {/* Duas colunas a partir de lg. Não é enfeite: em uma coluna só, este
+            parágrafo deixava 47% da placa de 936px em branco — a mesma faixa
+            morta que o resto da página já tinha corrigido. Duas colunas de
+            ~440px mantêm cada uma dentro da medida de leitura. */}
+        <div className="mt-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-10">
+          <p className="max-w-texto text-corpo text-tinta-media">
+            Chance não é resultado. O painel monta 100 cenários compatíveis com as pesquisas de hoje{" "}
+            <b className="font-semibold text-tinta">
+              e com o quanto a corrida ainda pode andar até outubro
+            </b>
+            , e conta em quantos deles cada um termina eleito.
+          </p>
+          <p className="mt-3 max-w-texto text-corpo text-tinta-media lg:mt-0">
+            Um resultado que aparece em {M.eleito.dia.l >= 0.5 ? eleitoF : eleitoL} de 100 cenários
+            é pouco provável — não é impossível.
+          </p>
+        </div>
       </Bloco>
 
       {/* 7. Procedência + selo de frescor. */}

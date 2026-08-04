@@ -44,7 +44,7 @@ export function Simbolo({ className }: { className?: string }) {
  */
 export function CabecalhoSite() {
   return (
-    <header className="mx-auto w-full max-w-pagina px-goteira pt-5 pb-1 md:px-goteira-md lg:px-goteira-lg">
+    <header className="mx-auto w-full max-w-pagina px-goteira pt-4 pb-1 md:px-goteira-md lg:px-goteira-lg">
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
         <Link
           href="/"

@@ -10,6 +10,11 @@
  * Os dois candidatos aparecem sempre na mesma ordem (Lula à esquerda, Flávio à
  * direita), com o mesmo tamanho, a mesma estrutura de frase e a mesma
  * quantidade de ressalvas — é a ordem da RÉGUA, não a do placar (VOZ §2.4).
+ *
+ * A PONTE DE VOCABULÁRIO mora aqui: esta é a PRIMEIRA vez que a home imprime
+ * "folga da medida", e o leitor que chega com "margem de erro" na cabeça — que
+ * é como a televisão fala — precisa de um lugar para encostar o termo. Os dois
+ * nomes aparecem juntos, uma vez, na primeira ocorrência da superfície.
  */
 import { Bloco, Cabecalho, Nicho, Subtitulo } from "@/components/ui/blocos";
 import { Termo } from "@/components/ui/glossario";
@@ -90,8 +95,9 @@ export function Frente() {
             <span className="numeros">{M.qtdEmpate}</span> das{" "}
             <span className="numeros">{M.qtdRecentes}</span> pesquisas dos últimos 35 dias estão em{" "}
             <Termo chave="empateTecnico">empate técnico</Termo>: nelas, a diferença é menor que{" "}
-            <b className="font-semibold text-tinta">o dobro</b> da folga da medida — é essa a folga
-            que vale quando se comparam os dois números.
+            <b className="font-semibold text-tinta">o dobro</b> da{" "}
+            <b className="font-semibold text-tinta">folga da medida — a margem de erro</b>. É essa a
+            folga que vale quando se comparam os dois números.
             {invertida ? (
               <>
                 {" "}

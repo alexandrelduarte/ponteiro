@@ -55,29 +55,51 @@ function useAssentaUmaVez<T extends HTMLElement>() {
   return { ref, assentou };
 }
 
+/**
+ * As três escalas do elemento-assinatura, em ordem estrita de tamanho.
+ *
+ * O elemento-assinatura tem de ser o MAIOR onde ele assina (§5.1): a versão
+ * anterior deixava o hero a 1440 com bolinha de 16px contra 20px do enxame de
+ * "Isso ainda pode virar?" — o hero 25% menor que uma seção do meio da página,
+ * porque ali ele dividia a placa com a micro-legenda e perdia largura. Agora a
+ * ordem é garantida por construção, e o hero não tem teto: ele ocupa a placa
+ * inteira, em qualquer largura, como §2.2 item 5 manda ("o passo cresce sem
+ * teto"). Medido na placa de 936px de 1440: hero ~23px · média ~16px ·
+ * mini ~13px. A 390 as três valem 318px de contêiner e caem no piso de 8px.
+ */
+const LARGURA_ESCALA = {
+  hero: "",
+  media: "max-w-[40rem]",
+  mini: "max-w-[32rem]",
+} as const;
+
+export type EscalaEnxame = keyof typeof LARGURA_ESCALA;
+
 export function Enxame({
   layout,
   rotuloAcessivel,
-  compacto = false,
+  escala = "media",
   idTeste,
 }: {
   layout: LayoutEnxame;
   /** o gráfico dito em português, com os DOIS números (§6.2) */
   rotuloAcessivel: string;
-  compacto?: boolean;
+  escala?: EscalaEnxame;
   idTeste?: string;
 }) {
   const { ref, assentou } = useAssentaUmaVez<HTMLDivElement>();
   const { passo, diametro, passoVertical, larguraSvg, alturaSvg, yEixo, xEmpate } = layout;
   const raio = diametro / 2;
+  /**
+   * Rótulos de ponta curtos no mini: no cartão de 286px de 390, "← Flávio na
+   * frente · 18" quebrava e deixava o "18" órfão numa linha sozinha, sem o
+   * lado que ele descreve — o número ancorado no desenho perdia a âncora. A
+   * frase inteira continua no rótulo acessível do SVG.
+   */
+  const curto = escala === "mini";
 
   return (
-    // O compacto pode ser MENOR que o hero, mas não pode parar de crescer: a
-    // 1440 a versão de 20rem travava as bolinhas em 8px contra as 22px do
-    // hero — 2,5× de diferença entre duas instâncias do mesmo elemento, e §4.2
-    // existe para comparar maçã com maçã. Em 32rem a bolinha do compacto mede
-    // ~16px a 1440 e continua ≥8px a 390 (o contêiner ali tem 286px).
-    <div ref={ref} className={compacto ? "max-w-[32rem]" : "max-w-[45rem]"}>
+    <div ref={ref} className={LARGURA_ESCALA[escala]}>
       {/* Rótulo do empate, ancorado em porcentagem e fora do SVG. */}
       <div className="relative h-5 text-micro text-tinta">
         <span
@@ -160,18 +182,22 @@ export function Enxame({
           (`{{T2_LULA}}`/`{{T2_FLAVIO}}`), nunca da manchete: escrito e
           desenhado são o mesmo inteiro por construção (H3). Cada um fica do
           lado da régua que descreve, no mesmo peso da legenda de ponta. */}
-      <p className="mt-1 flex justify-between gap-4 text-micro text-tinta-media">
-        <span>
-          ← Flávio na frente ·{" "}
+      {/* `flex-wrap` é rede de segurança, não layout: com os dois rótulos em
+          `whitespace-nowrap`, uma fonte maior que a prevista faria o par
+          estourar a coluna. Assim ele quebra por rótulo INTEIRO — nunca
+          separando o número do lado que ele descreve. */}
+      <p className="mt-1 flex flex-wrap justify-between gap-x-3 text-micro text-tinta-media">
+        <span className="whitespace-nowrap">
+          ← {curto ? "Flávio" : "Flávio na frente"} ·{" "}
           <b data-testid={idTeste ? `${idTeste}-n-flavio` : undefined} className="text-flavio">
             {layout.nFlavio}
           </b>
         </span>
-        <span>
+        <span className="whitespace-nowrap">
           <b data-testid={idTeste ? `${idTeste}-n-lula` : undefined} className="text-lula">
             {layout.nLula}
           </b>{" "}
-          · Lula na frente →
+          · {curto ? "Lula" : "Lula na frente"} →
         </span>
       </p>
     </div>

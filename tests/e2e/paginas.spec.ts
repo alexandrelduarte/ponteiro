@@ -90,6 +90,46 @@ test.describe("páginas de apoio", () => {
     await expect(page).toHaveURL(/\/$/);
   });
 
+  /**
+   * O aviso legal é UMA FONTE SÓ por página. Ele vinha em dois textos
+   * empilhados no mesmo rodapé — "Antes de sair, três coisas" e o "Aviso:" —
+   * com 40 palavras verbatim em comum, nas três páginas públicas.
+   */
+  test("o aviso do rodapé não se repete na mesma tela", async ({ page }) => {
+    const FRASES = [
+      "uma vez a cada cinco disputas parecidas",
+      "A lista só cresce",
+      "sem vínculo com candidatos",
+    ];
+    for (const rota of ["/", "/historico", "/metodologia"]) {
+      await page.goto(rota);
+      const texto = (await page.getByRole("contentinfo").innerText()).replace(/\s+/g, " ");
+      for (const frase of FRASES) {
+        const vezes = texto.split(frase).length - 1;
+        expect(vezes, `"${frase}" aparece ${vezes}× no rodapé de ${rota}`).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+
+  /** §5.7: /metodologia é prosa em coluna de leitura, ZERO cartão decorativo. */
+  test("/metodologia não tem cartão decorativo e respeita a medida de leitura", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/metodologia");
+
+    const placas = await page.locator("main .rounded-bloco").count();
+    expect(placas, "a /metodologia voltou a empilhar placas").toBe(0);
+
+    const larguras = await page.evaluate(() =>
+      [...document.querySelectorAll("main p, main h1, main h2")]
+        .map((el) => Math.round(el.getBoundingClientRect().width))
+        .filter((w) => w > 0),
+    );
+    // 512px é `--container-texto`; a folga cobre o arredondamento do zoom.
+    expect(Math.max(...larguras)).toBeLessThanOrEqual(520);
+  });
+
   test("o símbolo da marca aparece uma vez por tela", async ({ page }) => {
     for (const rota of ["/", "/historico", "/metodologia"]) {
       await page.goto(rota);

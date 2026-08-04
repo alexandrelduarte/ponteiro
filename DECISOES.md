@@ -257,6 +257,22 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
   Animation.setPlaybackRate no CDP, reduced-motion com medições, rastro de slider,
   pulso da celebração medido em px).
 
+## Fase 7 — loop v2 (iteração 2: 0 BLOCKER · 4 MAJOR · 8 MINOR · 5 NIT; leigo 3/4)
+
+- Cartões de CONTEXTO traduzidos em camada de apresentação (`copia-contexto.ts`, fallback ao
+  original) → mesmo precedente de cores/erros; o × ambíguo de aprova×desaprova virou texto.
+- Aviso legal: UMA fonte por página (bloco jurídico íntegro liderado por "Isto não é previsão.");
+  `rodape.simples.p1..p4` descontinuadas no deck (§T atualizado pelo orquestrador) → a tela dizia
+  o mesmo 3× e em /historico o rodapé era 43,5% da página.
+- Meta de altura da home (≤20.000px) NÃO renegociada nem forçada: 23.276px aceitos pelo
+  orquestrador → o que sobra é conteúdo, não repetição (medido bloco a bloco); esconder mais
+  atrás de disclosure violaria a regra que o próprio crítico validou; o crítico arbitra na
+  iteração 3.
+- 60fps provado por trace CDP (maior tarefa 13,76ms; zero quadros perdidos por trabalho da
+  página; "perdidos" do arraste são custo do robô de teste, testemunha rAF concorda).
+- Enxame com API de escala (hero > media > mini por construção); hero voltou a ocupar a placa
+  inteira (as 2 colunas de lg travavam a instância-manchete como a menor das três).
+
 ## Fase 6 — reescrita da camada de apresentação (frontend-dev)
 
 ### Fundação

@@ -183,14 +183,24 @@ export function SeriePesquisas() {
           da <Termo chave="margemErro">folga da medida</Termo> — é essa a folga da diferença entre
           os dois. Quando a barra cruza a régua do empate, não dá para dizer quem está na frente.
         </Traduzindo>
-        {/* eslint-disable-next-line @next/next/no-img-element -- SVG estático, sem otimização a fazer */}
-        <img
-          src="/ilustracoes/explicando-empate.svg"
-          alt=""
-          width={320}
-          height={190}
-          className="mt-3 h-auto w-full max-w-[15rem]"
-        />
+        {/* A ilustração é EXEMPLO, e agora diz isso. Sem a legenda, ela ficava
+            colada na frase "nas outras 4, Lula aparece na frente" e mostrava
+            exatamente quatro cápsulas, uma delas inteiramente do lado de
+            Flávio: o leitor lia "1 em 4 pesquisas com Flávio à frente" onde o
+            painel tem 1 em 13. O acoplamento era falso e visível. */}
+        <figure className="mt-3 w-full max-w-[15rem]">
+          {/* eslint-disable-next-line @next/next/no-img-element -- SVG estático, sem otimização a fazer */}
+          <img
+            src="/ilustracoes/explicando-empate.svg"
+            alt=""
+            width={320}
+            height={190}
+            className="h-auto w-full"
+          />
+          <figcaption className="mt-1 text-micro text-tinta-media">
+            Exemplo: quatro pesquisas imaginárias. Não são as pesquisas da lista.
+          </figcaption>
+        </figure>
       </div>
 
       {serieAlterada ? (
@@ -210,7 +220,22 @@ export function SeriePesquisas() {
           ("BR- / 07845/"), e ele é justamente o dado que R4/H12 mandam manter
           sempre alcançável. Em md os cartões viram duas colunas — a largura
           extra vira leitura, não rolagem lateral. */}
-      <ReguaPesquisas escala={escala} className="mt-4 lg:hidden" />
+      {/* UMA RÉGUA POR COLUNA. Em coluna única a régua servia as barras de
+          todas as linhas — mas a partir de md a lista vira duas colunas e a
+          régua continuava sendo uma só, esticada sobre as duas: o "empate" do
+          rótulo caía no VÃO entre as colunas, a 167px das duas réguas de tinta
+          que ele deveria nomear. Cada cópia repete o recuo de 16px do padding
+          do cartão, que é o que faz o rótulo cair no mesmo x da barra.
+          A segunda é `aria-hidden`: é a mesma frase, e o leitor de tela não
+          precisa ouvi-la duas vezes. */}
+      <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 lg:hidden">
+        <div className="px-4">
+          <ReguaPesquisas escala={escala} />
+        </div>
+        <div aria-hidden="true" className="hidden px-4 md:block">
+          <ReguaPesquisas escala={escala} />
+        </div>
+      </div>
       <ul
         className="mt-1 grid grid-cols-1 gap-3 md:grid-cols-2 lg:hidden"
         aria-label="Pesquisas da série"

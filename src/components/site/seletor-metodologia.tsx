@@ -10,9 +10,16 @@
  * remonta nada — logo, zero CLS e zero espera.
  *
  * A camada técnica é a mesma que sempre esteve aqui, palavra por palavra.
+ *
+ * SEM PLACA: §5.7 manda a /metodologia ser prosa em coluna de leitura, "zero
+ * cartão decorativo". A placa de 936px que envolvia este seletor deixava 50%
+ * de faixa morta à direita a 1440 — o controle ocupa 300px. O que ele perde em
+ * campo branco, ganha em contorno: o trilho do segmentado passa a ter 1,5px de
+ * `--color-contorno` (3,01:1 contra a bruma), porque sobre a página tingida o
+ * campo `--color-nicho` fica a 1,05:1 e o controle deixaria de parecer
+ * controle.
  */
 import { useState, useSyncExternalStore, type ReactNode } from "react";
-import { Secao } from "@/components/ui/blocos";
 
 export type ModoMetodologia = "simples" | "tecnica";
 
@@ -49,43 +56,41 @@ export function SeletorMetodologia({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <Secao>
-        <div className="rounded-bloco bg-placa p-bloco md:p-bloco-md">
-          <p id="rotulo-modo" className="text-secao text-tinta">
-            Como você quer ler esta página?
-          </p>
-          <div
-            id="explicacao-tecnica"
-            role="radiogroup"
-            aria-labelledby="rotulo-modo"
-            className="mt-2 inline-flex scroll-mt-4 flex-wrap gap-1 rounded-plena bg-nicho p-1"
-          >
-            {OPCOES.map((o) => (
-              <button
-                key={o.valor}
-                type="button"
-                role="radio"
-                aria-checked={modo === o.valor}
-                data-testid={`modo-${o.valor}`}
-                onClick={() => setModo(o.valor)}
-                className={[
-                  "min-h-toque rounded-plena px-5 text-corpo font-semibold",
-                  "transition-colors duration-(--dur-rapida) ease-(--ease-padrao)",
-                  modo === o.valor
-                    ? "bg-ameixa text-tinta-inversa"
-                    : "text-tinta hover:bg-ameixa-tenue",
-                ].join(" ")}
-              >
-                {o.rotulo}
-              </button>
-            ))}
-          </div>
-          <p className="mt-2 max-w-texto text-micro text-tinta-media">
-            A explicação técnica é a mesma que sempre esteve aqui, palavra por palavra. A simples
-            não tira nada: só troca as palavras difíceis.
-          </p>
+      <section aria-labelledby="rotulo-modo" className="mt-8">
+        <p id="rotulo-modo" className="text-secao text-tinta">
+          Como você quer ler esta página?
+        </p>
+        <div
+          id="explicacao-tecnica"
+          role="radiogroup"
+          aria-labelledby="rotulo-modo"
+          className="mt-2 inline-flex scroll-mt-4 flex-wrap gap-1 rounded-plena bg-placa p-1 shadow-[inset_0_0_0_1.5px_var(--color-contorno)]"
+        >
+          {OPCOES.map((o) => (
+            <button
+              key={o.valor}
+              type="button"
+              role="radio"
+              aria-checked={modo === o.valor}
+              data-testid={`modo-${o.valor}`}
+              onClick={() => setModo(o.valor)}
+              className={[
+                "min-h-toque rounded-plena px-5 text-corpo font-semibold",
+                "transition-colors duration-(--dur-rapida) ease-(--ease-padrao)",
+                modo === o.valor
+                  ? "bg-ameixa text-tinta-inversa"
+                  : "text-tinta hover:bg-ameixa-tenue",
+              ].join(" ")}
+            >
+              {o.rotulo}
+            </button>
+          ))}
         </div>
-      </Secao>
+        <p className="mt-2 text-micro text-tinta-media">
+          A explicação técnica é a mesma que sempre esteve aqui, palavra por palavra. A simples não
+          tira nada: só troca as palavras difíceis.
+        </p>
+      </section>
 
       <div className="group" data-modo={modo}>
         {children}

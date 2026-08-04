@@ -46,6 +46,7 @@ export function Virada() {
       <div className="mt-5">
         <Enxame
           layout={layout}
+          escala="media"
           idTeste="enxame-virada"
           rotuloAcessivel={`Gráfico dos cenários da diferença no dia da votação: ${layout.nLula} em 100 do lado de Lula, ${layout.nFlavio} em 100 do lado de Flávio.`}
         />
@@ -53,10 +54,13 @@ export function Virada() {
 
       {/* A faixa "em 8 de cada 10 cenários…" aparecia três vezes na mesma
           página (aqui, em "Quem está na frente?" e na divisão de votos). Ela
-          fica onde nasce: no bloco da diferença medida. */}
+          fica onde nasce: no bloco da diferença medida.
+          A frase "a régua do meio é o empate: ali os dois teriam o mesmo tanto
+          de voto" saiu daqui: o traduzindo, cinco linhas acima, já diz qual
+          lado é de quem, e a régua já vem rotulada "empate" no desenho. */}
       <p className="mt-4 max-w-texto text-corpo text-tinta-media">
-        A régua do meio é o empate: ali os dois teriam o mesmo tanto de voto. Tudo o que está do
-        lado esquerdo dela é o espaço de virada que os dados de hoje ainda comportam.
+        Tudo o que está do lado esquerdo da régua é o espaço de virada que os dados de hoje ainda
+        comportam.
       </p>
 
       <p className="mt-4 max-w-texto text-corpo text-tinta-media">

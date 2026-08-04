@@ -1,9 +1,26 @@
 /**
  * Rodapé (COPY-DECK §T).
  *
- * A versão simples fica ACIMA do aviso legal, não no lugar dele: o texto legal
- * completo permanece íntegro, palavra por palavra. R3: a instrução "digite
- * «atualizar» no chat" saiu — não existe gatilho público de atualização.
+ * UMA FONTE SÓ POR PÁGINA. O rodapé trazia dois textos empilhados — "Antes de
+ * sair, três coisas" (editorial, quatro parágrafos em corpo) e o "Aviso:"
+ * (jurídico, três parágrafos em micro) — que diziam a mesma coisa duas vezes,
+ * na mesma tela, nas três páginas públicas: 40 palavras verbatim só no primeiro
+ * par ("Chance alta não é garantia, e chance baixa não é impossibilidade — um
+ * resultado de 20 em 100 acontece uma vez a cada cinco disputas parecidas"),
+ * mais a propriedade dos números e a aprovação humana da lista. VOZ §4 bane
+ * explicar o óbvio duas vezes na mesma tela, e em /historico o par ocupava
+ * 43,5% da página inteira.
+ *
+ * A versão que fica é a JURÍDICA, íntegra palavra por palavra — é ela que
+ * carrega a obrigação. O editorial não some do produto: cada uma das suas
+ * quatro afirmações já estava dita dentro do aviso (não é previsão · os
+ * números são dos institutos e a publicação prevalece · sem vínculo com
+ * ninguém e as suposições ficam à vista · a lista só cresce por decisão
+ * humana). O que ele tinha de próprio era o DESTAQUE: por isso o parágrafo da
+ * chance sobe para primeiro e ganha o mesmo "Isto não é previsão." em negrito.
+ *
+ * R3: a instrução "digite «atualizar» no chat" saiu — não existe gatilho
+ * público de atualização.
  */
 import { LinkInterno } from "@/components/ui/blocos";
 import { ROTAS } from "@/app/_lib/site";
@@ -14,29 +31,39 @@ export function Rodape() {
       <div className="rounded-bloco bg-placa p-bloco md:p-bloco-md">
         {/* Sem o símbolo como ornamento: MARCA.md §6.6.10 dá ao PONTEIRO uma
             aparição por tela, e ela é o cabeçalho. */}
-        <h2 className="text-pergunta text-tinta">Antes de sair, três coisas</h2>
+        <h2 className="text-pergunta text-tinta">Antes de sair</h2>
 
-        <div className="mt-4 grid max-w-none gap-4 text-corpo text-tinta-media md:grid-cols-2">
+        {/* O aviso legal, TRADUZIDO — ele é a superfície de 100% de alcance
+            (aparece nas três páginas públicas) e carregava cinco palavras
+            banidas por VOZ §5.1: "probabilidade", "premissas", "parâmetros",
+            "rodadas" e "sliders" (esta última em inglês). Nada foi retirado:
+            cada obrigação legal continua dita, com as palavras do deck.
+            A linha das datas fica FORA daqui — ela é informação de calendário,
+            não obrigação legal. */}
+        {/* A partir de lg o aviso vira duas colunas: numa placa de 936px, o
+            parágrafo corrido chegava a ~110 caracteres de medida — o dobro do
+            que §5.7 aceita para leitura. */}
+        <div className="mt-4 grid gap-x-10 gap-y-2 rounded-nicho bg-nicho p-4 text-micro text-tinta-media lg:grid-cols-2 lg:items-start">
           <p>
-            <b className="font-semibold text-tinta">Isto não é previsão.</b> O que está aqui é uma
-            chance: em quantas eleições parecidas com esta cada candidato termina eleito. Chance
-            alta não é garantia, e chance baixa não é impossibilidade — um resultado de 20 em 100
-            acontece uma vez a cada cinco disputas parecidas.
+            <b className="font-semibold text-tinta">Isto não é previsão.</b> O que este site publica
+            é uma <b className="font-semibold text-tinta">chance</b>, não um resultado: em quantas
+            eleições parecidas com esta cada candidato termina eleito, dadas as suposições que ficam
+            à vista e que você pode mudar nas réguas. Chance alta não é garantia, e chance baixa não
+            é impossibilidade — um resultado de 20 em 100 acontece uma vez a cada cinco disputas
+            parecidas.
           </p>
           <p>
-            <b className="font-semibold text-tinta">Os números não são nossos.</b> Cada pesquisa é
-            de um instituto, tem registro na Justiça Eleitoral e link para a publicação original. Se
-            a nossa leitura discordar da publicação, vale a publicação.
+            <b className="font-semibold text-tinta">Aviso:</b> ferramenta estatística e educacional,
+            sem vínculo com candidatos, partidos, institutos de pesquisa ou veículos de imprensa. Os
+            números pertencem aos respectivos institutos e estão registrados no TSE sob os números
+            indicados em cada linha da lista; os links levam sempre à publicação original, que
+            prevalece sobre qualquer leitura feita aqui.
           </p>
           <p>
-            <b className="font-semibold text-tinta">Ninguém aqui torce.</b> Esta é uma ferramenta de
-            estudo, sem ligação com candidato, partido, instituto de pesquisa ou jornal. As
-            suposições ficam à vista e você pode mexer em todas.
-          </p>
-          <p>
-            <b className="font-semibold text-tinta">A lista só cresce com gente conferindo.</b>{" "}
-            Pesquisa encontrada automaticamente fica esperando aprovação de uma pessoa, e toda
-            entrada e saída fica registrada numa lista pública.
+            A lista só cresce por decisão humana: as pesquisas encontradas automaticamente entram
+            como pendentes e uma pessoa precisa aprová-las, com registro numa lista pública. As
+            simulações feitas na página (acrescentar ou tirar pesquisas, mexer nas réguas) valem só
+            no seu navegador e nunca alteram a base oficial.
           </p>
         </div>
 
@@ -52,35 +79,6 @@ export function Rodape() {
             </LinkInterno>
           ))}
         </nav>
-
-        {/* O aviso legal, TRADUZIDO — ele é a superfície de 100% de alcance
-            (aparece nas três páginas públicas) e carregava cinco palavras
-            banidas por VOZ §5.1: "probabilidade", "premissas", "parâmetros",
-            "rodadas" e "sliders" (esta última em inglês). Nada foi retirado:
-            cada obrigação legal continua dita, com as palavras do deck.
-            A linha das datas saiu daqui — ela já está 700px acima. */}
-        <div className="mt-6 rounded-nicho bg-nicho p-4 text-micro text-tinta-media">
-          <p>
-            <b className="font-semibold text-tinta">Aviso:</b> ferramenta estatística e educacional,
-            sem vínculo com candidatos, partidos, institutos de pesquisa ou veículos de imprensa. Os
-            números pertencem aos respectivos institutos e estão registrados no TSE sob os números
-            indicados em cada linha da lista; os links levam sempre à publicação original, que
-            prevalece sobre qualquer leitura feita aqui.
-          </p>
-          <p className="mt-2">
-            O que este site publica é uma <b className="font-semibold text-tinta">chance</b>, não um
-            resultado: em quantas eleições parecidas com esta cada candidato termina eleito, dadas
-            as suposições que ficam à vista e que você pode mudar nas réguas. Chance alta não é
-            garantia, e chance baixa não é impossibilidade — um resultado de 20 em 100 acontece uma
-            vez a cada cinco disputas parecidas.
-          </p>
-          <p className="mt-2">
-            A lista só cresce por decisão humana: as pesquisas encontradas automaticamente entram
-            como pendentes e uma pessoa precisa aprová-las, com registro numa lista pública. As
-            simulações feitas na página (acrescentar ou tirar pesquisas, mexer nas réguas) valem só
-            no seu navegador e nunca alteram a base oficial.
-          </p>
-        </div>
       </div>
     </footer>
   );

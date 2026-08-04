@@ -45,7 +45,11 @@ export function Replay2022() {
         é outro e o contexto é outro.
       </p>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-3 md:items-start">
+      {/* Três colunas só a partir de lg. A 768 a grade ficava severamente
+          desequilibrada — as colunas 1 e 2 terminavam ~450px acima da 3, que
+          carrega o dobro de texto — e a coluna de ~180px espremia o botão
+          primário em quatro linhas, virando uma pílula de 110px de altura. */}
+      <div className="mt-4 grid gap-3 lg:grid-cols-3 lg:items-start">
         <Nicho>
           <p className="text-secao text-tinta">1º turno, com o erro de 2022 aplicado</p>
           <p className="mt-2">
@@ -100,16 +104,20 @@ export function Replay2022() {
             {r2lInt} × {100 - r2lInt} e Lula seria eleito em {emCem(replay.elRepH)} de cada 100
             cenários. É a distância até outubro que derruba esse número para {elDia}.
           </p>
-          <p className="mt-3">
-            <Botao
-              data-testid="aplicar-replica"
-              onClick={() => definirParam("vies", ERRO_2022.t2.margem)}
-            >
-              Aplicar esta hipótese ao painel (puxada de 3,1)
-            </Botao>
-          </p>
         </Nicho>
       </div>
+
+      {/* O botão saiu de dentro do terceiro cartão: ele é a ação da SEÇÃO
+          inteira, não daquele cartão, e numa coluna de grade ele nunca tem
+          largura para caber em uma linha. */}
+      <p className="mt-3">
+        <Botao
+          data-testid="aplicar-replica"
+          onClick={() => definirParam("vies", ERRO_2022.t2.margem)}
+        >
+          Aplicar esta hipótese ao painel (puxada de 3,1)
+        </Botao>
+      </p>
 
       {/* Vira um detalhe com afordância de controle, e sem a frase "eleito em
           NN de cada 100 cenários, por pouco" — ela já aparecia duas vezes

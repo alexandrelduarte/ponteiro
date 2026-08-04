@@ -12,8 +12,8 @@ import type { Metadata } from "next";
 import { formatInTimeZone } from "date-fns-tz";
 import {
   Bloco,
+  Cabecalho,
   LinkInterno,
-  Pergunta,
   Resposta,
   Secao,
   Subtitulo,
@@ -67,18 +67,27 @@ export default async function Historico() {
   return (
     <main>
       <Secao>
+        {/* Mesma disposição de duas colunas dos blocos da home a partir de lg:
+            a resposta na medida de leitura à esquerda e o traduzindo na faixa
+            que sobrava à direita. Em coluna única este bloco deixava 46,6% da
+            placa de 936px em branco — o mesmo "L" que a home já tinha
+            corrigido. A ORDEM DE LEITURA não muda: é a do DOM. */}
         <Bloco rotuladoPor="titulo-historico">
-          <h1 id="titulo-historico" className="text-pergunta text-tinta">
-            O que já mudou nesta página?
-          </h1>
-          <Resposta>
-            Toda pesquisa que entrou ou saiu da lista está registrada aqui, com data.
-          </Resposta>
-          <Traduzindo>
-            Este é o histórico do próprio painel. Ele existe para você poder conferir se algum
-            número mudou de um dia para o outro — e por quê. Quem fez a alteração não aparece; o que
-            aparece é o ato.
-          </Traduzindo>
+          <div className="lg:grid lg:grid-cols-[minmax(0,34rem)_minmax(0,1fr)] lg:items-start lg:gap-10">
+            <div>
+              <h1 id="titulo-historico" className="text-pergunta text-tinta">
+                O que já mudou nesta página?
+              </h1>
+              <Resposta>
+                Toda pesquisa que entrou ou saiu da lista está registrada aqui, com data.
+              </Resposta>
+            </div>
+            <Traduzindo className="lg:mt-0">
+              Este é o histórico do próprio painel. Ele existe para você poder conferir se algum
+              número mudou de um dia para o outro — e por quê. Quem fez a alteração não aparece; o
+              que aparece é o ato.
+            </Traduzindo>
+          </div>
           <p className="mt-4">
             <LinkInterno href="/" className="text-corpo font-semibold">
               ← voltar ao painel
@@ -89,10 +98,11 @@ export default async function Historico() {
 
       <Secao>
         <Bloco rotuladoPor="titulo-grafico-historico">
-          <Pergunta id="titulo-grafico-historico">Como a chance mudou com o tempo</Pergunta>
-          <Traduzindo>
-            Cada ponto é a chance calculada naquele dia, projetada para o dia da votação.
-          </Traduzindo>
+          <Cabecalho
+            id="titulo-grafico-historico"
+            pergunta="Como a chance mudou com o tempo"
+            traduzindo="Cada ponto é a chance calculada naquele dia, projetada para o dia da votação."
+          />
 
           {dados.length >= 2 ? (
             <>
@@ -125,14 +135,13 @@ export default async function Historico() {
 
       <Secao>
         <Bloco rotuladoPor="titulo-linha-tempo">
-          <Pergunta id="titulo-linha-tempo">O que entrou e o que saiu da lista</Pergunta>
+          <Cabecalho
+            id="titulo-linha-tempo"
+            pergunta="O que entrou e o que saiu da lista"
+            traduzindo="Registro automático, gravado no momento da ação. Mostramos o ato e a data; não mostramos quem executou — publicar o nome de quem aprova convida a pressão sobre uma pessoa, e a auditoria não precisa disso para funcionar."
+          />
           {feed.length ? (
             <>
-              <Traduzindo>
-                Registro automático, gravado no momento da ação. Mostramos o ato e a data; não
-                mostramos quem executou — publicar o nome de quem aprova convida a pressão sobre uma
-                pessoa, e a auditoria não precisa disso para funcionar.
-              </Traduzindo>
               <ol className="mt-4 space-y-2">
                 {feed.map((e) => (
                   <li key={e.id} className="flex flex-wrap gap-x-3 border-t border-filete pt-2">
@@ -154,12 +163,17 @@ export default async function Historico() {
             </div>
           )}
           <Subtitulo className="mt-6">Por que isto existe</Subtitulo>
-          <p className="mt-1 max-w-texto text-corpo text-tinta-media">
-            Se a lista pudesse ser ajustada em silêncio — uma pesquisa inconveniente removida aqui,
-            uma favorável adicionada ali — o número do topo seria opinião com cara de estatística.
-            Quem quiser conferir não precisa da nossa boa-fé: compara esta lista com a publicação
-            original de cada pesquisa.
-          </p>
+          <div className="mt-1 lg:grid lg:grid-cols-2 lg:items-start lg:gap-10">
+            <p className="max-w-texto text-corpo text-tinta-media">
+              Se a lista pudesse ser ajustada em silêncio — uma pesquisa inconveniente removida
+              aqui, uma favorável adicionada ali — o número do topo seria opinião com cara de
+              estatística.
+            </p>
+            <p className="mt-3 max-w-texto text-corpo text-tinta-media lg:mt-0">
+              Quem quiser conferir não precisa da nossa boa-fé: compara esta lista com a publicação
+              original de cada pesquisa.
+            </p>
+          </div>
         </Bloco>
       </Secao>
     </main>

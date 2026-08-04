@@ -44,20 +44,34 @@ const posicao = (v: number, escala: EscalaBarra) =>
  * continuava dependendo do selo escrito. As três marcas usam exatamente a
  * mesma escala das barras, então o "empate" do rótulo cai no mesmo x da régua
  * de tinta de todas as linhas.
+ *
+ * O invariante só vale se a régua tiver A MESMA LARGURA E O MESMO RECUO das
+ * barras que ela nomeia: uma régua esticada sobre um grid de duas colunas
+ * aponta para o vão entre elas. Quem renderiza é responsável por isso — em
+ * `serie-pesquisas.tsx` há uma cópia por coluna, cada uma com o recuo de 16px
+ * do padding do cartão.
  */
 export function ReguaPesquisas({ escala, className }: { escala: EscalaBarra; className?: string }) {
   return (
+    /* DUAS FILEIRAS: "empate" em cima, sozinho, e as duas pontas embaixo. Numa
+       fileira só, o rótulo do meio encostava em "← Flávio na frente" assim que
+       a régua ficava estreita — a partir de md ela mede ~288px por coluna do
+       grid, e a ponta esquerda sozinha já come 125 dos 144 que a metade tem.
+       Empilhado, o rótulo do meio não disputa largura com ninguém e continua
+       ancorado no mesmo x da régua de tinta. Ele fica na fileira DE BAIXO, que
+       é a que encosta nos cartões: é dali que o olho desce para a régua de
+       tinta de cada barra. */
     <p
-      className={["relative h-5 text-micro text-tinta-media", className].filter(Boolean).join(" ")}
+      className={["relative h-10 text-micro text-tinta-media", className].filter(Boolean).join(" ")}
     >
-      <span className="absolute left-0">← Flávio na frente</span>
+      <span className="absolute top-0 left-0">← Flávio na frente</span>
+      <span className="absolute top-0 right-0">Lula na frente →</span>
       <span
-        className="absolute -translate-x-1/2 font-semibold text-tinta"
+        className="absolute bottom-0 -translate-x-1/2 font-semibold whitespace-nowrap text-tinta"
         style={{ left: `${posicao(0, escala)}%` }}
       >
         empate
       </span>
-      <span className="absolute right-0">Lula na frente →</span>
     </p>
   );
 }

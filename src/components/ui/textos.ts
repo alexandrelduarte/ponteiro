@@ -126,8 +126,15 @@ export interface VerbeteGlossario {
 export const GLOSSARIO = {
   margemErro: {
     termo: "margem de erro",
+    /**
+     * A primeira linha é uma PONTE DE VOCABULÁRIO, não uma definição: o painel
+     * chama esta folga de "folga da medida", a televisão chama de "margem de
+     * erro", e quem chega com o segundo nome na cabeça precisa saber que é a
+     * mesma coisa antes de qualquer explicação.
+     */
     texto:
-      "É a folga da medida. A pesquisa ouviu uma parte das pessoas, não todas — então o número " +
+      "“Folga da medida” e “margem de erro” são a mesma coisa — este painel usa o primeiro nome, a " +
+      "televisão usa o segundo. A pesquisa ouviu uma parte das pessoas, não todas — então o número " +
       "real pode estar um pouco para cima ou um pouco para baixo. Exemplo: folga de 2 pontos com " +
       "Lula em 47% quer dizer que o número real está, provavelmente, entre 45% e 49%.",
   },
@@ -198,8 +205,9 @@ export const GLOSSARIO = {
   amostra: {
     termo: "quantas pessoas foram ouvidas",
     texto:
-      "É o tamanho da pesquisa. Quanto mais gente ouvida, menor a folga da medida — mas ouvir mais " +
-      "gente não conserta erro de método.",
+      "É o tamanho da pesquisa. Quanto mais gente ouvida, menor a folga da medida. Exemplo: ouvir " +
+      "2.000 pessoas dá uma folga de cerca de 2 pontos; ouvir 5.000 dá cerca de 1,4. Mas ouvir " +
+      "mais gente não conserta erro de método.",
   },
   deriva: {
     termo: "o quanto a corrida ainda pode andar",

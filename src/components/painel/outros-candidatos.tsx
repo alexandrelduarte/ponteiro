@@ -175,14 +175,17 @@ export function OutrosCandidatos() {
         ) : (
           <>
             {/* A régua, rotulada e igual para os nove. Ela vem ANTES das barras
-                porque é ela que dá sentido ao comprimento de cada uma. */}
-            <div
-              aria-hidden="true"
-              className="mt-1 flex justify-between text-micro text-tinta-media"
-            >
-              <span>0</span>
-              <span>25%</span>
-              <span>50% dos votos</span>
+                porque é ela que dá sentido ao comprimento de cada uma.
+                O rótulo do meio é POSICIONADO, não distribuído: num
+                `justify-between` de três itens o do meio se centra no VÃO entre
+                os outros dois, e não no tique — media 675 num trilho cujo meio
+                é 720, ou seja, o rótulo "25%" caía sobre 22,4% da escala. É a
+                mesma âncora da marca no trilho (`left-1/2 -translate-x-1/2`),
+                então os dois não têm como divergir. */}
+            <div aria-hidden="true" className="relative mt-1 h-5 text-micro text-tinta-media">
+              <span className="absolute left-0">0</span>
+              <span className="absolute left-1/2 -translate-x-1/2">25%</span>
+              <span className="absolute right-0">50% dos votos</span>
             </div>
 
             <ul className="mt-1 space-y-3" data-testid="lista-candidatos">
@@ -190,25 +193,27 @@ export function OutrosCandidatos() {
                 const largura = Math.min(100, (100 * c.media) / REGUA_MAX);
                 return (
                   <li key={c.nome}>
+                    {/* Nome e partido em LINHAS DIFERENTES, para os nove.
+                        Inline, o par quebrava conforme o comprimento do nome —
+                        sete dos nove empurravam "(PSD)", "(Avante)", "(UP)"
+                        para a segunda linha e dois ficavam inteiros, então a
+                        lista não tinha ritmo nenhum. Aqui a primeira linha é
+                        sempre "Nº · nome" contra o número, e a segunda sempre
+                        o partido; nada depende de caber. */}
                     <div className="flex items-baseline justify-between gap-x-3">
-                      <span className="min-w-0 text-corpo text-tinta">
-                        <b className="font-semibold">
-                          {i + 1}º · {c.nome}
-                        </b>{" "}
-                        <span className="text-micro text-tinta-media">({c.partido})</span>
-                        {i < 2 ? (
-                          <Chip tom="ameixa" className="ml-2">
-                            disputa principal
-                          </Chip>
-                        ) : null}
+                      <span className="min-w-0 text-corpo font-semibold text-tinta">
+                        {i + 1}º · {c.nome}
                       </span>
                       <span className="shrink-0 text-corpo font-semibold whitespace-nowrap text-tinta numeros">
-                        {fmt(c.media)}%{" "}
-                        <span className="text-micro font-normal text-tinta-media">
-                          · {c.k} {c.k === 1 ? "pesquisa" : "pesquisas"}
-                        </span>
+                        {fmt(c.media)}%
                       </span>
                     </div>
+                    <p className="flex flex-wrap items-center gap-x-2 text-micro text-tinta-media numeros">
+                      <span>
+                        {c.partido} · média de {c.k} {c.k === 1 ? "pesquisa" : "pesquisas"}
+                      </span>
+                      {i < 2 ? <Chip tom="ameixa">disputa principal</Chip> : null}
+                    </p>
                     {/* Trilho = a régua inteira (0 a 50%). A marca da metade
                         cai sempre no mesmo lugar, para os nove. */}
                     <div className="relative mt-1 h-3 overflow-hidden rounded-plena bg-nicho">

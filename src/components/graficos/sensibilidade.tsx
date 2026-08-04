@@ -47,6 +47,19 @@ const fracaoX = (v: number) =>
  *     as duas curvas e dois tracejados, com a palavra "virada" riscada por um
  *     deles. O ponto preto continua no lugar e a frase logo abaixo do gráfico
  *     já diz, com o mesmo número, o que ele é.
+ *  5. **Dois rótulos na MESMA abscissa se empilham, e só o de baixo puxa o
+ *     filete.** No padrão, "onde você está" e "As pesquisas estão certas"
+ *     nomeiam a mesma vertical (x = 0): o filete do de cima descia até o topo
+ *     da plotagem e atravessava o de baixo no meio, passando entre "pesquisas"
+ *     e "estão". Agora a linha só sobe até o primeiro rótulo, e o de cima fica
+ *     empilhado sobre ele, sem traço nenhum entre os dois.
+ *  6. **"metade a metade" saiu de dentro da plotagem.** No canto inferior
+ *     direito ela era cruzada pela curva que sobe depois do ponto de virada
+ *     (medido a 390: a linha atravessava as letras entre x≈250 e x≈275); nos
+ *     cantos da esquerda, pela vertical ameixa de x = 0. O rótulo mede ~105px
+ *     e a plotagem a 390 tem 262px, com a vertical a 60px da borda — não
+ *     existe canto livre. Ele passou a nomear a linha DE FORA, na legenda do
+ *     eixo y, logo acima do gráfico.
  */
 const MARGEM_TOPO = 84;
 const RECUO_FILEIRA = [66, 48, 30, 12] as const;
@@ -79,6 +92,7 @@ function RotuloAncorado({
   fileira,
   cor,
   t,
+  filete = true,
 }: {
   viewBox?: CaixaRotulo;
   texto: string;
@@ -86,13 +100,24 @@ function RotuloAncorado({
   cor: string;
   /** posição do rótulo no domínio do eixo x, de 0 a 1 */
   t: number;
+  /** desenha a chamada até o topo da plotagem — falso quando há outro rótulo empilhado abaixo */
+  filete?: boolean;
 }) {
   if (viewBox?.x == null || viewBox.y == null) return null;
   const y = viewBox.y - RECUO_FILEIRA[fileira];
   return (
     <g>
       {/* O filete de chamada: do rótulo até o topo da vertical que ele nomeia. */}
-      <line x1={viewBox.x} y1={y + 4} x2={viewBox.x} y2={viewBox.y} stroke={cor} strokeWidth={1} />
+      {filete ? (
+        <line
+          x1={viewBox.x}
+          y1={y + 4}
+          x2={viewBox.x}
+          y2={viewBox.y}
+          stroke={cor}
+          strokeWidth={1}
+        />
+      ) : null}
       <text
         className="rotulo-grafico"
         x={viewBox.x}
@@ -127,6 +152,9 @@ export default function GraficoSensibilidade({
     onAplicar(Math.round(v * 10) / 10);
   };
 
+  /** Há um cenário na mesma vertical de "onde você está"? Então ele leva o filete. */
+  const viesEmpilhado = cenarios.some((c) => Math.abs(c.vies - vies) < 0.05);
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <ComposedChart
@@ -154,20 +182,14 @@ export default function GraficoSensibilidade({
         />
         <Tooltip trigger="click" content={<DicaSensibilidade />} />
 
-        {/* A metade a metade fica à DIREITA: à esquerda ela era atravessada
-            pela vertical ameixa, que no padrão mora em x = 0. */}
-        <ReferenceLine
-          y={50}
-          stroke={COR.tintaMedia}
-          strokeDasharray="4 3"
-          label={{
-            value: "metade a metade",
-            position: "insideBottomRight",
-            fontSize: 13,
-            fill: COR.tintaMedia,
-            className: "rotulo-grafico",
-          }}
-        />
+        {/* A linha do 50 fica SEM rótulo dentro da plotagem. Não sobrou canto
+            livre para ele: à direita e embaixo ele era cruzado pela curva que
+            sobe depois do ponto de virada, e à esquerda pela vertical ameixa,
+            que no padrão mora em x = 0 (a 390 o texto mede ~105px e a vertical
+            está a 60px da borda da plotagem — ele passava por baixo dela em
+            qualquer alinhamento). Quem nomeia a linha agora é a legenda ACIMA
+            do gráfico, fora da área de tinta, junto do nome do eixo y. */}
+        <ReferenceLine y={50} stroke={COR.tintaMedia} strokeDasharray="4 3" />
         {/* Verticais dos cenários em tinta média e tracejado longo: contra a
             grade (`grade`, 1px, 2 4) elas eram invisíveis. */}
         {cenarios.map((c, i) => (
@@ -200,7 +222,13 @@ export default function GraficoSensibilidade({
           stroke={COR.ameixa}
           strokeWidth={2}
           label={
-            <RotuloAncorado texto="onde você está" fileira={0} cor={COR.ameixa} t={fracaoX(vies)} />
+            <RotuloAncorado
+              texto="onde você está"
+              fileira={0}
+              cor={COR.ameixa}
+              t={fracaoX(vies)}
+              filete={!viesEmpilhado}
+            />
           }
         />
         <Line

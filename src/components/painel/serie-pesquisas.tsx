@@ -270,13 +270,16 @@ export function SeriePesquisas() {
                       {chip.texto}
                     </Chip>
                   </td>
-                  {/* Só o NÚMERO é inquebrável: com o `nowrap` na célula, o
-                      rótulo «peso baixo» fixava a coluna em 80px — mais que o
-                      dobro do valor — e era parte do que empurrava o registro
-                      do TSE para fora da área visível em 768. */}
+                  {/* O número e o rótulo são inquebráveis CADA UM NA SUA linha
+                      (o rótulo em bloco próprio não pode partir em «peso» /
+                      «baixo»); o que segue proibido é o nowrap na CÉLULA, que
+                      forçaria «0,15 peso baixo» numa linha só de 80px e
+                      empurraria o registro do TSE para fora em 768. */}
                   <td className="py-2 pr-1.5 lg:pr-3 text-right">
                     <span className="whitespace-nowrap">{fmt(l.w, 2)}</span>
-                    {baixo ? <span className="block text-xs">peso baixo</span> : null}
+                    {baixo ? (
+                      <span className="block text-xs whitespace-nowrap">peso baixo</span>
+                    ) : null}
                   </td>
                   <td className={`py-2 pr-1.5 lg:pr-3 text-xs ${classeTse(l.tse)}`}>{l.tse}</td>
                   <td className="py-2 text-right">

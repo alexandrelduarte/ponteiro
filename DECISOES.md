@@ -125,7 +125,7 @@ Registro de decisões ambíguas (R6): contexto → decisão → porquê. Uma lin
   diâmetro → anel por `box-shadow` de blur zero (pintado fora da caixa) + `border: 0` →
   `--spacing-thumb` volta a ser o diâmetro visível literal (medido 24,0px em Chromium/Firefox).
 - Alfa necessário na sombra de rolagem sem token novo → `color-mix(in srgb,
-  var(--color-linha-forte) 55%, transparent)` → mantém "zero hex em componente".
+var(--color-linha-forte) 55%, transparent)` → mantém "zero hex em componente".
 - Etiquetas de cartão carregavam frases inteiras em caixa alta → prop `Cartao.descricao`
   (texto em caixa normal abaixo da etiqueta; `aria-labelledby` continua na etiqueta curta).
 - "0%" absoluto em prosa → helper de UI `pctComPiso` ("<1%"/">99%") APENAS na prosa; `pct` do
@@ -149,3 +149,26 @@ Registro de decisões ambíguas (R6): contexto → decisão → porquê. Uma lin
 - Verificação adversarial de mão dupla: o corretor provou por CDP (fonte rasterizada) que 4
   subpontos da crítica de mono/Archivo estavam errados (mini-cartões, contadores e 92%/8% já eram
   mono); os pontos verdadeiros (83%, anotações, 25/10) foram corrigidos.
+
+## Fase 7 — hardening (backend-security + integração)
+
+- CSP com nonce descartada → as páginas são ISR atrás do CDN (nonce único iria a milhares de
+  leitores; dinamizar mataria o cache, que é a mitigação de A5) → CSP estática: `script-src
+'self' 'unsafe-inline'` (payload RSC inline muda a cada revalidação — hash inviável), SEM
+  `unsafe-eval` em produção, `style-src 'unsafe-inline'` (inline styles do React/Recharts;
+  `style-src-elem` descartado empiricamente — 404/global-error do Next embutem `<style>` e o
+  suporte não é uniforme), `frame-ancestors 'none'` + `X-Frame-Options DENY`, connect-src
+  derivado de `NEXT_PUBLIC_SUPABASE_URL` no build.
+- `pnpm audit`: 5 vulns transitivas (4× postcss 8.4.31 pinado pelo Next — exigem CSS controlado
+  pelo atacante, inexistente; 1× sharp opcional — next/image não é usado) → SEM overrides →
+  forçar versões não declaradas pelo Next trocaria risco inalcançável por risco real de quebra;
+  gatilho de reavaliação documentado em SECURITY.md.
+- CI sem passo de `pnpm audit` (reprovaria por falhas inalcançáveis; Dependabot cobre) e COM
+  grep de segredo em `.next/static/` como gate → serve o R1 diretamente.
+- Rota do cron exportava só POST → renomeada para GET (405 nos demais verbos) → o Vercel Cron
+  invoca por GET; com POST o updater diário nunca dispararia em produção.
+- Probe JIT do Zod 4 (`Function("")`) violava a CSP no cliente → `z.config({ jitless: true })`
+  no único módulo cliente que importa Zod → validação idêntica, violação 1→0 (provado).
+- Custo do cron corrigido no README: ~US$ 5–20/mês (não "centavos") → o que domina são os
+  tokens das páginas re-cobrados na resposta com web_search, não a taxa de busca; botões para
+  reduzir documentados (`max_uses`, versão 2026-02 da tool).

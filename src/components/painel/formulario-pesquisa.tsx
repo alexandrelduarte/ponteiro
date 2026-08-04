@@ -14,6 +14,11 @@ import { useId, useState } from "react";
 import { z } from "zod";
 import type { Pesquisa } from "@/data/tipos";
 
+// O probe JIT do Zod chama `Function("")` e dispara uma violação da CSP
+// (script-src sem unsafe-eval). `jitless` desliga o probe; a validação é
+// idêntica, apenas sem o atalho compilado. É o único módulo cliente com Zod.
+z.config({ jitless: true });
+
 const CAMPOS = [
   { chave: "instituto", rotulo: "Instituto*", largo: true, tipo: "text" },
   { chave: "fim", rotulo: "Data final do campo*", largo: false, tipo: "date" },

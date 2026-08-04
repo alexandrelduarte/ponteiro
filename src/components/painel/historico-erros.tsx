@@ -131,13 +131,12 @@ export function HistoricoErros() {
           ganharam um gabarito perfeito — o resultado real do 1º turno — e recalibraram com ele. As
           pesquisas que alimentam este painel hoje ainda não passaram por{" "}
           <b className="text-tinta">calibragem nenhuma</b>: são o mesmo tipo de instrumento que
-          produziu o +6,3. Por isso o erro do 1ºT entra três
-          vezes no modelo: (1) ancora a incerteza sistemática do retrato atual, pré-calibragem
-          (padrão 4,0, entre os estados calibrado e não calibrado); (2) muda a cara do 1º turno
-          projetado — folga de ~9 p.p. vira chegada de ~2,5, alterando a chance de definição em
-          04/10 e a dinâmica da campanha; (3) define o teto observado do erro do setor, usado no
-          cartão «teste-limite». O +3,1 só vira a referência certa depois de 04/10, quando o
-          gabarito voltar a existir.
+          produziu o +6,3. Por isso o erro do 1ºT entra três vezes no modelo: (1) ancora a incerteza
+          sistemática do retrato atual, pré-calibragem (padrão 4,0, entre os estados calibrado e não
+          calibrado); (2) muda a cara do 1º turno projetado — folga de ~9 p.p. vira chegada de ~2,5,
+          alterando a chance de definição em 04/10 e a dinâmica da campanha; (3) define o teto
+          observado do erro do setor, usado no cartão «teste-limite». O +3,1 só vira a referência
+          certa depois de 04/10, quando o gabarito voltar a existir.
         </p>
         <p className="mt-2 text-xs leading-leitura text-cinza">
           <b className="text-tinta">E as correções persistem entre eleições?</b> O histórico diz: só

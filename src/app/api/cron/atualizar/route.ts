@@ -36,7 +36,8 @@ function segredoConfere(recebido: string, esperado: string): boolean {
 /** Guarda contra disparo duplo na mesma instância (o cron às vezes repete). */
 let emExecucao = false;
 
-export async function POST(requisicao: Request) {
+/** O Vercel Cron invoca por GET com `Authorization: Bearer ${CRON_SECRET}`. */
+export async function GET(requisicao: Request) {
   const segredo = process.env.CRON_SECRET;
   if (!segredo) {
     return NextResponse.json({ erro: "serviço indisponível" }, { status: 503, headers: SEM_CACHE });
@@ -90,9 +91,9 @@ export async function POST(requisicao: Request) {
   }
 }
 
-export async function GET() {
+export async function POST() {
   return NextResponse.json(
     { erro: "método não permitido" },
-    { status: 405, headers: { ...SEM_CACHE, Allow: "POST" } },
+    { status: 405, headers: { ...SEM_CACHE, Allow: "GET" } },
   );
 }

@@ -1,0 +1,70 @@
+version: 2
+
+# Ameaça A9 (supply chain): o lockfile congela as versões, mas congelar sem
+# atualizar é só adiar. O Dependabot abre o PR, o CI roda os gates e os golden
+# tests provam que o modelo continua idêntico (1e-9) antes de qualquer merge.
+
+updates:
+  # ---------------------------------------------------------------- npm/pnpm
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Sao_Paulo
+    open-pull-requests-limit: 5
+    versioning-strategy: increase
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    labels:
+      - dependencias
+    groups:
+      # Uma revisão por família em vez de um PR por pacote: menos ruído,
+      # e o conjunto que precisa subir junto sobe junto.
+      react-next:
+        patterns:
+          - "next"
+          - "eslint-config-next"
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      ferramental-dev:
+        dependency-type: development
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "eslint-config-next"
+          - "@types/react"
+          - "@types/react-dom"
+      producao-menores:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+        exclude-patterns:
+          - "next"
+          - "react"
+          - "react-dom"
+
+  # ------------------------------------------------------- GitHub Actions
+  # Actions são código de terceiro rodando com o token do repositório: manter
+  # as tags subindo é parte da mesma ameaça A9.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Sao_Paulo
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(ci)"
+    labels:
+      - dependencias
+    groups:
+      actions:
+        patterns:
+          - "*"

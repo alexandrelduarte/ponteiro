@@ -1,0 +1,84 @@
+name: CI
+
+# Portão único do repositório: os mesmos gates que rodam na máquina
+# (typecheck → lint → test → build) rodam aqui, na ordem que falha mais barato
+# primeiro. Sem secrets: o site builda e testa SEM Supabase e SEM Anthropic
+# (regra R8, degradação graciosa para o seed local). Se algum dia um passo
+# precisar de credencial, ele está no lugar errado.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Nada aqui escreve no repositório nem publica pacote.
+permissions:
+  contents: read
+
+# PR novo cancela a execução anterior do mesmo branch.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    name: typecheck · lint · test · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      # Determinismo: mesmo fuso e mesma locale da produção.
+      TZ: America/Sao_Paulo
+      NEXT_TELEMETRY_DISABLED: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          # Fixado porque o package.json não tem campo `packageManager`; o
+          # Dependabot (github-actions, semanal) cuida de propor as subidas.
+          version: 10
+          run_install: false
+
+      - name: Instalar Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          # Cache do store do pnpm chaveado pelo lockfile.
+          cache: pnpm
+
+      - name: Instalar dependências (lockfile congelado)
+        # --frozen-lockfile falha se o pnpm-lock.yaml não bate com o
+        # package.json: ninguém resolve versão nova dentro do CI.
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Testes (modelo, updater, RLS)
+        run: pnpm test
+
+      - name: Build de produção
+        run: pnpm build
+
+      - name: Provar que nenhum segredo foi para o bundle do navegador (R1)
+        # .next/static é literalmente o que o browser baixa. Nem o NOME nem o
+        # valor de uma chave server-only pode aparecer ali.
+        run: |
+          set -euo pipefail
+          padroes='sk-ant|SUPABASE_SERVICE_ROLE_KEY|service_role|ANTHROPIC_API_KEY|CRON_SECRET|ADMIN_EMAILS'
+          if grep -REl "$padroes" .next/static/ ; then
+            echo "::error::segredo (nome ou valor) encontrado no bundle do cliente"
+            exit 1
+          fi
+          echo "bundle do cliente limpo"

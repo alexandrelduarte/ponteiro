@@ -64,7 +64,7 @@ export function SeletorMetodologia({ children }: { children: ReactNode }) {
           id="explicacao-tecnica"
           role="radiogroup"
           aria-labelledby="rotulo-modo"
-          className="mt-2 inline-flex scroll-mt-4 flex-wrap gap-1 rounded-plena bg-placa p-1 shadow-[inset_0_0_0_1.5px_var(--color-contorno)]"
+          className="mt-2 inline-flex scroll-mt-4 flex-wrap gap-1 rounded-nicho bg-placa p-1 shadow-[inset_0_0_0_1.5px_var(--color-contorno)] sm:rounded-plena"
         >
           {OPCOES.map((o) => (
             <button

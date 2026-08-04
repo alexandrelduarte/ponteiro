@@ -38,7 +38,8 @@ export function Virada() {
           <>
             Cada bolinha é um resultado possível para a diferença no dia da votação, e todas valem o
             mesmo. As que caem à direita da régua são cenários em que Lula ganha; à esquerda,
-            cenários em que Flávio ganha. Quanto mais espalhadas, menos fechada está a disputa.
+            cenários em que Flávio ganha. Na régua, os dois teriam o mesmo tanto de voto. Quanto
+            mais espalhadas, menos fechada está a disputa.
           </>
         }
       />

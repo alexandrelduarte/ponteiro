@@ -838,3 +838,193 @@ para isso — só a exigência de que os rótulos ancorados usem `{{T2_LULA}}`/`
 placeholders da legenda, e nunca a manchete.
 
 — _data-scientist, 04/08/2026_
+
+---
+
+## 11. Adendo — carimbo dos blocos A–I da iteração 2
+
+Auditado no código real, não no relatório. **3 vetados · 4 com emenda · o resto aprovado.**
+
+### A. `src/components/painel/copia-contexto.ts` — tradução dos 5 cartões
+
+**Os cinco campos `dado`: APROVADOS.** Conferi número a número contra `src/data/contexto.ts`
+(intocado): 48/47 · 46/50 · 47,6/51,2 · 42/51 · 47–53 · 46–57 · 47/38 · 36/31 · 27 anos · 25% ·
+22/07 · 16/08 · 04/10 · 25/10 — **nenhum trocado, nenhum perdido**. O "conforme o instituto"
+sobreviveu. E o desfazimento do "×" está **correto nos quatro pares**: a leitura original ("1º saldo
+positivo de Lula") só fecha se o primeiro número for a aprovação, e é assim que os quatro foram
+traduzidos. Era o ponto onde um deslize viraria fato fabricado; não houve. O `fonte` de cada cartão
+passa intacto pelo `map` (H12 ✔), e o fallback para o texto original quando falta tradução é o
+desenho certo — nada some da tela.
+
+**A.1 Cartão 1, `leitura` — APROVADO COM EMENDA.** "incumbente competitivo, não dominante" virou
+"costuma disputar de igual para igual — **não larga na frente**, nem está fora da disputa". "Não
+dominante" é sobre o tamanho da vantagem; "não larga na frente" é sobre a posição — e a posição é
+exatamente o que a manchete da mesma página afirma (Lula em 83 de 100). O cartão passa a parecer
+desmentir o painel, dizendo mais do que o dado dele diz.
+
+> ✓ País dividido. Na Quaest foi a primeira vez, desde dezembro de 2024, que mais gente aprova do
+> que desaprova. Isso vai na mesma direção da leve melhora de Lula nas pesquisas de voto. Governo
+> com aprovação entre 42% e 48% costuma disputar de igual para igual: continua na disputa, mas sem
+> vantagem grande.
+
+**A.2 Cartão 2, `leitura` — APROVADO COM EMENDA.** Uma ressalva foi amputada: o original diz
+"**~**8–15% de indecisos e brancos" e a tradução fixa "8% a 15%". O til é a única marca de que a
+faixa é estimada.
+
+> ✓ …A disputa se decide entre os **cerca de** 8% a 15% que ainda não escolheram ou vão de branco e
+> nulo. …
+
+_(o resto do cartão fica: "teto" → "limite" está certo, e trocar "indecisos e brancos" por "ainda
+não escolheram ou vão de branco e nulo" aproxima o cartão do `bnns` que o modelo publica — 9,6%,
+dentro da faixa. Melhoria, não desvio.)_
+
+**A.3 Cartão 3, `leitura` — VETADO.** Três problemas em duas linhas:
+
+- "…por isso as pesquisas de 2026 **andam de décimo em décimo**, e não aos saltos." É a mesma frase
+  que emendei em `secao.contexto.resposta` (§4) — e ela está **falsa contra a série do próprio
+  painel**: a média ponderada andou 7,0 → 3,6 → 5,9 → 4,7, e as pesquisas individuais vão de −1,0
+  (Gerp) a +8,0 (Quaest). Pior: a `resposta` da seção, 30 linhas acima no mesmo bloco, já foi
+  corrigida para "anda devagar". A tela passaria a dizer as duas coisas.
+- "tende a oscilar pouco" virou "**a opinião se mexe pouco**": o "tende a" é uma ressalva e foi
+  amputado.
+- "é voto fechado" virou "**já decidiu e não muda**": o dado é uma resposta declarada ("é o único em
+  que votaria"), não uma garantia de comportamento futuro. É certeza fabricada em miniatura (H1).
+
+> ✓ Dois terços de quem vota em cada um já diz que não votaria em mais ninguém. Com o eleitorado
+> dividido assim, sobra pouca gente para conquistar — e a opinião tende a se mexer pouco.
+
+_(A frase "sobra pouca gente para conquistar" vinha do cartão-síntese que o bloco H apagou; trazê-la
+para cá recupera a ideia sem recriar a repetição.)_
+
+**A.4 Cartões 4 e 5, `leitura` — APROVADOS.** "fundamento matemático da «deriva»" → "é daí que sai a
+conta do quanto a corrida ainda pode andar" usa o nome canônico do glossário e a direção está certa
+(`deriva = 0,35·√dias`: mais tempo, mais espaço). "choques exógenos com efeito eleitoral ainda
+incerto" → "fatos grandes, vindos de fora da disputa, e ainda não se sabe o efeito de nenhum deles"
+— a incerteza sobreviveu inteira. Sem reparo.
+
+**Observação de manutenção (não é veto):** o mapa é chaveado pelo `titulo` original. Se um título
+mudar em `contexto.ts`, o cartão cai no fallback e o texto v1 — "incumbente competitivo", "choques
+exógenos" — volta à superfície pública sem aviso. Vale um teste que falhe quando uma chave de
+`CARTOES` não casar com nenhum `CONTEXTO[i].titulo`.
+
+### B. Ponte de vocabulário "folga da medida — a margem de erro" — APROVADO
+
+Nos três lugares (`frente.tsx:99`, `metodologia/page.tsx`, 1ª linha de `GLOSSARIO.margemErro`). Os
+dois nomes designam a mesma quantidade, VOZ §5.4 mantém "margem de erro" como termo com chip, e a
+ponte é o que permite ao leitor que chega da televisão entender a regra do **dobro** sem achar que é
+outra coisa. Confirmado no código que o "o dobro" e o "é essa a folga que vale quando se comparam os
+dois números" continuam junto — a ponte não diluiu o veto do §3.1.
+
+### C. Legenda do mini-enxame, cláusula nova — VETADO
+
+> ✗ "A largura da pilha é o tamanho da dúvida: quanto mais espalhadas, **maior a margem de erro**."
+
+A largura da pilha é `sigmaDia2` = **5,2 pontos** — a combinação de três coisas: o quanto a média
+ainda pode variar, o erro que todas as pesquisas podem cometer juntas e o quanto a corrida ainda
+pode andar. **Margem de erro** é outra coisa: a folga amostral de **uma** pesquisa, que a tabela da
+mesma página publica como 1,0 · 2,0 · 2,2. Chamar a largura do enxame de "margem de erro" funde as
+três fontes num nome só, contradiz as três linhas de "As contas" logo abaixo (que existem para
+separá-las) e desfaz a ponte de vocabulário do bloco B na mesma tela.
+
+A intenção — ensinar a ler a **forma**, não só a contar os lados — é boa e fica. Só o nome muda:
+
+> ✓ As bolinhas mostram só a decisão de 25 de outubro: {{SIM_T2_LULA}} caem do lado de Lula e
+> {{SIM_T2_FLAVIO}} do lado de Flávio. A largura da pilha é o tamanho da dúvida **no dia da
+> votação**: quanto mais espalhadas, **menos fechada está a disputa**. A frase acima soma também
+> quem ganha já em 4 de outubro — por isso dá outro número.
+
+_("menos fechada está a disputa" já é a redação aprovada em `secao.virar.traduzindo`: a mesma forma
+passa a ter a mesma explicação nos dois enxames.)_
+
+### D. Glossário `amostra`, exemplo novo — VETADO
+
+> ✗ "…ouvir 2.000 pessoas dá uma folga de cerca de 2 pontos; **ouvir 5.000 dá cerca de 1,4**."
+
+A conta está certa (`0,98/√n`: 2.000 → 2,19; 5.000 → 1,39) e **é justamente por isso que o exemplo
+não pode ficar**: a tabela da mesma página tem duas linhas da AtlasIntel com **5.021 e 4.999 pessoas
+ouvidas e folga declarada de 1,0**. O leitor que aprender a regra e for conferir encontra o painel
+se desmentindo — exatamente o defeito do "empate técnico" que vetei no §3.1. (O "cerca de 2" para
+2.000 não tem esse problema: a tabela mostra 2,0 e 2,2 para pesquisas desse tamanho.)
+
+> ✓ É o tamanho da pesquisa. Quanto mais gente ouvida, menor a folga da medida. Exemplo: com 2.000
+> pessoas ouvidas a folga fica perto de 2 pontos, e para cortá-la pela metade seria preciso ouvir
+> quatro vezes mais gente. Cada instituto calcula a sua, e ouvir mais gente não conserta erro de
+> método.
+
+Ensina a lei que importa (a folga cai com a **raiz** do tamanho — quatro vezes mais gente para
+metade da folga, exatamente verdadeiro), e nenhuma linha da tabela a contradiz.
+
+**Observação:** os exemplos acrescentados aos outros verbetes foram conferidos e **estão todos
+aritmeticamente corretos** — `votosValidos` (47 e 41 com 12% fora dá 53 × 47 ✔), `vies` (4,7 − 3 =
+1,7 ✔), `empateTecnico` (folga 2 → 4; vantagem 3 é empate ✔), `projecao` (88 → 83, os números reais
+✔) e `peso` (1,00 e 0,05: `exp(−ln2 × 90/21)` = 0,051 ✔). Só noto que os verbetes passaram de 1–2
+para 3–4 frases, contra VOZ §5.4 — é chamada do ux-writer, não minha; os exemplos valem o espaço.
+
+### E. Lead "Isto não é previsão." no rodapé — APROVADO
+
+O texto legal continua íntegro no parágrafo seguinte, e o parágrafo de chance ganhou, de quebra,
+"dadas as suposições que ficam à vista e que você pode mudar nas réguas" — que é o conserto que
+exigi em `comoLer.rodape` e `secao.metodo.traduzindo` (§3.6), agora também onde o leitor mais
+desconfiado chega. Nenhum reparo.
+
+### F. Legenda da ilustração — APROVADO COM EMENDA
+
+O diagnóstico do dev está certo e é fino: a ilustração mostra quatro cápsulas, uma inteira do lado
+de Flávio, colada na frase "nas outras 4, Lula aparece na frente" — o leitor lia "1 em 4" onde o
+painel tem 1 em 13. A legenda resolve _quais_ pesquisas são; falta resolver _quantas_, que é o
+número que ele estava lendo errado.
+
+> ✓ Exemplo: quatro pesquisas imaginárias, **só para mostrar como ler a barra**. Não são as
+> pesquisas da lista.
+
+### G. Eixo y da curva de sensibilidade — APROVADO
+
+"chance de ser eleito, em cada 100 — a linha tracejada no 50 é a metade a metade". O campo é
+`calcSerieSens → elD × 100` (chance de ser **eleito**, projetada), que é o que o rótulo diz; a
+unidade é frequência em 100, não percentual solto (VOZ §2.1 ✔); e o cruzamento das duas linhas cai
+mesmo sobre y = 50 ✔. Nenhum reparo.
+
+### H. Os dois cortes de repetição
+
+**H.1 Cartão-síntese do contexto — APROVADO.** Nada de estatístico se perdeu: as quatro ideias da
+síntese vivem nos cartões 2 ("8% a 15% que ainda não escolheram"), 3 (eleitorado dividido), 4
+(propaganda a partir do fim de agosto) e 5 (economia e Justiça). O corte, aliás, foi provocado pela
+minha própria emenda em `secao.contexto.resposta`, que criou a duplicata. **Condição:** §W dá
+`secao.contexto.sintese.*` como coberto e o INVENTÁRIO manda que nada suma — a supressão precisa
+virar linha registrada, não sumiço silencioso.
+
+**H.2 Frase da régua na virada — APROVADO COM EMENDA.** A consolidação da faixa de 80% num lugar só
+está certa e conferida (renderiza uma vez, em `frente.tsx`, já com "medida nas pesquisas" e com a
+ponta de baixo condicional a `int80[0] < 0` ✔). Mas a frase apagada — "a régua do meio é o empate:
+ali os dois teriam o mesmo tanto de voto" — era a **única definição de "empate" naquele bloco**, e
+"empate" é a palavra que este produto usa para três coisas diferentes (a coluna do zero, o empate
+técnico das pesquisas e a faixa 50–60 da chance). O `traduzindo` restante diz de quem é cada lado,
+nunca o que é o meio. Restaura-se sem parágrafo novo, dentro do `traduzindo` que já existe:
+
+> ✓ Cada bolinha é um resultado possível para a diferença no dia da votação, e todas valem o mesmo.
+> As que caem à direita da régua são cenários em que Lula ganha; à esquerda, cenários em que Flávio
+> ganha. **Na régua, os dois teriam o mesmo tanto de voto.** Quanto mais espalhadas, menos fechada
+> está a disputa.
+
+### I. "PT · média de 9 pesquisas" na lista de candidatos — APROVADO, e com elogio
+
+`k` vem de `mediaEm` e é o número de pesquisas que mediram **aquele** nome. Conferido: Lula e Flávio
+9, o pelotão do meio 7, a cauda 4. Publicar isso impede a comparação silenciosa entre uma média de 9
+pesquisas e uma de 4 como se tivessem o mesmo lastro — é procedência por linha (R4/H12), e foi
+iniciativa da implementação, não exigência minha.
+
+### Fecho do §11
+
+Vetados: **`copia-contexto` cartão 3 `leitura`**, **cláusula "maior a margem de erro" da legenda do
+mini-enxame**, **exemplo dos 5.000 no glossário `amostra`**. Com emenda: `copia-contexto` cartões 1
+e 2 `leitura`, legenda da ilustração, `traduzindo` da virada. Todo o resto — as cinco `dado`, os
+cartões 4 e 5, a ponte de vocabulário, o rodapé, o eixo da curva, o corte da síntese e o `k` por
+candidato — **aprovado**.
+
+Os três vetos têm a mesma assinatura dos vetos originais: **um nome técnico aplicado à quantidade
+errada** (largura do enxame chamada de margem de erro), **uma regra que a própria tabela desmente**
+(5.000 → 1,4 contra a AtlasIntel em 1,0) e **uma frase que o próprio gráfico desmente** (décimo em
+décimo contra uma série que andou 3,4 pontos). Nenhum deles é opinião: os três são conferíveis na
+tela em menos de um minuto.
+
+— _data-scientist, 04/08/2026_

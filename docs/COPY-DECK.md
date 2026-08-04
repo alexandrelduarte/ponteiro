@@ -1675,55 +1675,55 @@ _Fora do INVENTÁRIO (superfície criada na produção), incluída para não fic
 
 Verificação item a item de `docs/INVENTARIO.md` §3 e §4. "Chave" aponta onde o texto vive agora.
 
-| Item do INVENTÁRIO                        | Onde ficou                                                               |
-| ----------------------------------------- | ------------------------------------------------------------------------ |
-| 3.1 sobretítulo "Apuração de pesquisas…"  | **substituído** por `marca.wordmark` + `marca.tagline` (VOZ §10.8)       |
-| 3.1 título "PRESIDENTE 2026"              | `marca.tituloPagina` (sem caixa alta)                                    |
-| 3.1 subtítulo (N pesquisas, base)         | `hero.procedencia` + `frescor.*`                                         |
-| 3.1 botão "Atualizar agora" (R3)          | `frescor.ok/alerta/semBanco` + `frescor.explica`                         |
-| 3.1 contadores de dias                    | `hero.linhaTempo`, `hero.linhaTempo.primeiro`                            |
-| 3.2 cabeçalho da tela / "não é previsão"  | `hero.manchete`, `hero.naoEPrevisao`                                     |
-| 3.2 linha principal (projetada)           | `hero.manchete` + `hero.manchete.rodape`                                 |
-| 3.2 linha secundária (hoje)               | `hero.hoje`                                                              |
-| 3.2 aviso âmbar de viés                   | `hero.avisoVies` (+ `.direcao.*`)                                        |
-| 3.2 veredito (4 faixas + sufixo)          | `hero.veredito.*` (4 títulos + 4 textos + sufixo)                        |
-| 3.2 caminho mais provável                 | `hero.caminho`                                                           |
-| 3.2 nota externa (as duas linhas)         | `hero.hoje.porQueDifere` + `hero.traduzindo`                             |
-| 3.3 abas + par definido pelos dados       | `secao.outros.aba.*`, `secao.outros.resposta`, `secao.outros.porQueDois` |
-| 3.3 aviso de par líder mudado             | `secao.outros.avisoParMudou`                                             |
-| 3.3 barras, bn, nomes ≤1%, tabela, gap3   | `secao.outros.marcaPrincipal`, `.bnns`, `.nomesPequenos`, `.tabelaNd`    |
-| 3.4 cartão 1º turno (todos os campos)     | `secao.frente.t1.*` + `secao.frente.tendencia.*`                         |
-| 3.4 cartão 2º turno (todos os campos)     | `secao.frente.t2.*`                                                      |
-| 3.5 evolução (toggle, tooltip, nota)      | `secao.evolucao.*`                                                       |
-| 3.5 distribuição / espaço de virada       | `secao.virar.*`                                                          |
-| 3.6 contexto social (5 cartões + síntese) | `secao.contexto.*` (títulos-pergunta; dado/leitura/fonte preservados)    |
-| 3.7 4 sliders com dica completa           | `secao.simulacao.slider1..4.*`                                           |
-| 3.7 caixa de fórmulas                     | `secao.simulacao.contas.linha1..3` + `.link`                             |
-| 3.7 botão restaurar padrão                | `secao.simulacao.restaurar*`                                             |
-| 3.7 estado na URL / compartilhar          | `acoes.compartilhar*`, `marca.compartilhar.textoSimulacao`               |
-| 3.8 tabela dos 5 pleitos                  | `secao.erro2022.tabela.caption` + `.col.*`                               |
-| 3.8 "pode se repetir" / "pode ser menor"  | `secao.erro2022.podeRepetir.*`, `.podeSerMenor.*`                        |
-| 3.8 bloco "erro do 1ºT importa agora"     | `secao.erro2022.porQue1T.p1..p4` (inclui 86 / 83 / 79)                   |
-| 3.8 curva de sensibilidade + clique       | `secao.erro2022.curva.*`                                                 |
-| 3.8 3 cartões de cenário                  | `secao.erro2022.cenario1..3.*`                                           |
-| 3.8 legenda do ponto de virada            | `secao.erro2022.curva.legenda`                                           |
-| 3.8 Replay 2022 (3 cartões + botão)       | `secao.erro2022.replay.*`                                                |
-| 3.8 parágrafo de calibração               | `secao.erro2022.replay.calibracao`                                       |
-| 3.8 fontes do histórico                   | `secao.erro2022.fontes.titulo`                                           |
-| 3.9 título dinâmico do cenário-base       | `secao.cenarioBase.resposta` (+ `.apertada` / `.moderada`)               |
-| 3.9 3 cartões da linha do tempo           | `secao.cenarioBase.passo1..3.*`                                          |
-| 3.9 bandas de margem + modal              | `secao.cenarioBase.bandas.*`                                             |
-| 3.9 "por que este é o cenário-base"       | `secao.cenarioBase.porQue.*` + `.oQueDerruba`                            |
-| 3.9 metodologia da seção                  | `secao.cenarioBase.comoFoiFeito.*`                                       |
-| 3.9 nota "1 vez a cada N eleições"        | `secao.cenarioBase.notaFrequencia`                                       |
-| 3.10 colunas da tabela + chips + peso     | `secao.pesquisas.col.*`, `.chip.*`, `.peso.explica`                      |
-| 3.10 badges usuário/auto, linhas fracas   | `secao.pesquisas.badge.*`, `.pesoBaixo`                                  |
-| 3.10 formulário (R5) e restaurar          | `simulacao.formulario.*`, `acoes.restaurarOficial`                       |
-| 3.10 cartões abaixo de md                 | `secao.pesquisas.registro.*`, `.verRegistro`                             |
-| 3.11 metodologia (6 blocos)               | `metodologia.*` (abertura simples; técnico intacto)                      |
-| 3.12 aviso legal                          | `rodape.simples.p1..p4` + `rodape.legalCompleta` (integral)              |
-| 4 estado vazio                            | `estados.serieVazia.*`                                                   |
-| 4 focus, fontes, formatos                 | regras em `VOZ.md` §8 (não são texto)                                    |
-| — degradação sem banco (R8)               | `estados.semBanco`, `estados.falhaRede`                                  |
-| — faixa "Como ler esta página" (novo)     | `comoLer.*`                                                              |
-| — glossário tocável (novo, P3)            | `glossario.*` (13 termos)                                                |
+| Item do INVENTÁRIO                        | Onde ficou                                                                                                                                         |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 3.1 sobretítulo "Apuração de pesquisas…"  | **substituído** por `marca.wordmark` + `marca.tagline` (VOZ §10.8)                                                                                 |
+| 3.1 título "PRESIDENTE 2026"              | `marca.tituloPagina` (sem caixa alta)                                                                                                              |
+| 3.1 subtítulo (N pesquisas, base)         | `hero.procedencia` + `frescor.*`                                                                                                                   |
+| 3.1 botão "Atualizar agora" (R3)          | `frescor.ok/alerta/semBanco` + `frescor.explica`                                                                                                   |
+| 3.1 contadores de dias                    | `hero.linhaTempo`, `hero.linhaTempo.primeiro`                                                                                                      |
+| 3.2 cabeçalho da tela / "não é previsão"  | `hero.manchete`, `hero.naoEPrevisao`                                                                                                               |
+| 3.2 linha principal (projetada)           | `hero.manchete` + `hero.manchete.rodape`                                                                                                           |
+| 3.2 linha secundária (hoje)               | `hero.hoje`                                                                                                                                        |
+| 3.2 aviso âmbar de viés                   | `hero.avisoVies` (+ `.direcao.*`)                                                                                                                  |
+| 3.2 veredito (4 faixas + sufixo)          | `hero.veredito.*` (4 títulos + 4 textos + sufixo)                                                                                                  |
+| 3.2 caminho mais provável                 | `hero.caminho`                                                                                                                                     |
+| 3.2 nota externa (as duas linhas)         | `hero.hoje.porQueDifere` + `hero.traduzindo`                                                                                                       |
+| 3.3 abas + par definido pelos dados       | `secao.outros.aba.*`, `secao.outros.resposta`, `secao.outros.porQueDois`                                                                           |
+| 3.3 aviso de par líder mudado             | `secao.outros.avisoParMudou`                                                                                                                       |
+| 3.3 barras, bn, nomes ≤1%, tabela, gap3   | `secao.outros.marcaPrincipal`, `.bnns`, `.nomesPequenos`, `.tabelaNd`                                                                              |
+| 3.4 cartão 1º turno (todos os campos)     | `secao.frente.t1.*` + `secao.frente.tendencia.*`                                                                                                   |
+| 3.4 cartão 2º turno (todos os campos)     | `secao.frente.t2.*`                                                                                                                                |
+| 3.5 evolução (toggle, tooltip, nota)      | `secao.evolucao.*`                                                                                                                                 |
+| 3.5 distribuição / espaço de virada       | `secao.virar.*`                                                                                                                                    |
+| 3.6 contexto social (5 cartões + síntese) | `secao.contexto.*` — síntese SUPRIMIDA por corte de repetição (AUDITORIA §11 H1: as 4 ideias vivem nos cartões 2–5); vira "O que ainda pode mexer" |
+| 3.7 4 sliders com dica completa           | `secao.simulacao.slider1..4.*`                                                                                                                     |
+| 3.7 caixa de fórmulas                     | `secao.simulacao.contas.linha1..3` + `.link`                                                                                                       |
+| 3.7 botão restaurar padrão                | `secao.simulacao.restaurar*`                                                                                                                       |
+| 3.7 estado na URL / compartilhar          | `acoes.compartilhar*`, `marca.compartilhar.textoSimulacao`                                                                                         |
+| 3.8 tabela dos 5 pleitos                  | `secao.erro2022.tabela.caption` + `.col.*`                                                                                                         |
+| 3.8 "pode se repetir" / "pode ser menor"  | `secao.erro2022.podeRepetir.*`, `.podeSerMenor.*`                                                                                                  |
+| 3.8 bloco "erro do 1ºT importa agora"     | `secao.erro2022.porQue1T.p1..p4` (inclui 86 / 83 / 79)                                                                                             |
+| 3.8 curva de sensibilidade + clique       | `secao.erro2022.curva.*`                                                                                                                           |
+| 3.8 3 cartões de cenário                  | `secao.erro2022.cenario1..3.*`                                                                                                                     |
+| 3.8 legenda do ponto de virada            | `secao.erro2022.curva.legenda`                                                                                                                     |
+| 3.8 Replay 2022 (3 cartões + botão)       | `secao.erro2022.replay.*`                                                                                                                          |
+| 3.8 parágrafo de calibração               | `secao.erro2022.replay.calibracao`                                                                                                                 |
+| 3.8 fontes do histórico                   | `secao.erro2022.fontes.titulo`                                                                                                                     |
+| 3.9 título dinâmico do cenário-base       | `secao.cenarioBase.resposta` (+ `.apertada` / `.moderada`)                                                                                         |
+| 3.9 3 cartões da linha do tempo           | `secao.cenarioBase.passo1..3.*`                                                                                                                    |
+| 3.9 bandas de margem + modal              | `secao.cenarioBase.bandas.*`                                                                                                                       |
+| 3.9 "por que este é o cenário-base"       | `secao.cenarioBase.porQue.*` + `.oQueDerruba`                                                                                                      |
+| 3.9 metodologia da seção                  | `secao.cenarioBase.comoFoiFeito.*`                                                                                                                 |
+| 3.9 nota "1 vez a cada N eleições"        | `secao.cenarioBase.notaFrequencia`                                                                                                                 |
+| 3.10 colunas da tabela + chips + peso     | `secao.pesquisas.col.*`, `.chip.*`, `.peso.explica`                                                                                                |
+| 3.10 badges usuário/auto, linhas fracas   | `secao.pesquisas.badge.*`, `.pesoBaixo`                                                                                                            |
+| 3.10 formulário (R5) e restaurar          | `simulacao.formulario.*`, `acoes.restaurarOficial`                                                                                                 |
+| 3.10 cartões abaixo de md                 | `secao.pesquisas.registro.*`, `.verRegistro`                                                                                                       |
+| 3.11 metodologia (6 blocos)               | `metodologia.*` (abertura simples; técnico intacto)                                                                                                |
+| 3.12 aviso legal                          | `rodape.simples.p1..p4` + `rodape.legalCompleta` (integral)                                                                                        |
+| 4 estado vazio                            | `estados.serieVazia.*`                                                                                                                             |
+| 4 focus, fontes, formatos                 | regras em `VOZ.md` §8 (não são texto)                                                                                                              |
+| — degradação sem banco (R8)               | `estados.semBanco`, `estados.falhaRede`                                                                                                            |
+| — faixa "Como ler esta página" (novo)     | `comoLer.*`                                                                                                                                        |
+| — glossário tocável (novo, P3)            | `glossario.*` (13 termos)                                                                                                                          |

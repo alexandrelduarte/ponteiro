@@ -205,9 +205,10 @@ export const GLOSSARIO = {
   amostra: {
     termo: "quantas pessoas foram ouvidas",
     texto:
-      "É o tamanho da pesquisa. Quanto mais gente ouvida, menor a folga da medida. Exemplo: ouvir " +
-      "2.000 pessoas dá uma folga de cerca de 2 pontos; ouvir 5.000 dá cerca de 1,4. Mas ouvir " +
-      "mais gente não conserta erro de método.",
+      "É o tamanho da pesquisa. Quanto mais gente ouvida, menor a folga da medida. Exemplo: com " +
+      "2.000 pessoas ouvidas a folga fica perto de 2 pontos, e para cortá-la pela metade seria " +
+      "preciso ouvir quatro vezes mais gente. Cada instituto calcula a sua, e ouvir mais gente " +
+      "não conserta erro de método.",
   },
   deriva: {
     termo: "o quanto a corrida ainda pode andar",

@@ -198,7 +198,8 @@ export function SeriePesquisas() {
             className="h-auto w-full"
           />
           <figcaption className="mt-1 text-micro text-tinta-media">
-            Exemplo: quatro pesquisas imaginárias. Não são as pesquisas da lista.
+            Exemplo: quatro pesquisas imaginárias, só para mostrar como ler a barra. Não são as
+            pesquisas da lista.
           </figcaption>
         </figure>
       </div>

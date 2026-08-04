@@ -52,8 +52,8 @@ const CARTOES: Record<string, { dado: string; leitura: string }> = {
     leitura:
       "País dividido. Na Quaest foi a primeira vez, desde dezembro de 2024, que mais gente " +
       "aprova do que desaprova. Isso vai na mesma direção da leve melhora de Lula nas pesquisas " +
-      "de voto. Governo com aprovação entre 42% e 48% costuma disputar de igual para igual — " +
-      "não larga na frente, nem está fora da disputa.",
+      "de voto. Governo com aprovação entre 42% e 48% costuma disputar de igual para igual: " +
+      "continua na disputa, mas sem vantagem grande.",
   },
   "Rejeição e teto de voto": {
     dado:
@@ -61,16 +61,17 @@ const CARTOES: Record<string, { dado: string; leitura: string }> = {
       "Quem diz que poderia votar (Quaest, julho): Lula 47% × Flávio 38%.",
     leitura:
       "Os dois têm muita gente que não votaria neles de jeito nenhum, e isso limita até onde " +
-      "cada um pode chegar. A disputa se decide entre os 8% a 15% que ainda não escolheram ou " +
-      "vão de branco e nulo. Pelo número de quem diz que poderia votar, o limite de Flávio hoje " +
-      "é mais baixo que o de Lula — é esse número que a campanha do PL precisa mover.",
+      "cada um pode chegar. A disputa se decide entre os cerca de 8% a 15% que ainda não " +
+      "escolheram ou vão de branco e nulo. Pelo número de quem diz que poderia votar, o limite " +
+      "de Flávio hoje é mais baixo que o de Lula — é esse número que a campanha do PL precisa " +
+      "mover.",
   },
   "Piso firme (comprometimento)": {
     dado: "“É o único em que votaria”: Lula 36% × Flávio 31% (PoderData, julho).",
     leitura:
-      "Dois terços de quem vota em cada um já decidiu e não muda. Com o eleitorado dividido " +
-      "assim, a opinião se mexe pouco — por isso as pesquisas de 2026 andam de décimo em " +
-      "décimo, e não aos saltos.",
+      "Dois terços de quem vota em cada um já diz que não votaria em mais ninguém. Com o " +
+      "eleitorado dividido assim, sobra pouca gente para conquistar — e a opinião tende a se " +
+      "mexer pouco.",
   },
   "Calendário que ainda pesa": {
     dado:

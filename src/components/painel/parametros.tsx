@@ -212,9 +212,9 @@ export function Parametros() {
             className="mt-3 max-w-texto text-micro text-tinta-media"
           >
             As bolinhas mostram só a decisão de 25 de outubro: {layout.nLula} caem do lado de Lula e{" "}
-            {layout.nFlavio} do lado de Flávio. A largura da pilha é o tamanho da dúvida: quanto
-            mais espalhadas, maior a margem de erro. A frase acima soma também quem ganha já em 4 de
-            outubro — por isso dá outro número.
+            {layout.nFlavio} do lado de Flávio. A largura da pilha é o tamanho da dúvida no dia da
+            votação: quanto mais espalhadas, menos fechada está a disputa. A frase acima soma também
+            quem ganha já em 4 de outubro — por isso dá outro número.
           </p>
         </div>
       </Nicho>

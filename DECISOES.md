@@ -172,3 +172,18 @@ var(--color-linha-forte) 55%, transparent)` → mantém "zero hex em componente"
 - Custo do cron corrigido no README: ~US$ 5–20/mês (não "centavos") → o que domina são os
   tokens das páginas re-cobrados na resposta com web_search, não a taxa de busca; botões para
   reduzir documentados (`max_uses`, versão 2026-02 da tool).
+
+# REDESIGN v2 (branch redesign/v2; v1 preservada na tag v1-urna)
+
+## Fases 1–2 — pesquisa e naming
+
+- Nome escolhido pelo orquestrador entre 5 finalistas verificados: **PONTEIRO** → triplo
+  significado nativo ("ponteiro da tabela" = líder no vocabulário popular do futebol; agulha de
+  medidor = instrumento; ponteiro de relógio = tempo até a eleição), 3 sílabas, teste do rádio
+  perfeito, neutro, oponteiro.com.br/ponteiro.org.br livres (RDAP) → descartados: Pêndulo (SEO
+  dominado por esoterismo), Palmo (mudo sem tagline), Páreo (bairro das apostas), Em Miúdos
+  (não vira marca). Tagline: "Para onde apontam as pesquisas."
+- Salvaguarda anti-needle: a agulha do PONTEIRO é MARCA estática (logo/ícone) — proibido virar
+  medidor animado de probabilidade no hero → o "needle" do NYT 2016 é o contraexemplo canônico
+  (TENDENCIAS-2026 P1); o hero comunica probabilidade pelo campo contável de 100 unidades
+  (quantile dotplot, melhor evidência para baixa numeracia).

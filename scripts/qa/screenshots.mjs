@@ -42,6 +42,23 @@ const servidor = spawn("pnpm", ["exec", "next", "start", "-p", "3100"], {
   stdio: "pipe",
   detached: false,
 });
+
+/** Abre todos os disclosures da página (details + aria-expanded). */
+const abrirTudo = async (page) => {
+  await page.evaluate(async () => {
+    const passo = window.innerHeight * 0.8;
+    for (let y = 0; y < document.body.scrollHeight; y += passo) {
+      window.scrollTo(0, y);
+      await new Promise((r) => setTimeout(r, 100));
+    }
+    document.querySelectorAll("details").forEach((d) => {
+      d.open = true;
+    });
+    document.querySelectorAll('[aria-expanded="false"]').forEach((el) => el.click());
+    window.scrollTo(0, 0);
+  });
+  await page.waitForTimeout(800);
+};
 const esperarServidor = async () => {
   for (let i = 0; i < 60; i++) {
     try {
@@ -57,7 +74,9 @@ const esperarServidor = async () => {
 
 try {
   await esperarServidor();
-  const browser = await chromium.launch();
+  // --lang define a locale da UI do navegador — é ela (não `locale` do contexto)
+  // que os controles nativos como <input type="date"> seguem para a máscara.
+  const browser = await chromium.launch({ args: ["--lang=pt-BR"] });
   for (const vp of VIEWPORTS) {
     const page = await browser.newPage({
       viewport: { width: vp.width, height: vp.height },
@@ -114,6 +133,26 @@ try {
           });
         } catch {
           console.warn(`aba candidatos não capturada em ${vp.nome}px`);
+        }
+        // home com TODOS os disclosures abertos (o conteúdo escondido também é auditado)
+        await page.goto(BASE + "/", { waitUntil: "networkidle" });
+        await abrirTudo(page);
+        await page.screenshot({
+          path: join(DIR, `home-${vp.nome}-full-aberto.png`),
+          fullPage: true,
+        });
+      }
+      if (pg.nome === "metodologia" && vp.nome === "390") {
+        // o estado "Explicação técnica" fotografado (pedido do qa-critic)
+        try {
+          await page.getByTestId("modo-tecnica").click();
+          await page.waitForTimeout(500);
+          await page.screenshot({
+            path: join(DIR, `metodologia-390-tecnica.png`),
+            fullPage: true,
+          });
+        } catch {
+          console.warn("estado técnica não capturado");
         }
       }
     }

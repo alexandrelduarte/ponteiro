@@ -23,7 +23,9 @@ z.config({ jitless: true });
 
 const CAMPOS = [
   { chave: "instituto", rotulo: "Instituto *", largo: true, tipo: "text" },
-  { chave: "fim", rotulo: "Último dia da pesquisa *", largo: false, tipo: "date" },
+  // `largo`: a 390px a coluna estreita (133px) trunca a máscara nativa do campo
+  // de data para "mm/dd/yy" — em linha própria os 10 glifos sempre cabem.
+  { chave: "fim", rotulo: "Último dia da pesquisa *", largo: true, tipo: "date" },
   { chave: "n", rotulo: "Quantas pessoas foram ouvidas", largo: false, tipo: "text" },
   { chave: "moe", rotulo: "Folga da medida, em pontos", largo: false, tipo: "text" },
   { chave: "tse", rotulo: "Número do registro no TSE", largo: false, tipo: "text" },

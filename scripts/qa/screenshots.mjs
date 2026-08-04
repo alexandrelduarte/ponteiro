@@ -152,14 +152,18 @@ try {
         // UM popover aberto por gesto real (o estado que um humano alcança):
         // o primeiro chip de glossário da página, clicado de verdade.
         try {
-          await page.goto(BASE + "/", { waitUntil: "networkidle" });
+          // `load` + espera fixa: depois do abrirTudo, networkidle nunca chega
+          // (alguma atividade de rede fica sem os 500ms de silêncio) e o goto
+          // estourava 30s — era a origem dos flakes da iter-7/8.
+          await page.goto(BASE + "/", { waitUntil: "load" });
+          await page.waitForTimeout(700);
           const chip = page.locator('[aria-expanded="false"]').first();
           await chip.scrollIntoViewIfNeeded();
           await chip.click();
           await page.waitForTimeout(500);
           await page.screenshot({ path: join(DIR, `home-${vp.nome}-popover.png`) });
-        } catch {
-          falhou(`popover não capturado em ${vp.nome}px`);
+        } catch (e) {
+          falhou(`popover não capturado em ${vp.nome}px — ${String(e).split("\n")[0]}`);
         }
         // Evidência DIRIGIDA dos chips nomeados (condição 3 do qa-critic, iter-7):
         // chance (colado à manchete/LCP) e registro no TSE nos 3 viewports; a 768
@@ -181,14 +185,15 @@ try {
         ];
         for (const c of chipsDirigidos) {
           try {
-            await page.goto(BASE + "/", { waitUntil: "networkidle" });
+            await page.goto(BASE + "/", { waitUntil: "load" });
+            await page.waitForTimeout(700);
             const alvo = c.localizar();
             await alvo.scrollIntoViewIfNeeded();
             await alvo.click();
             await page.waitForTimeout(500);
             await page.screenshot({ path: join(DIR, `home-${vp.nome}-${c.nome}.png`) });
-          } catch {
-            falhou(`${c.nome} não capturado em ${vp.nome}px`);
+          } catch (e) {
+            falhou(`${c.nome} não capturado em ${vp.nome}px — ${String(e).split("\n")[0]}`);
           }
         }
       }

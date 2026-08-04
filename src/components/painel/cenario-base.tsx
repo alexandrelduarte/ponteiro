@@ -18,10 +18,10 @@
  * medem" fica na MESMA dobra dos chips, nunca colapsado.
  */
 import { useMemo } from "react";
-import { Bloco, Nicho, Pergunta, Resposta, Subtitulo, Traduzindo } from "@/components/ui/blocos";
+import { Bloco, Cabecalho, Detalhe, Nicho, Subtitulo } from "@/components/ui/blocos";
 import { Termo } from "@/components/ui/glossario";
 import { emCem, inteiroEmCem } from "@/components/ui/textos";
-import { calcCenarioBase, fmt, fmtSinal } from "@/lib/modelo";
+import { calcCenarioBase, fmt } from "@/lib/modelo";
 import { usePainel } from "./estado";
 
 /** Rótulos das quatro bandas, na ordem em que o modelo as devolve. */
@@ -52,23 +52,28 @@ export function CenarioBase() {
 
   return (
     <Bloco rotuladoPor="titulo-cenario-base">
-      <Pergunta id="titulo-cenario-base">O que é mais provável acontecer em outubro?</Pergunta>
-      <Resposta>
-        <span data-testid="cenario-base-titulo">
-          {lider} eleito, com a definição saindo em 25 de outubro e por diferença {apertada}: é o
-          caminho que aparece em <span className="numeros">{pV2Abs}</span> de cada 100 cenários.
-          Somando com o caminho de vitória já em 4 de outubro, {lider} termina eleito em{" "}
-          <span data-testid="cenario-base-probabilidade" className="numeros">
-            {pElei}
-          </span>{" "}
-          de cada 100.
-        </span>
-      </Resposta>
-      <Traduzindo>
-        De todos os caminhos que o painel calcula, este é o que aparece em mais cenários. “Mais
-        provável” não é “certo”: os outros caminhos continuam existindo, com as chances mostradas ao
-        lado.
-      </Traduzindo>
+      <Cabecalho
+        id="titulo-cenario-base"
+        pergunta="O que é mais provável acontecer em outubro?"
+        resposta={
+          <span data-testid="cenario-base-titulo">
+            {lider} eleito, com a definição saindo em 25 de outubro e por diferença {apertada}: é o
+            caminho que aparece em <span className="numeros">{pV2Abs}</span> de cada 100 cenários.
+            Somando com o caminho de vitória já em 4 de outubro, {lider} termina eleito em{" "}
+            <span data-testid="cenario-base-probabilidade" className="numeros">
+              {pElei}
+            </span>{" "}
+            de cada 100.
+          </span>
+        }
+        traduzindo={
+          <>
+            De todos os caminhos que o painel calcula, este é o que aparece em mais cenários. “Mais
+            provável” não é “certo”: os outros caminhos continuam existindo, com as chances
+            mostradas ao lado.
+          </>
+        }
+      />
 
       <div className="mt-5 grid gap-3 md:grid-cols-3 md:items-start">
         <Nicho>
@@ -94,11 +99,6 @@ export function CenarioBase() {
             <span className="text-flavio">Flávio {fmt(100 - cen.placarL)}%</span> dos{" "}
             <Termo chave="votosValidos">votos válidos</Termo>.
           </p>
-          <p className="mt-1 text-micro text-tinta-media numeros">
-            Em 8 de cada 10 cenários, a diferença{" "}
-            <b className="font-semibold text-tinta">medida nas pesquisas</b> fica entre{" "}
-            {fmtSinal(M.int80[0])} e {fmtSinal(M.int80[1])} pontos.
-          </p>
         </Nicho>
       </div>
 
@@ -108,8 +108,27 @@ export function CenarioBase() {
           De quanto pode ser a diferença no fim, do jeito que as pesquisas medem
         </Subtitulo>
 
+        {/* A régua, rotulada — ela aparecia aqui sem nome nenhum, e é a mesma
+            do enxame. */}
+        <p className="relative mt-3 h-5 text-micro text-tinta-media">
+          <span
+            className="absolute -translate-x-1/2 font-semibold whitespace-nowrap text-tinta"
+            style={{ left: `${Math.max(cen.bandas[0].p * 100, 0)}%` }}
+          >
+            empate
+          </span>
+        </p>
+
+        {/* Quatro pedaços CONTÍGUOS: eles somam 100, e a folga de 3px entre
+            eles quebrava justamente a leitura de proporção. O que separa um do
+            outro é um filete da cor da placa, de 1px, que não rouba largura
+            perceptível.
+            Todos no MESMO lilás da dúvida: dar campo ameixa cheio só ao pedaço
+            modal punha ênfase visual num desfecho e não no outro (R4/H9). O
+            modal é marcado por contorno de tinta — canal de forma, não de cor
+            — e nomeado na lista logo abaixo. */}
         <div
-          className="relative mt-2 flex h-7 w-full gap-[3px]"
+          className="relative flex h-7 w-full overflow-hidden rounded-plena"
           role="img"
           aria-label={cen.bandas
             .map((b, i) => `${ROTULO_BANDA[i]}: ${emCem(b.p)} em 100`)
@@ -119,19 +138,18 @@ export function CenarioBase() {
             <div
               key={ROTULO_BANDA[i]}
               className={[
-                "h-full rounded-plena",
-                i === larguraModal ? "bg-ameixa-clara" : "bg-faixa",
+                "h-full border-r border-placa bg-faixa last:border-r-0",
+                i === larguraModal ? "shadow-[inset_0_0_0_2px_var(--color-tinta)]" : "",
               ].join(" ")}
               style={{ width: `${Math.max(b.p * 100, 0)}%` }}
             />
           ))}
           {/* A régua do empate mora na fronteira entre a primeira banda
               (Flávio na frente) e a segunda: é o mesmo zero do enxame, e por
-              isso é desenhada POR CIMA, em tinta, e não como borda de um
-              pedaço (borda em raio pleno some). */}
+              isso é desenhada POR CIMA, em tinta. */}
           <span
             aria-hidden="true"
-            className="absolute inset-y-[-4px] w-[3px] -translate-x-1/2 rounded-plena bg-tinta"
+            className="absolute inset-y-0 w-[3px] -translate-x-1/2 bg-tinta"
             style={{ left: `${Math.max(cen.bandas[0].p * 100, 0)}%` }}
           />
         </div>
@@ -141,7 +159,7 @@ export function CenarioBase() {
             <li key={ROTULO_BANDA[i]} className="numeros">
               {ROTULO_BANDA[i]}: <b className="font-semibold text-tinta">{emCem(b.p)} em 100</b>
               {i === larguraModal ? (
-                <span className="font-semibold text-ameixa"> ● o mais provável</span>
+                <span className="font-semibold text-tinta"> — o mais provável</span>
               ) : null}
             </li>
           ))}
@@ -167,17 +185,12 @@ export function CenarioBase() {
           Quando as pesquisas erraram em 2018 e em 2022, o erro foi na mesma direção — subestimando
           a direita — e a repetição fiel de 2022 dá algo perto de 51 × 49.
         </p>
-        <p className="mt-3 text-corpo text-tinta-media">
-          Três coisas derrubariam este caminho. Pesquisas novas levando a diferença para baixo de 2
-          pontos. Três institutos seguidos com Flávio na frente, fora da folga. Ou um erro de
-          pesquisa maior que o já visto quando os institutos tinham o gabarito na mão.
-        </p>
+        {/* A lista das "três coisas que mudariam o quadro" mora no bloco
+            "Isso ainda pode virar?" — aqui ela voltava quase palavra por
+            palavra, na mesma página. */}
       </div>
 
-      <details className="mt-4 max-w-texto">
-        <summary className="inline-flex min-h-toque items-center text-corpo font-semibold text-ameixa">
-          Como este caminho foi escolhido
-        </summary>
+      <Detalhe titulo="Como este caminho foi escolhido" className="mt-4 max-w-texto">
         <p className="mt-1 text-corpo text-tinta-media numeros">
           O painel vai perguntando, uma coisa de cada vez, e fica sempre com a resposta mais
           provável. Cada resposta é a mais provável da sua pergunta — juntas elas descrevem o
@@ -186,11 +199,11 @@ export function CenarioBase() {
           faixa em destaque acima. Nada disso é opinião fixa: mude a régua da puxada para 6,3 e esta
           seção passa a descrever, sozinha, a vitória de Flávio.
         </p>
-      </details>
+      </Detalhe>
 
       <p className="mt-4 max-w-texto text-micro text-tinta-media numeros">
-        Leitura das pesquisas, não previsão nem torcida. Um resultado que aparece em {pContra} de
-        cada 100 cenários acontece, no longo prazo, 1 vez a cada {umaEm} eleições parecidas.
+        Um resultado que aparece em {pContra} de cada 100 cenários acontece, no longo prazo, 1 vez a
+        cada {umaEm} eleições parecidas.
       </p>
     </Bloco>
   );

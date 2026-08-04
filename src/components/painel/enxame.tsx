@@ -72,7 +72,12 @@ export function Enxame({
   const raio = diametro / 2;
 
   return (
-    <div ref={ref} className={compacto ? "max-w-[20rem]" : "max-w-[45rem]"}>
+    // O compacto pode ser MENOR que o hero, mas não pode parar de crescer: a
+    // 1440 a versão de 20rem travava as bolinhas em 8px contra as 22px do
+    // hero — 2,5× de diferença entre duas instâncias do mesmo elemento, e §4.2
+    // existe para comparar maçã com maçã. Em 32rem a bolinha do compacto mede
+    // ~16px a 1440 e continua ≥8px a 390 (o contêiner ali tem 286px).
+    <div ref={ref} className={compacto ? "max-w-[32rem]" : "max-w-[45rem]"}>
       {/* Rótulo do empate, ancorado em porcentagem e fora do SVG. */}
       <div className="relative h-5 text-micro text-tinta">
         <span
@@ -135,21 +140,39 @@ export function Enxame({
           />
           {/* Régua do empate: passa no VÃO entre as colunas que ladeiam o zero. */}
           <line
+            className="regua-empate"
             x1={xEmpate}
             y1={0}
             x2={xEmpate}
             y2={alturaSvg}
             stroke="var(--color-tinta)"
-            strokeWidth={3}
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
           />
         </svg>
       </div>
 
+      {/* Os DOIS números, ancorados no desenho e não na prosa.
+          Contar 100 bolinhas de 8px num Android é ficção: sem número junto, a
+          "frequência contável" que P1 promete não chega ao leitor — e a 390 a
+          prosa que trazia o 82 e o 18 caía fora da primeira dobra.
+          Eles saem de `layout`, ou seja, da CONTAGEM DAS PRÓPRIAS BOLINHAS
+          (`{{T2_LULA}}`/`{{T2_FLAVIO}}`), nunca da manchete: escrito e
+          desenhado são o mesmo inteiro por construção (H3). Cada um fica do
+          lado da régua que descreve, no mesmo peso da legenda de ponta. */}
       <p className="mt-1 flex justify-between gap-4 text-micro text-tinta-media">
-        <span>← Flávio na frente</span>
-        <span>Lula na frente →</span>
+        <span>
+          ← Flávio na frente ·{" "}
+          <b data-testid={idTeste ? `${idTeste}-n-flavio` : undefined} className="text-flavio">
+            {layout.nFlavio}
+          </b>
+        </span>
+        <span>
+          <b data-testid={idTeste ? `${idTeste}-n-lula` : undefined} className="text-lula">
+            {layout.nLula}
+          </b>{" "}
+          · Lula na frente →
+        </span>
       </p>
     </div>
   );

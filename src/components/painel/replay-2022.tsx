@@ -15,7 +15,7 @@
  * e o texto diz exatamente por quê.
  */
 import { useMemo } from "react";
-import { Botao, Chip, Nicho, Subtitulo } from "@/components/ui/blocos";
+import { Botao, Chip, Detalhe, Nicho, Subtitulo } from "@/components/ui/blocos";
 import { emCem, parEmCem } from "@/components/ui/textos";
 import { ERRO_2022 } from "@/data/constantes";
 import { calcReplay, fmt, fmtSinal } from "@/lib/modelo";
@@ -40,9 +40,6 @@ export function Replay2022() {
       <Subtitulo>E se o erro de 2022 se repetisse do mesmo tamanho?</Subtitulo>
 
       <p className="mt-1 max-w-texto rounded-nicho bg-atencao-fundo px-4 py-3 text-corpo text-tinta">
-        <span aria-hidden="true" className="mr-1 font-semibold text-atencao">
-          ⚠
-        </span>
         Isto não diz que o erro vai se repetir. É uma conta de “e se”: pegamos o erro exato das
         pesquisas de véspera de 2022 e aplicamos nos números de hoje. Em 2026 o candidato da direita
         é outro e o contexto é outro.
@@ -114,20 +111,21 @@ export function Replay2022() {
         </Nicho>
       </div>
 
-      <p className="mt-4 max-w-texto text-micro text-tinta-media numeros">
-        De onde saem esses números: em 2022, as pesquisas de véspera do 1º turno davam a Lula uma
-        vantagem de 7,1 a 14 pontos (média de 11,6), e o resultado real foi 5,2. No 2º turno davam
-        de 0,8 a 8 pontos (média de 4,9), e o resultado real foi 1,8. Os dois erros não se somam: as
-        do 2º turno foram refeitas depois do susto do 1º, e o que sobrou de erro na decisão foi 3,1.
-        Por isso a repetição fiel de 2022{" "}
-        <b className="font-semibold text-tinta">
-          ainda deixa Lula na frente: eleito em {elDia} de cada 100 cenários, por pouco.
-        </b>{" "}
-        No painel principal essa mesma hipótese aparece como cerca de {emCem(replay.pPainel)} em
-        100, porque lá a dúvida sobre o tamanho da puxada continua na conta. Para a corrida se
-        inverter seria preciso algo que <b className="font-semibold text-tinta">não</b> aconteceu em
-        2022: o erro do 1º turno chegar inteiro à decisão — é o cartão de teste-limite, acima.
-      </p>
+      {/* Vira um detalhe com afordância de controle, e sem a frase "eleito em
+          NN de cada 100 cenários, por pouco" — ela já aparecia duas vezes
+          neste mesmo bloco, na resposta do topo e no cartão da soma. */}
+      <Detalhe titulo="De onde saem esses números" className="mt-4 max-w-texto">
+        <p className="mt-1 text-micro text-tinta-media numeros">
+          Em 2022, as pesquisas de véspera do 1º turno davam a Lula uma vantagem de 7,1 a 14 pontos
+          (média de 11,6), e o resultado real foi 5,2. No 2º turno davam de 0,8 a 8 pontos (média de
+          4,9), e o resultado real foi 1,8. Os dois erros não se somam: as do 2º turno foram
+          refeitas depois do susto do 1º, e o que sobrou de erro na decisão foi 3,1. No painel
+          principal esta mesma hipótese aparece como cerca de {emCem(replay.pPainel)} em 100, porque
+          lá a dúvida sobre o tamanho da puxada continua na conta. Para a corrida se inverter seria
+          preciso algo que <b className="font-semibold text-tinta">não</b> aconteceu em 2022: o erro
+          do 1º turno chegar inteiro à decisão — é o cartão de teste-limite, acima.
+        </p>
+      </Detalhe>
     </div>
   );
 }

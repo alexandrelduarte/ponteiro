@@ -6,25 +6,39 @@
  * O par principal é DEFINIDO PELOS DADOS (os dois primeiros do 1º turno) — se
  * o ranking mudar, o painel avisa em vez de fingir que nada aconteceu.
  *
- * Cor das barras: Lula e Flávio usam os tokens da paleta v2 (é a cor própria
- * deles no sistema); os demais mantêm a cor de `src/data/constantes.ts`, que é
- * DADO do protótipo e não muda. Assim a "cor própria por candidato" do
- * inventário sobrevive sem reintroduzir a paleta antiga nos dois protagonistas.
- * A cor nunca informa sozinha: o nome e o número estão sempre ao lado.
+ * Três decisões desta seção, todas da Fase 7:
+ *
+ *  1. **A cor vem do mapa de exibição** (`ui/cores-candidatos`), não do campo
+ *     `cor` do dado. O dado continua intocado — é a tela que deixa de vestir a
+ *     paleta da v1. Lula e Flávio ficam com os tokens próprios; os outros sete,
+ *     com a rampa neutra de 7 degraus. A cor nunca informa sozinha: nome e
+ *     número estão sempre ao lado.
+ *  2. **A régua das barras é FIXA, de 0 a 50% dos votos, e vem rotulada.**
+ *     Normalizar pelo líder desenhava 41,4% como trilho cheio — é a barra
+ *     83/17 da v1 voltando pela porta dos fundos, e faz a régua mudar conforme
+ *     quem lidera (H9/R4). Agora as nove barras estão na mesma régua, com a
+ *     marca da metade no mesmo lugar para todo mundo.
+ *  3. **Abaixo de `lg` a matriz candidato × instituto é uma lista de cartões.**
+ *     Dez colunas numa tela de 390 (ou de 768) só cabem com rolagem horizontal,
+ *     que §6.3 bane com todas as letras. O número por instituto continua
+ *     alcançável, a um toque, em qualquer largura.
  */
 import { useRef } from "react";
-import { Bloco, Chip, Pergunta, Resposta, Traduzindo, Vazio } from "@/components/ui/blocos";
+import { Bloco, Cabecalho, Chip, Vazio } from "@/components/ui/blocos";
+import { corDeExibicao } from "@/components/ui/cores-candidatos";
 import { fmt, fmtData, valCand } from "@/lib/modelo";
 import { usePainel, type Aba } from "./estado";
 
 const ORDEM: Aba[] = ["principal", "todos"];
 
+/** Topo da régua das barras, em % de intenção de voto no 1º turno. */
+const REGUA_MAX = 50;
+
 /**
- * Abreviação INTENCIONAL do nome do instituto no cabeçalho da matriz abaixo de
- * `md`, onde 7 colunas + candidato + média disputam a largura. Corte cego de
- * string entregava "PODERDA", "DATAFOL" — palavra mutilada onde o produto pede
- * procedência. Em `md+` o nome sai inteiro; o nome completo continua no rótulo
- * acessível em qualquer largura.
+ * Abreviação INTENCIONAL do nome do instituto no cabeçalho da matriz, onde
+ * 7 colunas + candidato + média disputam a largura. Corte cego de string
+ * entregava "PODERDA", "DATAFOL" — palavra mutilada onde o produto pede
+ * procedência. O nome completo continua no rótulo acessível.
  */
 const ABREV_INSTITUTO: Record<string, string> = {
   PoderData: "PoderD.",
@@ -35,12 +49,6 @@ const ABREV_INSTITUTO: Record<string, string> = {
   Gerp: "Gerp",
   Indexa: "Indexa",
 };
-
-function corDoCandidato(nome: string, corDoDado: string): string {
-  if (nome === "Lula") return "var(--color-lula)";
-  if (nome === "Flávio Bolsonaro") return "var(--color-flavio)";
-  return corDoDado;
-}
 
 export function OutrosCandidatos() {
   const { campoCompleto, aba, definirAba } = usePainel();
@@ -61,41 +69,44 @@ export function OutrosCandidatos() {
 
   const classeAba = (alvo: Aba) =>
     [
-      "min-h-toque rounded-plena px-5 text-corpo font-semibold",
+      "min-h-toque flex-1 basis-0 rounded-plena px-4 text-center text-corpo font-semibold",
       "transition-colors duration-(--dur-rapida) ease-(--ease-padrao)",
       aba === alvo ? "bg-ameixa text-tinta-inversa" : "text-tinta hover:bg-ameixa-tenue",
     ].join(" ");
 
   return (
     <Bloco rotuladoPor="titulo-outros">
-      <Pergunta id="titulo-outros">E os outros candidatos?</Pergunta>
-      <Resposta>
-        {campoCompleto?.gap3 != null ? (
+      <Cabecalho
+        id="titulo-outros"
+        pergunta="E os outros candidatos?"
+        resposta={
+          campoCompleto?.gap3 != null ? (
+            <>
+              O terceiro colocado está <span className="numeros">{fmt(campoCompleto.gap3)}</span>{" "}
+              pontos atrás do segundo — por isso o painel faz a conta do 2º turno só entre os dois
+              primeiros.
+            </>
+          ) : (
+            <>
+              Nenhuma pesquisa da lista divulgou o 1º turno com a lista de nomes, então não há
+              ranking a mostrar hoje.
+            </>
+          )
+        }
+        traduzindo={
           <>
-            O terceiro colocado está <span className="numeros">{fmt(campoCompleto.gap3)}</span>{" "}
-            pontos atrás do segundo — por isso o painel faz a conta do 2º turno só entre os dois
-            primeiros.
+            Aqui estão todos os nomes testados no 1º turno, com a média de cada um. O par principal
+            não é escolha nossa: são os dois primeiros da própria lista. Se o ranking mudar, o
+            painel avisa.
           </>
-        ) : (
-          <>
-            Nenhuma pesquisa da lista divulgou o 1º turno com a lista de nomes, então não há ranking
-            a mostrar hoje.
-          </>
-        )}
-      </Resposta>
-      <Traduzindo>
-        Aqui estão todos os nomes testados no 1º turno, com a média de cada um. O par principal não
-        é escolha nossa: são os dois primeiros da própria lista. Se o ranking mudar, o painel avisa.
-      </Traduzindo>
+        }
+      />
 
       {campoCompleto && !campoCompleto.parPadrao ? (
         <p
           role="status"
           className="mt-4 rounded-nicho bg-atencao-fundo px-4 py-3 text-corpo text-tinta"
         >
-          <span aria-hidden="true" className="mr-1 font-semibold text-atencao">
-            ⚠
-          </span>
           Os dois primeiros mudaram: agora são <b>{campoCompleto.top2.join(" × ")}</b>. As contas de
           2º turno continuam em Lula × Flávio até existirem pesquisas do novo confronto.
         </p>
@@ -105,7 +116,7 @@ export function OutrosCandidatos() {
         role="tablist"
         aria-label="Escopo da lista de candidatos"
         onKeyDown={aoTeclar}
-        className="mt-4 inline-flex flex-wrap gap-1 rounded-plena bg-nicho p-1"
+        className="mt-4 flex w-full gap-1 rounded-plena bg-nicho p-1 md:w-auto md:max-w-[32rem]"
       >
         <button
           type="button"
@@ -136,7 +147,7 @@ export function OutrosCandidatos() {
           onClick={() => definirAba("todos")}
           className={classeAba("todos")}
         >
-          Candidatos testados nas pesquisas
+          Candidatos testados
           {campoCompleto ? ` (${campoCompleto.linhas.length})` : ""}
         </button>
       </div>
@@ -163,37 +174,55 @@ export function OutrosCandidatos() {
           </Vazio>
         ) : (
           <>
-            <ul className="space-y-3">
+            {/* A régua, rotulada e igual para os nove. Ela vem ANTES das barras
+                porque é ela que dá sentido ao comprimento de cada uma. */}
+            <div
+              aria-hidden="true"
+              className="mt-1 flex justify-between text-micro text-tinta-media"
+            >
+              <span>0</span>
+              <span>25%</span>
+              <span>50% dos votos</span>
+            </div>
+
+            <ul className="mt-1 space-y-3" data-testid="lista-candidatos">
               {campoCompleto.linhas.map((c, i) => {
-                const largura = (100 * c.media) / campoCompleto.linhas[0].media;
+                const largura = Math.min(100, (100 * c.media) / REGUA_MAX);
                 return (
                   <li key={c.nome}>
-                    <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                      <span className="text-corpo text-tinta">
+                    <div className="flex items-baseline justify-between gap-x-3">
+                      <span className="min-w-0 text-corpo text-tinta">
                         <b className="font-semibold">
                           {i + 1}º · {c.nome}
                         </b>{" "}
                         <span className="text-micro text-tinta-media">({c.partido})</span>
                         {i < 2 ? (
                           <Chip tom="ameixa" className="ml-2">
-                            ● disputa principal
+                            disputa principal
                           </Chip>
                         ) : null}
                       </span>
-                      <span className="text-corpo font-semibold whitespace-nowrap text-tinta numeros">
+                      <span className="shrink-0 text-corpo font-semibold whitespace-nowrap text-tinta numeros">
                         {fmt(c.media)}%{" "}
                         <span className="text-micro font-normal text-tinta-media">
                           · {c.k} {c.k === 1 ? "pesquisa" : "pesquisas"}
                         </span>
                       </span>
                     </div>
-                    <div className="mt-1 h-3 overflow-hidden rounded-plena bg-nicho">
+                    {/* Trilho = a régua inteira (0 a 50%). A marca da metade
+                        cai sempre no mesmo lugar, para os nove. */}
+                    <div className="relative mt-1 h-3 overflow-hidden rounded-plena bg-nicho">
                       <div
+                        data-testid={`barra-candidato-${i}`}
                         className="h-full rounded-plena"
                         style={{
                           width: `${largura}%`,
-                          background: corDoCandidato(c.nome, c.cor),
+                          background: corDeExibicao(c.nome, i),
                         }}
+                      />
+                      <span
+                        aria-hidden="true"
+                        className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-contorno"
                       />
                     </div>
                   </li>
@@ -201,17 +230,57 @@ export function OutrosCandidatos() {
               })}
             </ul>
 
-            <p className="mt-4 text-micro text-tinta-media numeros">
+            <p className="mt-2 max-w-texto text-micro text-tinta-media">
+              Todas as barras estão na mesma régua: de 0 a 50% dos votos no 1º turno. O risco na
+              marca do meio é a metade dessa régua, 25%.
+            </p>
+
+            <p className="mt-3 text-micro text-tinta-media numeros">
               Branco, nulo e quem ainda não sabe somam {fmt(campoCompleto.bn)}% na média. Outros
               nomes testados em alguma pesquisa ficam em 1% ou menos e não entram no ranking.
             </p>
 
-            <div
-              className="rolagem-x relative mt-4 overflow-x-auto"
-              role="group"
-              tabIndex={0}
-              aria-labelledby="titulo-outros"
+            {/* ---------- abaixo de lg: um cartão por candidato ----------
+                Dez colunas não cabem em 390 nem em 768 sem rolagem lateral, e
+                tabela que rola de lado é o padrão que §6.3 bane. */}
+            <ul
+              className="mt-4 flex flex-col gap-2 lg:hidden"
+              aria-label="Cada candidato, pesquisa a pesquisa"
             >
+              {campoCompleto.linhas.map((c) => (
+                <li key={c.nome} className="rounded-nicho bg-nicho p-4">
+                  <details>
+                    <summary className="flex min-h-toque flex-wrap items-center justify-between gap-x-3 text-corpo text-tinta">
+                      <span className="font-semibold">{c.nome}</span>
+                      <span className="numeros">
+                        média {fmt(c.media)}%{" "}
+                        <span className="font-semibold text-ameixa underline decoration-from-font underline-offset-2">
+                          ver por instituto
+                        </span>
+                      </span>
+                    </summary>
+                    <dl className="mt-2 space-y-1 text-micro numeros">
+                      {campoCompleto.pollsCampo.map((p) => {
+                        const v = valCand(p, c.nome);
+                        return (
+                          <div key={p.id} className="flex justify-between gap-3">
+                            <dt className="text-tinta-media">
+                              {p.instituto} · {fmtData(p.fim)}
+                            </dt>
+                            <dd className="text-tinta">
+                              {v != null ? `${fmt(v, v % 1 ? 1 : 0)}%` : "não testou esse nome"}
+                            </dd>
+                          </div>
+                        );
+                      })}
+                    </dl>
+                  </details>
+                </li>
+              ))}
+            </ul>
+
+            {/* ---------- lg+: a matriz completa ---------- */}
+            <div className="mt-4 hidden lg:block">
               <table className="w-full text-micro numeros">
                 <caption className="sr-only">
                   Intenção de voto de cada candidato no 1º turno, pesquisa a pesquisa (as 7 mais
@@ -228,10 +297,14 @@ export function OutrosCandidatos() {
                         scope="col"
                         className="coluna-numerica min-w-[5ch] py-2 pr-3 font-medium whitespace-nowrap"
                       >
-                        <span aria-hidden="true" className="md:hidden">
-                          {ABREV_INSTITUTO[p.instituto] ?? p.instituto}
-                        </span>
-                        <span className="sr-only md:not-sr-only">{p.instituto}</span>
+                        {ABREV_INSTITUTO[p.instituto] ? (
+                          <>
+                            <span aria-hidden="true">{ABREV_INSTITUTO[p.instituto]}</span>
+                            <span className="sr-only">{p.instituto}</span>
+                          </>
+                        ) : (
+                          p.instituto
+                        )}
                         <br />
                         {fmtData(p.fim)}
                       </th>
@@ -268,12 +341,11 @@ export function OutrosCandidatos() {
                   ))}
                 </tbody>
               </table>
+              <p className="mt-3 max-w-texto text-micro text-tinta-media">
+                “–” quer dizer que o instituto não testou esse nome naquela pesquisa, ou não
+                divulgou o número.
+              </p>
             </div>
-
-            <p className="mt-3 max-w-texto text-micro text-tinta-media">
-              “–” quer dizer que o instituto não testou esse nome naquela pesquisa, ou não divulgou
-              o número.
-            </p>
           </>
         )}
       </div>

@@ -68,6 +68,29 @@ export const pessoasEmCem = (margem: number): number => Math.round(Math.abs(marg
 export const direcaoVies = (vies: number): string =>
   vies > 0 ? "a favor de Lula" : "a favor de Flávio";
 
+/**
+ * Aspas curvas, sempre.
+ *
+ * Parte do dado extraído do protótipo traz aspas angulares («…»), que na
+ * página conviviam com as curvas (“…”) usadas em todo o resto — duas
+ * tipografias para a mesma marca de citação. O dado não muda; a tela
+ * normaliza. Não troca uma palavra: só o glifo.
+ */
+export const aspasCurvas = (texto: string): string =>
+  texto.replace(/«\s?/g, "“").replace(/\s?»/g, "”");
+
+/**
+ * Registro no TSE, como o leitor lê.
+ *
+ * Uma pesquisa da série traz, no dado, "registrada (nº n/d na fonte)" — e
+ * "n/d" é abreviação de planilha, não português (VOZ §5.1). O dado fica como
+ * está; quem traduz é a tela.
+ */
+export const registroTse = (tse: string | null | undefined): string => {
+  if (!tse) return "o número do registro não está na publicação";
+  return /n\/d/i.test(tse) ? "o número do registro não está na publicação" : tse;
+};
+
 /** Inteiro em formato brasileiro, sem depender de ICU (hidratação estável). */
 export const inteiroBr = (n: number | null | undefined): string =>
   n == null || !isFinite(n) ? "–" : String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -118,39 +141,47 @@ export const GLOSSARIO = {
     termo: "votos válidos",
     texto:
       "É o bolo de votos depois de tirar os brancos e os nulos. Nas pesquisas também se tira quem " +
-      "ainda não sabe, porque essa pessoa ainda não escolheu. É esse bolo que decide se alguém " +
-      "passou da metade e ganhou já no 1º turno.",
+      "ainda não sabe, porque essa pessoa ainda não escolheu. Exemplo: numa pesquisa com Lula 47%, " +
+      "Flávio 41% e 12% de branco, nulo e indecisos, em votos válidos fica 53% × 47% — e é esse " +
+      "bolo que decide se alguém passou da metade e ganhou já no 1º turno.",
   },
   tendencia: {
     termo: "tendência",
     texto:
       "É a comparação de cada instituto com ele mesmo: a pesquisa nova contra a anterior da mesma " +
-      "casa. Mostra se a diferença subiu ou desceu. Não diz que vai continuar subindo.",
+      "casa. Exemplo: se o mesmo instituto dava 5 pontos de diferença em junho e dá 3 agora, a " +
+      "tendência é de queda de 2 pontos. Mostra se a diferença subiu ou desceu; não diz que vai " +
+      "continuar caindo.",
   },
   vies: {
     termo: "viés",
     texto:
       "É a pergunta “e se todas as pesquisas estiverem puxando para o mesmo lado?”. Você diz o " +
-      "tamanho da puxada e o painel refaz a conta. É um teste, não uma acusação.",
+      "tamanho da puxada e o painel refaz a conta. Exemplo: com uma puxada de 3 pontos a favor de " +
+      "Lula, uma diferença medida de 4,7 pontos vira 1,7 na conta. É um teste, não uma acusação.",
   },
   empateTecnico: {
     termo: "empate técnico",
     texto:
       "É quando a diferença entre os dois é menor que o dobro da folga da medida — a folga de cada " +
-      "número vale em dobro quando se comparam os dois. Não quer dizer que estão iguais: quer " +
-      "dizer que a pesquisa não consegue dizer quem está na frente.",
+      "número vale em dobro quando se comparam os dois. Exemplo: folga de 2 pontos vira 4 na " +
+      "diferença, então uma vantagem de 3 pontos é empate técnico. Não quer dizer que estão " +
+      "iguais: quer dizer que a pesquisa não consegue dizer quem está na frente.",
   },
   projecao: {
     termo: "projeção",
     texto:
       "É o número calculado para o dia da votação, não para hoje. Ele junta o retrato de hoje com " +
-      "o quanto a corrida ainda pode andar até lá.",
+      "o quanto a corrida ainda pode andar até lá. Exemplo: 88 em 100 se a votação fosse hoje " +
+      "podem virar 83 em 100 em outubro, porque falta tempo para a opinião se mexer.",
   },
   peso: {
     termo: "peso da pesquisa",
     texto:
-      "É o quanto cada pesquisa conta na média. Mais nova e com mais gente ouvida conta mais. A " +
-      "antiga vai perdendo peso, mas continua na lista para mostrar o movimento.",
+      "É o quanto cada pesquisa conta na média. Mais nova e com mais gente ouvida conta mais. " +
+      "Exemplo: uma pesquisa desta semana pode entrar com peso 1,00 e uma de três meses atrás com " +
+      "peso 0,05 — a antiga continua na lista para mostrar o movimento, mas quase não mexe na " +
+      "média de hoje.",
   },
   pontos: {
     termo: "ponto",

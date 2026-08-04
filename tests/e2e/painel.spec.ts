@@ -192,4 +192,120 @@ test.describe("painel", () => {
     await expect(page.getByTestId("disclaimer")).toBeVisible();
     await expect(page.getByRole("list", { name: "Pesquisas da série" })).toBeVisible();
   });
+
+  /* ------------------------------------------------------------------ *
+   * Fase 7 — o que a crítica da iteração 1 reprovou                      *
+   * ------------------------------------------------------------------ */
+
+  test("o cartão da simulação só diz «simulação» quando há simulação", async ({ page }) => {
+    await page.goto("/");
+    await painelPronto(page);
+
+    // Estado padrão: réguas no padrão E série oficial → é o número OFICIAL.
+    const oficial = page.getByTestId("resultado-oficial");
+    await expect(oficial).toBeVisible();
+    await expect(oficial).toContainText("Com as réguas no padrão");
+    await expect(page.getByTestId("resultado-simulacao")).toHaveCount(0);
+
+    // Mexer numa régua troca a chave, e o oficial vem junto na mesma frase.
+    const regua = page.getByTestId("slider-vies");
+    await regua.scrollIntoViewIfNeeded();
+    await regua.fill("6");
+    const simulado = page.getByTestId("resultado-simulacao");
+    await expect(simulado).toContainText("Nesta simulação");
+    await expect(simulado).toContainText("No painel oficial são");
+
+    await page.getByTestId("restaurar-parametros").click();
+    await expect(page.getByTestId("resultado-oficial")).toBeVisible();
+  });
+
+  test("a condição do rótulo é dupla: mexer só na lista já é simulação", async ({ page }) => {
+    await page.goto("/");
+    await painelPronto(page);
+
+    await page.getByTestId("abrir-form-simulacao").scrollIntoViewIfNeeded();
+    await page.getByTestId("abrir-form-simulacao").click();
+    await page.getByTestId("campo-instituto").fill("Instituto de Teste");
+    await page.getByTestId("campo-fim").fill("2026-08-01");
+    await page.getByTestId("campo-l2").fill("38");
+    await page.getByTestId("campo-f2").fill("52");
+    await page.getByTestId("campo-n").fill("3000");
+    await page.getByTestId("incluir-simulacao").click();
+
+    // Réguas intocadas, série alterada → ainda é simulação (H7).
+    await expect(page.getByTestId("restaurar-parametros")).toBeDisabled();
+    await expect(page.getByTestId("resultado-simulacao")).toContainText("Nesta simulação");
+    await expect(page.getByTestId("resultado-oficial")).toHaveCount(0);
+  });
+
+  test("o escrito ao lado de cada desenho é o desenhado (H3)", async ({ page }) => {
+    await page.goto("/");
+    await painelPronto(page);
+
+    // Hero: os rótulos ancorados, a legenda e a contagem de bolinhas batem.
+    const enxame = page.getByTestId("enxame");
+    const azuis = await enxame.locator('circle[fill="var(--color-flavio)"]').count();
+    const vermelhas = await enxame.locator('circle[fill="var(--color-lula)"]').count();
+    expect(azuis + vermelhas).toBe(100);
+    await expect(page.getByTestId("enxame-n-lula")).toHaveText(String(vermelhas));
+    await expect(page.getByTestId("enxame-n-flavio")).toHaveText(String(azuis));
+    await expect(page.getByTestId("legenda-enxame")).toContainText(
+      `${vermelhas} do lado de Lula, ${azuis} do lado de Flávio`,
+    );
+
+    // Mini-enxame da simulação: a legenda usa o número do próprio desenho.
+    const mini = page.getByTestId("enxame-simulacao");
+    await mini.scrollIntoViewIfNeeded();
+    const miniLula = await mini.locator('circle[fill="var(--color-lula)"]').count();
+    const miniFlavio = await mini.locator('circle[fill="var(--color-flavio)"]').count();
+    await expect(page.getByTestId("legenda-mini-enxame")).toContainText(
+      `${miniLula} caem do lado de Lula e ${miniFlavio} do lado de Flávio`,
+    );
+  });
+
+  test("a primeira dobra a 390 carrega dúvida", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+
+    const DUVIDA = [
+      "ainda pode mudar",
+      "não é previsão",
+      "não é certeza",
+      "não é garantia",
+      "pode mudar",
+    ];
+    const naDobra = await page.evaluate((termos) => {
+      const achados: string[] = [];
+      const it = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      let no: Node | null;
+      while ((no = it.nextNode())) {
+        const texto = (no.textContent ?? "").toLowerCase();
+        if (!termos.some((t) => texto.includes(t))) continue;
+        const alcance = document.createRange();
+        alcance.selectNodeContents(no);
+        const caixa = alcance.getBoundingClientRect();
+        if (caixa.height > 0 && caixa.bottom <= 844) achados.push(texto.trim().slice(0, 60));
+      }
+      return achados;
+    }, DUVIDA);
+
+    expect(naDobra.length, "nenhuma palavra de dúvida dentro dos 844px").toBeGreaterThan(0);
+  });
+
+  test("as barras dos candidatos usam régua fixa, não o líder", async ({ page }) => {
+    await page.goto("/");
+    await painelPronto(page);
+    await page.getByTestId("aba-todos").scrollIntoViewIfNeeded();
+    await page.getByTestId("aba-todos").click();
+
+    const primeira = page.getByTestId("barra-candidato-0");
+    await primeira.scrollIntoViewIfNeeded();
+    const trilho = primeira.locator("..");
+    const larguraBarra = (await primeira.boundingBox())!.width;
+    const larguraTrilho = (await trilho.boundingBox())!.width;
+    // O líder tem ~41% de 50% da régua: nunca o trilho inteiro. Normalizada
+    // pelo líder, esta razão era exatamente 1.
+    expect(larguraBarra / larguraTrilho).toBeGreaterThan(0.5);
+    expect(larguraBarra / larguraTrilho).toBeLessThan(0.95);
+  });
 });

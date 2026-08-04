@@ -11,7 +11,7 @@
  * direita), com o mesmo tamanho, a mesma estrutura de frase e a mesma
  * quantidade de ressalvas — é a ordem da RÉGUA, não a do placar (VOZ §2.4).
  */
-import { Bloco, Nicho, Pergunta, Resposta, Subtitulo, Traduzindo } from "@/components/ui/blocos";
+import { Bloco, Cabecalho, Nicho, Subtitulo } from "@/components/ui/blocos";
 import { Termo } from "@/components/ui/glossario";
 import { abs1, emCem, parEmCem, pessoasEmCem } from "@/components/ui/textos";
 import { fmt, fmtSinal } from "@/lib/modelo";
@@ -39,19 +39,26 @@ export function Frente() {
 
   return (
     <Bloco rotuladoPor="titulo-frente">
-      <Pergunta id="titulo-frente">Quem está na frente?</Pergunta>
-      <Resposta>
-        <b className="font-semibold">Na média das pesquisas</b> do 2º turno, Lula tem{" "}
-        <span className="numeros">{fmt(M.mediaL2)}%</span> e Flávio{" "}
-        <span className="numeros">{fmt(M.mediaF2)}%</span> — diferença de{" "}
-        <span className="numeros">{abs1(M.margem)}</span> pontos, cerca de{" "}
-        <span className="numeros">{pessoasEmCem(M.margem)}</span> pessoas a mais em cada 100.
-      </Resposta>
-      <Traduzindo>
-        Estes são os números das pesquisas, sem projeção: a média que o painel faz do que os
-        institutos mediram até agora. A eleição tem dois dias: 4 de outubro e, se ninguém passar de
-        metade dos <Termo chave="votosValidos">votos válidos</Termo>, 25 de outubro.
-      </Traduzindo>
+      <Cabecalho
+        id="titulo-frente"
+        pergunta="Quem está na frente?"
+        resposta={
+          <>
+            <b className="font-semibold">Na média das pesquisas</b> do 2º turno, Lula tem{" "}
+            <span className="numeros">{fmt(M.mediaL2)}%</span> e Flávio{" "}
+            <span className="numeros">{fmt(M.mediaF2)}%</span> — diferença de{" "}
+            <span className="numeros">{abs1(M.margem)}</span> pontos, cerca de{" "}
+            <span className="numeros">{pessoasEmCem(M.margem)}</span> pessoas a mais em cada 100.
+          </>
+        }
+        traduzindo={
+          <>
+            Estes são os números das pesquisas, sem projeção: a média que o painel faz do que os
+            institutos mediram até agora. A eleição tem dois dias: 4 de outubro e, se ninguém passar
+            de metade dos <Termo chave="votosValidos">votos válidos</Termo>, 25 de outubro.
+          </>
+        }
+      />
 
       <div className="mt-5 grid gap-4 md:grid-cols-2 md:items-start">
         {/* ---------------- 2º turno ---------------- */}

@@ -79,8 +79,12 @@ export function CurvaSensibilidade() {
             onAplicar={(v) => definirParam("vies", v)}
           />
         </CaixaGrafico>
-        <p className="text-right text-micro text-tinta-media">
-          tamanho da puxada suposta, em pontos
+        {/* O eixo de baixo era `-2 0 2 4 6 8 10` mudo. O número que carrega
+            sentido é o zero, e ele passa a ser nomeado em palavras aqui e no
+            rótulo ancorado à própria vertical ("As pesquisas estão certas"). */}
+        <p className="flex flex-wrap justify-between gap-x-4 text-micro text-tinta-media">
+          <span>0 quer dizer: nenhuma puxada</span>
+          <span>tamanho da puxada suposta, em pontos</span>
         </p>
       </div>
 
@@ -113,11 +117,12 @@ export function CurvaSensibilidade() {
                 ativo ? "bg-ameixa-bruma" : "bg-nicho hover:bg-ameixa-tenue",
               ].join(" ")}
             >
+              {/* Sem o "▶": VOZ §1.7 pede zero enfeite, e o glifo ainda lia
+                  como botão de play. O estado ativo já é dito pelo campo
+                  ameixa-bruma, pelo `aria-pressed` e pela linha "aplicado ao
+                  painel" abaixo. */}
               <Celebra chave={ativo ? `${c.vies}-ativo` : `${c.vies}-inativo`}>
-                <span className="block text-secao text-tinta">
-                  {ativo ? "▶ " : ""}
-                  {copy.titulo}
-                </span>
+                <span className="block text-secao text-tinta">{copy.titulo}</span>
               </Celebra>
               <span className="mt-1 block text-corpo font-semibold numeros">
                 <span className="text-lula">Lula {pl} em 100</span>
@@ -137,7 +142,7 @@ export function CurvaSensibilidade() {
               </span>
               {ativo ? (
                 <span className="mt-2 block text-micro font-semibold text-ameixa">
-                  ▶ aplicado ao painel
+                  aplicado ao painel
                 </span>
               ) : null}
             </button>

@@ -232,6 +232,31 @@ var(--color-linha-forte) 55%, transparent)` → mantém "zero hex em componente"
 - PNG bruto de procedência (1,1 MB) movido pelo orquestrador de public/ para
   docs/marca-origem/ → não é referenciado por nenhuma superfície; em public/ iria ao CDN.
 
+## Fase 7 — loop v2 (iteração 1: 2 BLOCKER · 12 MAJOR · 13 MINOR · 6 NIT; anti-regressão PASSOU
+
+com zero pixel da v1; teste do leigo 1/4 na dobra)
+
+- Cores de candidatos e traduções do histórico vivem na APRESENTAÇÃO (`cores-candidatos.ts`,
+  `copia-erros.ts`, keyed pelo dado, com fallback ao original) → `src/data/**` é intocável pela
+  paridade golden (campoCompleto carrega `cor`); rampa neutra de 7 degraus OKLCH com pior par
+  3,13:1 e ΔEok mínimo 0,0596 entre cores e 0,0556 contra a marca.
+- "Colisão de cor" definida como ΔE em OKLab, não razão de contraste → com luminância pura, 7
+  neutros ≥3:1 contra o nicho seriam matematicamente impossíveis (demonstrado no comentário).
+- Simulação: estados excludentes com condição DUPLA (réguas padrão E série oficial) e legenda
+  do mini-enxame com o número do DESENHO (redações assinadas, AUDITORIA §10); fechos
+  condicionais do hero APOSENTADOS (duas fontes para o mesmo fato foi como o 83↔82 nasceu).
+- Legenda do hero: 55 palavras com DUAS marcas de dúvida — a dobra de 390 sempre carrega dúvida
+  (medido: "ainda pode mudar" em y 647–693; e2e trava por varredura de texto até y=844).
+- Barras dos 9 candidatos: régua FIXA 0–50% rotulada (normalizar pelo líder é a barra 83/17
+  pela porta dos fundos); e2e trava razão <0,95 do trilho.
+- Breakpoint das tabelas subiu para lg (série e erros) → única saída que mantém o registro TSE
+  legível sem gesto a 768; cartões em 2 colunas na faixa md.
+- Altura da home: −35,6% a 390 (27.841→17.936px) por DEDUPLICAÇÃO + disclosure (nada saiu do
+  produto; 8 pesquisas antigas e aprofundamentos a um toque).
+- Motion auditável: evidências gravadas em .qa/motion-evidencias/ (frames da queda via
+  Animation.setPlaybackRate no CDP, reduced-motion com medições, rastro de slider,
+  pulso da celebração medido em px).
+
 ## Fase 6 — reescrita da camada de apresentação (frontend-dev)
 
 ### Fundação

@@ -44,7 +44,6 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
   const institutos = new Set(pesquisas.map((p) => p.instituto)).size;
   const lider = M.eleito.dia.l >= 0.5 ? "Lula" : "Flávio";
   const faixa = faixaVeredito(Math.max(M.eleito.dia.l, M.eleito.dia.f));
-  const lulaNaFrenteNo1T = M.p1 ? M.p1.lulaDia >= M.p1.flavioDia : true;
 
   return (
     <div className="mx-auto w-full max-w-pagina px-goteira pt-4 md:px-goteira-md lg:px-goteira-lg">
@@ -81,41 +80,40 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
         para Lula e {eleitoF}% para Flávio
       </p>
 
-      {/* 4. O enxame, dentro da placa (é contra ela que a bolinha faz o 3:1). */}
+      {/* 4. O enxame, dentro da placa (é contra ela que a bolinha faz o 3:1).
+             Em lg a legenda fica AO LADO do desenho: no cartão de 1000px o
+             conjunto deixava 46% de faixa morta à direita. */}
       <Bloco className="mt-5">
-        <Enxame
-          layout={layout}
-          idTeste="enxame"
-          rotuloAcessivel={`Cem bolinhas, uma por cenário da decisão de 25 de outubro: ${nLula} caem do lado de Lula e ${nFlavio} do lado de Flávio.`}
-        />
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-8">
+          <Enxame
+            layout={layout}
+            idTeste="enxame"
+            rotuloAcessivel={`Cem bolinhas, uma por cenário da decisão de 25 de outubro: ${nLula} caem do lado de Lula e ${nFlavio} do lado de Flávio.`}
+          />
 
-        {/* 5. A micro-legenda que reconcilia os dois números. Obrigatória, na
-               mesma tela, e não pode ser encurtada até perder a explicação. */}
-        <p className="mt-4 max-w-texto text-corpo text-tinta-media">
-          Cada bolinha é um resultado possível, e todas valem o mesmo. Aqui elas mostram{" "}
-          <b className="font-semibold text-tinta">só a decisão de 25 de outubro</b>: {nLula} caem do
-          lado de Lula e {nFlavio} do lado de Flávio. A frase de cima conta outra coisa: quem
-          termina eleito pelos dois caminhos juntos. Em {p1tDef} de cada 100 cenários a eleição
-          acaba já em 4 de outubro — nesses não existe 2º turno para a bolinha cair de um lado, e
-          eles entram na frase de cima a favor de quem venceu no 1º turno.{" "}
-          {lulaNaFrenteNo1T ? (
-            <>
-              Hoje quase todos esses cenários terminam com Lula eleito — por isso na frase de cima
-              ele fica com {eleitoL}, um pouco acima das {nLula} bolinhas, e Flávio com {eleitoF},
-              um pouco abaixo das {nFlavio} dele.
-            </>
-          ) : (
-            <>
-              Hoje quase todos esses cenários terminam com Flávio eleito — por isso na frase de cima
-              ele fica com {eleitoF}, um pouco acima das {nFlavio} bolinhas, e Lula com {eleitoL},
-              um pouco abaixo das {nLula} dele.
-            </>
-          )}
-        </p>
+          {/* 5. A micro-legenda, na redação assinada pelo data-scientist
+                 (AUDITORIA-COPY §10.2): 55 palavras, com DUAS marcas de dúvida
+                 dentro — "nenhuma é o resultado" e a cláusula literal de H2,
+                 "até outubro isso ainda pode mudar". É ela que garante que a
+                 primeira dobra de 390px carregue dúvida mesmo quando o
+                 veredito desce para baixo da linha do horizonte.
+                 Os fechos condicionais por líder ficaram APOSENTADOS: duas
+                 fontes para o mesmo fato foi como o 83 ↔ 82 nasceu. */}
+          <p
+            data-testid="legenda-enxame"
+            className="mt-4 max-w-texto text-corpo text-tinta-media lg:mt-0"
+          >
+            Cada bolinha é um resultado possível: nenhuma é o resultado —{" "}
+            <b className="font-semibold text-tinta">até outubro isso ainda pode mudar</b>. Aqui, só
+            a decisão de 25 de outubro: {nLula} do lado de Lula, {nFlavio} do lado de Flávio. Em{" "}
+            {p1tDef} de cada 100 cenários não há 2º turno; esses entram na frase de cima, que dá{" "}
+            {eleitoL} e {eleitoF}.
+          </p>
+        </div>
       </Bloco>
 
       {/* 6. "Não é previsão" — nunca some a 390px (H4). */}
-      <p data-testid="disclaimer" className="mt-5 max-w-texto text-intro text-tinta">
+      <p data-testid="disclaimer" className="mt-4 max-w-texto text-intro text-tinta">
         Isto não é previsão. É o que as {pesquisas.length} pesquisas registradas no TSE dizem hoje,
         mais o tanto que a corrida ainda pode andar até outubro.
       </p>

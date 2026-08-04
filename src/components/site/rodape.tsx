@@ -7,16 +7,14 @@
  */
 import { LinkInterno } from "@/components/ui/blocos";
 import { ROTAS } from "@/app/_lib/site";
-import { Simbolo } from "./marca";
 
 export function Rodape() {
   return (
     <footer className="mx-auto mt-8 w-full max-w-pagina px-goteira pb-16 md:px-goteira-md lg:px-goteira-lg">
       <div className="rounded-bloco bg-placa p-bloco md:p-bloco-md">
-        <div className="flex items-start gap-3">
-          <Simbolo className="mt-1 h-7 w-auto shrink-0 text-ameixa" />
-          <h2 className="text-pergunta text-tinta">Antes de sair, três coisas</h2>
-        </div>
+        {/* Sem o símbolo como ornamento: MARCA.md §6.6.10 dá ao PONTEIRO uma
+            aparição por tela, e ela é o cabeçalho. */}
+        <h2 className="text-pergunta text-tinta">Antes de sair, três coisas</h2>
 
         <div className="mt-4 grid max-w-none gap-4 text-corpo text-tinta-media md:grid-cols-2">
           <p>
@@ -47,7 +45,7 @@ export function Rodape() {
           <b className="font-semibold">25/10/2026</b>.
         </p>
 
-        <nav aria-label="Páginas do site" className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+        <nav aria-label="Todas as páginas" className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
           {ROTAS.map((r) => (
             <LinkInterno key={r.href} href={r.href} className="text-corpo font-semibold">
               {r.titulo}
@@ -55,30 +53,32 @@ export function Rodape() {
           ))}
         </nav>
 
+        {/* O aviso legal, TRADUZIDO — ele é a superfície de 100% de alcance
+            (aparece nas três páginas públicas) e carregava cinco palavras
+            banidas por VOZ §5.1: "probabilidade", "premissas", "parâmetros",
+            "rodadas" e "sliders" (esta última em inglês). Nada foi retirado:
+            cada obrigação legal continua dita, com as palavras do deck.
+            A linha das datas saiu daqui — ela já está 700px acima. */}
         <div className="mt-6 rounded-nicho bg-nicho p-4 text-micro text-tinta-media">
           <p>
             <b className="font-semibold text-tinta">Aviso:</b> ferramenta estatística e educacional,
             sem vínculo com candidatos, partidos, institutos de pesquisa ou veículos de imprensa. Os
             números pertencem aos respectivos institutos e estão registrados no TSE sob os números
-            indicados em cada linha da série; os links levam sempre à publicação original, que
+            indicados em cada linha da lista; os links levam sempre à publicação original, que
             prevalece sobre qualquer leitura feita aqui.
           </p>
           <p className="mt-2">
-            O que este site publica é uma <b className="font-semibold text-tinta">probabilidade</b>,
-            não um resultado: a fração de cenários compatíveis com os dados em que cada candidato
-            termina eleito, dadas premissas que ficam expostas e que você pode mudar nos parâmetros.
-            Probabilidade alta não é garantia, e probabilidade baixa não é impossibilidade — um
-            desfecho de 20% acontece uma vez a cada cinco disputas parecidas.
+            O que este site publica é uma <b className="font-semibold text-tinta">chance</b>, não um
+            resultado: em quantas eleições parecidas com esta cada candidato termina eleito, dadas
+            as suposições que ficam à vista e que você pode mudar nas réguas. Chance alta não é
+            garantia, e chance baixa não é impossibilidade — um resultado de 20 em 100 acontece uma
+            vez a cada cinco disputas parecidas.
           </p>
           <p className="mt-2">
-            A série só cresce por decisão humana: rodadas encontradas automaticamente entram como
-            pendentes e alguém precisa aprová-las, com registro em auditoria pública. Simulações
-            feitas na página (adicionar ou remover pesquisas, mover os sliders) valem apenas no seu
-            navegador e nunca alteram a base oficial.
-          </p>
-          <p className="mt-2 numeros">
-            Eleições: 1º turno <b className="font-semibold text-tinta">04/10/2026</b> · 2º turno{" "}
-            <b className="font-semibold text-tinta">25/10/2026</b>.
+            A lista só cresce por decisão humana: as pesquisas encontradas automaticamente entram
+            como pendentes e uma pessoa precisa aprová-las, com registro numa lista pública. As
+            simulações feitas na página (acrescentar ou tirar pesquisas, mexer nas réguas) valem só
+            no seu navegador e nunca alteram a base oficial.
           </p>
         </div>
       </div>

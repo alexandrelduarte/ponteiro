@@ -18,6 +18,49 @@ details > summary {
   cursor: pointer;
 }
 
+/**
+ * Detalhe em linha (componente `Detalhe`): o gatilho precisa PARECER controle.
+ * Texto ameixa em negrito, sozinho, se confunde com prosa enfatizada — e na
+ * mesma página os links reais são sublinhados. Aqui vão dois sinais: o
+ * sublinhado (no próprio JSX) e o chevron, que gira 180° ao abrir. Só
+ * `transform`, e a duração sai de token (zera em prefers-reduced-motion).
+ */
+.detalhe > summary {
+  list-style: none;
+}
+.detalhe > summary::-webkit-details-marker {
+  display: none;
+}
+.detalhe > summary .chevron {
+  display: inline-block;
+  transition: transform var(--dur-rapida) var(--ease-padrao);
+}
+.detalhe[open] > summary .chevron {
+  transform: rotate(180deg);
+}
+
+/**
+ * A RÉGUA DO EMPATE engrossa junto com o desenho.
+ * `vector-effect: non-scaling-stroke` mantém a espessura em pixels de tela, o
+ * que é certo a 390 (3px contra bolinhas de 8px) e vira fio de cabelo a 1440
+ * (3px contra bolinhas de 20px). A referência não pode desaparecer quando o
+ * desenho cresce — então ela ganha um degrau por breakpoint. Continua sendo a
+ * MESMA régua: muda a espessura, nunca a posição (§7.2).
+ */
+.regua-empate {
+  stroke-width: 3px;
+}
+@media (min-width: 48rem) {
+  .regua-empate {
+    stroke-width: 4px;
+  }
+}
+@media (min-width: 71.25rem) {
+  .regua-empate {
+    stroke-width: 5px;
+  }
+}
+
 /* ===========================================================================
    ENTRADA ORQUESTRADA — CSS puro, sem esperar JS (docs/DESIGN-V2.md §7)
    Só `transform` e `opacity`. Roda uma vez, no carregamento; `--atraso` faz o

@@ -4,7 +4,7 @@
  * "De onde vêm esses números?" — o método em quatro linhas (COPY-DECK §N).
  * O texto completo (limitações, classificação, fontes) mora em /metodologia.
  */
-import { Bloco, LinkInterno, Pergunta, Resposta, Traduzindo } from "@/components/ui/blocos";
+import { Bloco, Cabecalho, LinkInterno } from "@/components/ui/blocos";
 import { Termo } from "@/components/ui/glossario";
 import { usePainel } from "./estado";
 
@@ -13,16 +13,24 @@ export function MetodologiaResumo() {
 
   return (
     <Bloco rotuladoPor="titulo-metodo">
-      <Pergunta id="titulo-metodo">De onde vêm esses números?</Pergunta>
-      <Resposta>
-        De {pesquisas.length} pesquisas registradas no TSE, misturadas numa média que dá mais peso
-        às mais novas e às que ouviram mais gente.
-      </Resposta>
-      <Traduzindo>
-        Depois da média, o painel calcula duas chances: uma se a votação fosse hoje e outra para o
-        dia da votação. A segunda carrega mais dúvida, porque até lá a corrida ainda pode andar.
-        Nada aqui é torcida: as contas estão abertas e as quatro suposições do painel ficam à vista.
-      </Traduzindo>
+      <Cabecalho
+        id="titulo-metodo"
+        pergunta="De onde vêm esses números?"
+        resposta={
+          <>
+            De {pesquisas.length} pesquisas registradas no TSE, misturadas numa média que dá mais
+            peso às mais novas e às que ouviram mais gente.
+          </>
+        }
+        traduzindo={
+          <>
+            Depois da média, o painel calcula duas chances: uma se a votação fosse hoje e outra para
+            o dia da votação. A segunda carrega mais dúvida, porque até lá a corrida ainda pode
+            andar. Nada aqui é torcida: as contas estão abertas e as quatro suposições do painel
+            ficam à vista.
+          </>
+        }
+      />
 
       <ul className="mt-4 max-w-texto space-y-2 text-corpo text-tinta-media numeros">
         <li>

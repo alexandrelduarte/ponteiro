@@ -12,7 +12,7 @@
  * número nenhum (salvaguarda anti-needle, MARCA.md §6.6 item 3).
  */
 import Link from "next/link";
-import { NOME_SITE, TAGLINE } from "@/app/_lib/site";
+import { NOME_SITE, ROTAS, TAGLINE } from "@/app/_lib/site";
 
 /** Símbolo isolado: anel + agulha, em `currentColor`. Piso de 28px de altura. */
 export function Simbolo({ className }: { className?: string }) {
@@ -36,25 +36,44 @@ export function Simbolo({ className }: { className?: string }) {
 /**
  * Travamento horizontal: símbolo + wordmark + tagline. É o cabeçalho de todas
  * as páginas e o primeiro elemento do primeiro scroll de 390px (§5.1).
+ *
+ * A navegação entra aqui porque a 390 a home tem dezenas de telas de altura:
+ * sem uma saída visível na primeira dobra, "Metodologia" e "O que já mudou"
+ * ficavam a uma rolagem inteira de distância. São dois links de texto, no
+ * mesmo alvo de 44px do resto do produto — não é menu, não é gaveta.
  */
 export function CabecalhoSite() {
   return (
     <header className="mx-auto w-full max-w-pagina px-goteira pt-5 pb-1 md:px-goteira-md lg:px-goteira-lg">
-      <Link
-        href="/"
-        className="inline-flex items-center gap-3 rounded-nicho py-1 no-underline"
-        aria-label={`${NOME_SITE} — ${TAGLINE}`}
-      >
-        <Simbolo className="h-9 w-auto shrink-0 text-ameixa" />
-        <span>
-          <span aria-hidden="true" className="block font-display text-wordmark text-tinta">
-            {NOME_SITE}
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-3 rounded-nicho py-1 no-underline"
+          aria-label={`${NOME_SITE} — ${TAGLINE}`}
+        >
+          <Simbolo className="h-9 w-auto shrink-0 text-ameixa" />
+          <span>
+            <span aria-hidden="true" className="block font-display text-wordmark text-tinta">
+              {NOME_SITE}
+            </span>
+            <span aria-hidden="true" className="mt-0.5 block text-etiqueta text-ameixa">
+              {TAGLINE}
+            </span>
           </span>
-          <span aria-hidden="true" className="mt-0.5 block text-etiqueta text-ameixa">
-            {TAGLINE}
-          </span>
-        </span>
-      </Link>
+        </Link>
+
+        <nav aria-label="Páginas do site" className="flex flex-wrap items-center gap-x-5">
+          {ROTAS.filter((r) => r.href !== "/").map((r) => (
+            <Link
+              key={r.href}
+              href={r.href}
+              className="inline-flex min-h-toque items-center rounded-campo text-etiqueta font-semibold text-ameixa underline decoration-from-font underline-offset-2"
+            >
+              {r.titulo}
+            </Link>
+          ))}
+        </nav>
+      </div>
     </header>
   );
 }

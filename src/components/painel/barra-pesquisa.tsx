@@ -35,6 +35,33 @@ export function escalaDaSerie(linhas: readonly LinhaModelo[]): EscalaBarra {
 const posicao = (v: number, escala: EscalaBarra) =>
   ((v - escala.min) / (escala.max - escala.min)) * 100;
 
+/**
+ * A RÉGUA da lista, rotulada uma vez no topo.
+ *
+ * Sem ela, cada cartão trazia uma barra sem eixo, sem rótulo e sem a palavra
+ * "empate" ao lado da linha de tinta — a promessa de §4.3 ("empate técnico
+ * deixa de ser badge de texto e passa a ser VISTO") não se cumpria, e o cartão
+ * continuava dependendo do selo escrito. As três marcas usam exatamente a
+ * mesma escala das barras, então o "empate" do rótulo cai no mesmo x da régua
+ * de tinta de todas as linhas.
+ */
+export function ReguaPesquisas({ escala, className }: { escala: EscalaBarra; className?: string }) {
+  return (
+    <p
+      className={["relative h-5 text-micro text-tinta-media", className].filter(Boolean).join(" ")}
+    >
+      <span className="absolute left-0">← Flávio na frente</span>
+      <span
+        className="absolute -translate-x-1/2 font-semibold text-tinta"
+        style={{ left: `${posicao(0, escala)}%` }}
+      >
+        empate
+      </span>
+      <span className="absolute right-0">Lula na frente →</span>
+    </p>
+  );
+}
+
 export function BarraPesquisa({
   linha,
   escala,

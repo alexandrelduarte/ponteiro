@@ -47,9 +47,6 @@ export function FaixaSimulacao() {
             className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-nicho bg-atencao-fundo px-4 py-3 md:shadow-flutua"
           >
             <span className="text-corpo text-tinta">
-              <span aria-hidden="true" className="mr-1 font-semibold text-atencao">
-                ⚠
-              </span>
               {SIMULACAO.faixa}
               {serieAlterada ? ` ${SIMULACAO.detalheSerie(pesquisas.length)}` : ""}
               {paramsAlterados ? ` ${SIMULACAO.detalheReguas}` : ""}

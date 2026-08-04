@@ -11,9 +11,8 @@
  *
  * Nada aqui espera JavaScript nem carrega biblioteca de gráfico.
  */
-import { Bloco, Pergunta, Resposta, Traduzindo } from "@/components/ui/blocos";
+import { Bloco, Cabecalho } from "@/components/ui/blocos";
 import { abs1, parEmCem } from "@/components/ui/textos";
-import { fmtSinal } from "@/lib/modelo";
 import { Enxame, montarEnxame } from "./enxame";
 import { usePainel } from "./estado";
 
@@ -24,17 +23,25 @@ export function Virada() {
 
   return (
     <Bloco rotuladoPor="titulo-virada">
-      <Pergunta id="titulo-virada">Isso ainda pode virar?</Pergunta>
-      <Resposta>
-        Pode. Em <span className="numeros">{layout.nFlavio}</span> de cada 100 cenários para 25 de
-        outubro, é Flávio quem ganha a decisão — e em <span className="numeros">{eleitoF}</span> de
-        cada 100 ele termina eleito, contando os dois caminhos.
-      </Resposta>
-      <Traduzindo>
-        Cada bolinha é um resultado possível para a diferença no dia da votação, e todas valem o
-        mesmo. As que caem à direita da régua são cenários em que Lula ganha; à esquerda, cenários
-        em que Flávio ganha. Quanto mais espalhadas, menos fechada está a disputa.
-      </Traduzindo>
+      <Cabecalho
+        id="titulo-virada"
+        pergunta="Isso ainda pode virar?"
+        resposta={
+          <>
+            Pode. Em <span className="numeros">{layout.nFlavio}</span> de cada 100 cenários para 25
+            de outubro, é Flávio quem ganha a decisão — e em{" "}
+            <span className="numeros">{eleitoF}</span> de cada 100 ele termina eleito, contando os
+            dois caminhos.
+          </>
+        }
+        traduzindo={
+          <>
+            Cada bolinha é um resultado possível para a diferença no dia da votação, e todas valem o
+            mesmo. As que caem à direita da régua são cenários em que Lula ganha; à esquerda,
+            cenários em que Flávio ganha. Quanto mais espalhadas, menos fechada está a disputa.
+          </>
+        }
+      />
 
       <div className="mt-5">
         <Enxame
@@ -44,17 +51,12 @@ export function Virada() {
         />
       </div>
 
+      {/* A faixa "em 8 de cada 10 cenários…" aparecia três vezes na mesma
+          página (aqui, em "Quem está na frente?" e na divisão de votos). Ela
+          fica onde nasce: no bloco da diferença medida. */}
       <p className="mt-4 max-w-texto text-corpo text-tinta-media">
-        A régua do meio é o empate: ali os dois teriam o mesmo tanto de voto.
-      </p>
-      <p className="mt-2 max-w-texto text-corpo text-tinta-media">
-        Tudo o que está do lado esquerdo da régua é o espaço de virada que os dados de hoje ainda
-        comportam.
-      </p>
-      <p className="mt-2 max-w-texto text-corpo text-tinta-media numeros">
-        Em 8 de cada 10 cenários, a diferença{" "}
-        <b className="font-semibold text-tinta">medida nas pesquisas</b> fica entre{" "}
-        {fmtSinal(M.int80[0])} e {fmtSinal(M.int80[1])} pontos.
+        A régua do meio é o empate: ali os dois teriam o mesmo tanto de voto. Tudo o que está do
+        lado esquerdo dela é o espaço de virada que os dados de hoje ainda comportam.
       </p>
 
       <p className="mt-4 max-w-texto text-corpo text-tinta-media">

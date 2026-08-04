@@ -34,7 +34,8 @@ import { FAIXAS } from "./parametros-url";
 import { usePainel } from "./estado";
 
 export function Parametros() {
-  const { M, params, definirParam, restaurarParams, paramsAlterados } = usePainel();
+  const { M, Moficial, params, definirParam, restaurarParams, paramsAlterados, simulando } =
+    usePainel();
 
   const derivaPt = fmt(M.deriva2);
   // O efeito em pontos que a régua no PADRÃO produziria: a deriva é linear no
@@ -42,6 +43,7 @@ export function Parametros() {
   // raiz de dias, que arredondaria diferente do modelo).
   const derivaPadrao = fmt((M.deriva2 * PARAMS_PADRAO.coefDeriva) / params.coefDeriva);
   const [simLula, simFlavio] = parEmCem(M.eleito.dia.l);
+  const [eleitoLula, eleitoFlavio] = parEmCem(Moficial?.eleito.dia.l ?? null);
   const layout = montarEnxame(M.margemAj, M.sigmaDia2);
   const viesAbs = abs1(params.vies);
 
@@ -144,28 +146,71 @@ export function Parametros() {
         />
       </div>
 
-      {/* ---------------- resultado, na mesma linguagem do hero ---------------- */}
+      {/* ---------------- resultado, na mesma linguagem do hero ----------------
+          Duas chaves EXCLUDENTES, na redação assinada pelo data-scientist
+          (AUDITORIA-COPY §10.1). O rótulo "nesta simulação" existe para marcar
+          o que NÃO é oficial: usá-lo com tudo no padrão invertia H7 e fazia o
+          leitor concluir que o número da manchete era simulado.
+
+          A condição é DUPLA — réguas no padrão E série igual à oficial. Tirar
+          ou acrescentar uma pesquisa já é simulação, mesmo com as quatro
+          réguas intocadas: os dois eixos são independentes. */}
       <Nicho className="mt-6">
-        <p className="text-intro text-tinta">
-          Nesta simulação, Lula é eleito em{" "}
-          <Celebra chave={simLula}>
-            <b className="text-dado text-lula numeros">
-              {Number.isFinite(Number(simLula)) ? <Contagem valor={Number(simLula)} /> : simLula}
-            </b>
-          </Celebra>{" "}
-          de cada 100 cenários.
-        </p>
-        <p className="sr-only" role="status" aria-live="polite">
-          Resultado da sua simulação: {simLula} em 100 para Lula, {simFlavio} em 100 para Flávio.
-        </p>
+        {simulando ? (
+          <>
+            <p data-testid="resultado-simulacao" className="text-intro text-tinta">
+              Nesta simulação, Lula é eleito em{" "}
+              <Celebra chave={simLula}>
+                <b className="text-dado text-lula numeros">
+                  {Number.isFinite(Number(simLula)) ? (
+                    <Contagem valor={Number(simLula)} />
+                  ) : (
+                    simLula
+                  )}
+                </b>
+              </Celebra>{" "}
+              de cada 100 cenários, e Flávio em <b className="text-flavio numeros">{simFlavio}</b>.
+              No painel oficial são <span className="numeros">{eleitoLula}</span> e{" "}
+              <span className="numeros">{eleitoFlavio}</span>.
+            </p>
+            <p className="sr-only" role="status" aria-live="polite">
+              Resultado da sua simulação: {simLula} em 100 para Lula, {simFlavio} em 100 para
+              Flávio.
+            </p>
+          </>
+        ) : (
+          <>
+            <p data-testid="resultado-oficial" className="text-intro text-tinta">
+              Com as réguas no padrão, este é o número oficial do painel: Lula é eleito em{" "}
+              <b className="text-dado text-lula numeros">{eleitoLula}</b> de cada 100 cenários, e
+              Flávio em <b className="text-flavio numeros">{eleitoFlavio}</b>.
+            </p>
+            <p className="sr-only" role="status" aria-live="polite">
+              Resultado com as réguas no padrão: {eleitoLula} em 100 para Lula, {eleitoFlavio} em
+              100 para Flávio.
+            </p>
+          </>
+        )}
 
         <div className="mt-4">
           <Enxame
             layout={layout}
             compacto
             idTeste="enxame-simulacao"
-            rotuloAcessivel={`Cem bolinhas, uma por cenário da decisão de 25 de outubro: ${layout.nLula} caem do lado de Lula e ${layout.nFlavio} do lado de Flávio.`}
+            rotuloAcessivel={`Cem bolinhas, uma por cenário da decisão de 25 de outubro: ${layout.nLula} do lado de Lula e ${layout.nFlavio} do lado de Flávio.`}
           />
+          {/* A frase colada no desenho usa O NÚMERO DO DESENHO (§10.1c). O
+              mini-enxame desenha os quantis da margem do 2º turno; a frase
+              acima soma também o caminho que acaba em 4 de outubro. Sem esta
+              reconciliação, escrito e desenhado discordavam sem aviso (H3). */}
+          <p
+            data-testid="legenda-mini-enxame"
+            className="mt-3 max-w-texto text-micro text-tinta-media"
+          >
+            As bolinhas mostram só a decisão de 25 de outubro: {layout.nLula} caem do lado de Lula e{" "}
+            {layout.nFlavio} do lado de Flávio. A frase acima soma também quem ganha já em 4 de
+            outubro — por isso dá outro número.
+          </p>
         </div>
       </Nicho>
 
@@ -191,9 +236,13 @@ export function Parametros() {
             a soma dos dois.
           </p>
         </div>
+        {/* O rótulo tem de dizer o destino (VOZ §5.3). "Ver a fórmula exata"
+            levava a uma página que abre na explicação simples, onde não há
+            fórmula nenhuma: o link agora leva à explicação TÉCNICA, e a
+            /metodologia entende essa âncora e já abre nela. */}
         <p className="mt-2">
-          <LinkInterno href="/metodologia" className="text-corpo">
-            Ver a fórmula exata na metodologia
+          <LinkInterno href="/metodologia#explicacao-tecnica" className="text-corpo">
+            Ver a fórmula exata na explicação técnica da metodologia
           </LinkInterno>
         </p>
       </div>

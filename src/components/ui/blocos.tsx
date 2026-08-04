@@ -122,6 +122,38 @@ export function Subtitulo({
   );
 }
 
+/**
+ * Cabeçalho do bloco-conversa: pergunta → resposta → traduzindo.
+ *
+ * A ordem de leitura é sempre essa, e é a do DOM. O que muda em `lg` é só a
+ * DISPOSIÇÃO: a resposta fica na medida de leitura à esquerda e o traduzindo
+ * ocupa a faixa que sobrava à direita. A 1440 metade dos blocos deixava 46%
+ * da largura vazia enquanto a outra metade ia até a borda — a página lia como
+ * um "L". Aqui o ritmo passa a ser o mesmo em todo bloco, sem encolher a
+ * medida de leitura de nenhum parágrafo (cada coluna continua ≤ ~58ch).
+ */
+export function Cabecalho({
+  id,
+  pergunta,
+  resposta,
+  traduzindo,
+}: {
+  id?: string;
+  pergunta: ReactNode;
+  resposta?: ReactNode;
+  traduzindo?: ReactNode;
+}) {
+  return (
+    <div className="lg:grid lg:grid-cols-[minmax(0,34rem)_minmax(0,1fr)] lg:items-start lg:gap-10">
+      <div>
+        <Pergunta id={id}>{pergunta}</Pergunta>
+        {resposta ? <Resposta>{resposta}</Resposta> : null}
+      </div>
+      {traduzindo ? <Traduzindo className="lg:mt-0">{traduzindo}</Traduzindo> : null}
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ *
  * Nichos (caixa dentro do bloco)                                     *
  * ------------------------------------------------------------------ */
@@ -155,12 +187,21 @@ export function Nicho({
 
 export type TomChip = "neutro" | "ameixa" | "atencao" | "lula" | "flavio";
 
+/**
+ * Selo de estado = CONTORNO + campo bruma, nunca campo cheio.
+ *
+ * §3.1 é explícito: o âmbar-queimado é TINTA, não campo — e o chip de
+ * glossário do MESMO termo ("empate técnico ?") já era contorno sobre bruma.
+ * Campo cheio dava dois tratamentos visuais para a mesma palavra na mesma
+ * tela. O contorno de 1,5px cumpre o 3:1 de objeto gráfico contra placa e
+ * contra nicho (atenção 6,11/5,6 · lula 6,18/5,3 · flávio 9,50/8,2).
+ */
 const CAMPO_CHIP: Record<TomChip, string> = {
   neutro: "bg-nicho text-tinta-media",
   ameixa: "bg-ameixa-bruma text-tinta",
-  atencao: "bg-atencao-fundo text-atencao",
-  lula: "bg-lula-fundo text-lula",
-  flavio: "bg-flavio-fundo text-flavio",
+  atencao: "bg-bruma text-atencao shadow-[inset_0_0_0_1.5px_var(--color-atencao)]",
+  lula: "bg-bruma text-lula shadow-[inset_0_0_0_1.5px_var(--color-lula)]",
+  flavio: "bg-bruma text-flavio shadow-[inset_0_0_0_1.5px_var(--color-flavio)]",
 };
 
 /** Etiqueta curta e arredondada. Nunca em caixa alta (P3). */
@@ -284,6 +325,45 @@ export function LinkInterno({
 }
 
 /* ------------------------------------------------------------------ *
+ * Detalhe (revelação em linha)                                       *
+ * ------------------------------------------------------------------ */
+
+/**
+ * `<details>` com afordância de CONTROLE.
+ *
+ * Texto ameixa em negrito, sozinho, não parece controle: na mesma página os
+ * links reais são sublinhados, e o leitor não tem como saber que aquilo abre
+ * alguma coisa. Aqui o gatilho ganha o mesmo sublinhado dos links MAIS um
+ * chevron que gira ao abrir — dois sinais, nenhum deles só de cor.
+ *
+ * O marcador nativo sai (`list-none` + `::-webkit-details-marker`), porque
+ * ele varia de forma entre navegadores e brigaria com o chevron.
+ */
+export function Detalhe({
+  titulo,
+  children,
+  className,
+  idTeste,
+}: {
+  titulo: ReactNode;
+  children: ReactNode;
+  className?: string;
+  idTeste?: string;
+}) {
+  return (
+    <details className={junta("detalhe", className)} data-testid={idTeste}>
+      <summary className="inline-flex min-h-toque items-center gap-2 text-corpo font-semibold text-ameixa">
+        <span className="underline decoration-from-font underline-offset-2">{titulo}</span>
+        <span aria-hidden="true" className="chevron text-etiqueta">
+          ▾
+        </span>
+      </summary>
+      {children}
+    </details>
+  );
+}
+
+/* ------------------------------------------------------------------ *
  * Estados                                                            *
  * ------------------------------------------------------------------ */
 
@@ -291,6 +371,10 @@ export function LinkInterno({
  * Nota âmbar dentro do bloco (§5.9): diz o que ficou indisponível e o que
  * ainda vale. `role="status"` — a página não é uma emergência. Não existe
  * "perigo vermelho" neste sistema: vermelho é de candidato (R4).
+ *
+ * Sem o glifo "⚠": VOZ §1.7 pede zero enfeite, e ele não carregava informação
+ * nenhuma — quem marca a nota é o campo âmbar, e quem diz o que houve é o
+ * texto, que nunca depende de cor para ser entendido.
  */
 export function Aviso({ children, className }: { children: ReactNode; className?: string }) {
   return (
@@ -298,9 +382,6 @@ export function Aviso({ children, className }: { children: ReactNode; className?
       role="status"
       className={junta("rounded-nicho bg-atencao-fundo px-4 py-3 text-corpo text-tinta", className)}
     >
-      <span aria-hidden="true" className="mr-1 font-semibold text-atencao">
-        ⚠
-      </span>
       {children}
     </p>
   );

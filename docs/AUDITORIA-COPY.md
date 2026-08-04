@@ -747,3 +747,94 @@ Placeholder novo, décimo da lista do §5: **`{{BN_T2}}`** = `100 − mediaL2 �
 (hoje **10,8**).
 
 — _data-scientist, 04/08/2026_
+
+---
+
+## 10. Adendo — assinatura dos dois itens da Fase 7
+
+Sobre `.qa/iter-v2-1/critica.md`: o BLOCKER do mini-enxame e o MAJOR da dobra de 390.
+
+### 10.1 BLOCKER — o cartão da simulação rotulando o oficial, e 83 escrito sobre 82 desenhado
+
+A crítica está certa nos dois vetos, e o segundo é o meu §2 se repetindo num lugar onde ninguém o
+reconciliou. `secao.simulacao.resultado` **é aposentada** e vira duas chaves excludentes, mais uma
+legenda para o desenho.
+
+**(a) Estado padrão — `secao.simulacao.resultado.oficial`**
+
+> Com as réguas no padrão, este é o número oficial do painel: Lula é eleito em **{{ELEITO_LULA}}**
+> de cada 100 cenários, e Flávio em **{{ELEITO_FLAVIO}}**.
+
+**Condição de renderização (as duas, não uma):** réguas iguais a `PARAMS_PADRAO` **e** série igual à
+oficial. Se o leitor tirou ou acrescentou uma pesquisa, é simulação mesmo com as quatro réguas
+intocadas — `simulacao.faixa.detalheSerie` existe exatamente porque os dois eixos são independentes.
+E o número exibido aqui é `{{ELEITO_LULA}}`, não `{{SIM_LULA}}`: no estado padrão são o mesmo valor
+por construção, e usar o placeholder oficial elimina qualquer chance de os dois divergirem por
+arredondamento.
+
+**Aria:** `Resultado com as réguas no padrão: {{ELEITO_LULA}} em 100 para Lula, {{ELEITO_FLAVIO}} em 100 para Flávio.`
+
+**(b) Estado alterado — `secao.simulacao.resultado.simulacao`**
+
+> Nesta simulação, Lula é eleito em **{{SIM_LULA}}** de cada 100 cenários, e Flávio em
+> **{{SIM_FLAVIO}}**. No painel oficial são {{ELEITO_LULA}} e {{ELEITO_FLAVIO}}.
+
+A segunda frase não é enfeite: é o que transforma o rótulo em informação. Um número de simulação sem
+o oficial ao lado obriga o leitor a rolar para saber o que ele mesmo mudou — e H7 pede a volta ao
+oficial a um toque, não a uma rolagem. `secao.simulacao.resultado.aria` fica com o texto que já
+tinha, aplicado só a este estado.
+
+**(c) O 83 ↔ 82 ali — `secao.simulacao.miniEnxame.legenda` (nova)**
+
+Escolho a via que a crítica sugere primeiro: **a frase colada no desenho usa o número do desenho.** O
+mini-enxame é a mesma gramática do hero (DESIGN-V2 §4.2) e desenha os quantis da margem do 2º turno
+— não há como desenhar uma probabilidade combinada como quantis de margem, então mudar o desenho
+está fora de questão. O que muda é quem fala por ele:
+
+> As bolinhas mostram só a decisão de 25 de outubro: {{SIM_T2_LULA}} caem do lado de Lula e
+> {{SIM_T2_FLAVIO}} do lado de Flávio. A frase acima soma também quem ganha já em 4 de outubro — por
+> isso dá outro número.
+
+39 palavras. H3 fica intacto (o número escrito ao lado do desenho **é** o desenhado), a reconciliação
+existe sem repetir a do hero, e "quem ganha já em 4 de outubro" é neutro: continua verdadeiro se a
+régua da puxada inverter o quadro e o mini-enxame passar a ter mais bolinhas do lado de Flávio.
+
+**Aria — `secao.simulacao.miniEnxame.aria`:** `Cem bolinhas, uma por cenário da decisão de 25 de outubro: {{SIM_T2_LULA}} do lado de Lula e {{SIM_T2_FLAVIO}} do lado de Flávio.`
+
+**Placeholders novos (11º e 12º da lista do §5):** `{{SIM_T2_LULA}}` = `pL2dia × 100` do estado
+simulado, inteiro, com piso/teto; `{{SIM_T2_FLAVIO}}` = `100 − {{SIM_T2_LULA}}` (complemento, nunca
+arredondamento independente).
+
+### 10.2 MAJOR — a legenda do enxame em 55 palavras, com a dúvida dentro
+
+A crítica tem razão e o excesso é meu: a redação do §2 tinha 78 palavras de corpo mais o fecho
+condicional. Reescrita, **55 palavras exatas**, com os quatro requisitos e mais um:
+
+> **`hero.enxame.legenda`** — redação canônica, substitui a do §2
+>
+> Cada bolinha é um resultado possível: nenhuma é o resultado — até outubro isso ainda pode mudar.
+> Aqui, só a decisão de 25 de outubro: {{T2_LULA}} do lado de Lula, {{T2_FLAVIO}} do lado de Flávio.
+> Em {{P_1T_DEF}} de cada 100 cenários não há 2º turno; esses entram na frase de cima, que dá
+> {{ELEITO_LULA}} e {{ELEITO_FLAVIO}}.
+
+O que mudou e por quê:
+
+- **"nenhuma é o resultado — até outubro isso ainda pode mudar"** põe **duas** marcas de dúvida
+  dentro da legenda, e a segunda é a cláusula literal de H2. A dobra de 390 passa a carregar dúvida
+  mesmo que "Isto não é previsão" e o veredito desçam. Não conflita com a faixa 90+: lá a ressalva
+  "não é garantia" continua obrigatória no `hero.veredito.amplo.titulo`, e as duas frases são
+  verdadeiras ao mesmo tempo — a deriva existe até o dia da votação em qualquer faixa.
+- **"esses entram na frase de cima"** substitui os fechos condicionais. É a mesma explicação, sem
+  direção: verdadeira para Lula e para Flávio, e imune à inversão do quadro. Era exatamente a
+  assimetria que eu vetei no §2 — resolvida com menos palavras em vez de mais.
+- **`hero.enxame.legenda.fecho.lula` e `.fecho.flavio` ficam APOSENTADOS.** Não devem ser
+  implementados: duas fontes para o mesmo fato é como o 83 ↔ 82 nasceu. Se o design quiser nomear a
+  direção em md+, ela já está publicada em `hero.caminho`, na mesma página.
+
+**Nota sobre o outro MAJOR (nenhum número junto ao desenho).** Ancorar "82" e "18" nas duas metades
+do enxame é correto e **reforça** esta legenda: o escrito no desenho, o escrito na legenda e o
+desenhado passam a ser o mesmo inteiro nos três lugares (H3). Nenhuma alteração de texto é necessária
+para isso — só a exigência de que os rótulos ancorados usem `{{T2_LULA}}`/`{{T2_FLAVIO}}`, os mesmos
+placeholders da legenda, e nunca a manchete.
+
+— _data-scientist, 04/08/2026_

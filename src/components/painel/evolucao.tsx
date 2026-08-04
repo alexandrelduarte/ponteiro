@@ -13,7 +13,7 @@
  */
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useRef } from "react";
-import { Bloco, Pergunta, Resposta, Traduzindo } from "@/components/ui/blocos";
+import { Bloco, Cabecalho } from "@/components/ui/blocos";
 import { Termo } from "@/components/ui/glossario";
 import { duracaoDoToken, easeDoToken } from "@/components/ui/movimento";
 import { abs1 } from "@/components/ui/textos";
@@ -48,17 +48,25 @@ export function Evolucao() {
 
   return (
     <Bloco rotuladoPor="titulo-evolucao">
-      <Pergunta id="titulo-evolucao">Como a diferença mudou com o tempo?</Pergunta>
-      <Resposta>
-        Desde janeiro a diferença encolheu: era de cerca de{" "}
-        <span className="numeros">{inicio === null ? "–" : abs1(inicio)}</span> pontos e hoje está
-        em <span className="numeros">{abs1(M.margem)}</span>. No caminho ela subiu e desceu — não
-        foi uma queda em linha reta.
-      </Resposta>
-      <Traduzindo>
-        Cada ponto é uma pesquisa. A linha é a média do painel, que dá mais peso às pesquisas mais
-        novas e maiores. A faixa em volta da linha é a dúvida: quanto mais larga, menos se sabe.
-      </Traduzindo>
+      <Cabecalho
+        id="titulo-evolucao"
+        pergunta="Como a diferença mudou com o tempo?"
+        resposta={
+          <>
+            Desde janeiro a diferença encolheu: era de cerca de{" "}
+            <span className="numeros">{inicio === null ? "–" : abs1(inicio)}</span> pontos e hoje
+            está em <span className="numeros">{abs1(M.margem)}</span>. No caminho ela subiu e desceu
+            — não foi uma queda em linha reta.
+          </>
+        }
+        traduzindo={
+          <>
+            Cada bolinha é uma pesquisa. A linha é a média do painel, que dá mais peso às pesquisas
+            mais novas e maiores. A faixa em volta da linha é a dúvida: quanto mais larga, menos se
+            sabe.
+          </>
+        }
+      />
 
       <div
         role="tablist"
@@ -99,7 +107,10 @@ export function Evolucao() {
         aria-labelledby={`aba-turno-${turnoGrafico}`}
         className="relative mt-3"
       >
-        <p className="text-micro text-tinta-media">Lula na frente ↑</p>
+        <p className="flex flex-wrap justify-between gap-x-4 text-micro text-tinta-media">
+          <span>Lula na frente ↑</span>
+          <span>a altura é a diferença, em pontos</span>
+        </p>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={turnoGrafico}
@@ -135,7 +146,8 @@ export function Evolucao() {
           tanto de voto.
         </p>
         <p>
-          Depois de hoje a faixa fica tracejada: dali para a frente é{" "}
+          A linha vertical marcada <b className="font-semibold text-tinta">hoje</b> é onde as
+          pesquisas acabam. Dali para a frente a faixa fica tracejada: é{" "}
           <Termo chave="projecao">projeção</Termo>, não pesquisa.
         </p>
         {turnoGrafico === 1 ? (
@@ -144,10 +156,16 @@ export function Evolucao() {
             mais antigas.
           </p>
         ) : null}
+        {/* Este gráfico é de DIFERENÇA e tem uma linha só, ameixa. Dizer
+            "vermelho: Lula, azul: Flávio" mandava o leitor procurar duas
+            linhas que não existem. O que a cor faz aqui é dizer, em cada
+            pesquisa, de que lado da régua ela caiu. */}
         <p className="numeros">
-          Vermelho: Lula. Azul: Flávio. Pontos: cada pesquisa. Linha: a média do painel. Hoje a
-          média do {turnoGrafico}º turno está em {fmt(serie.at(-1)?.l)}% para Lula e{" "}
-          {fmt(serie.at(-1)?.f)}% para Flávio.
+          Cada bolinha é uma pesquisa, na cor de quem aparece à frente nela: acima da régua,{" "}
+          <b className="font-semibold text-lula">Lula</b>; abaixo,{" "}
+          <b className="font-semibold text-flavio">Flávio</b>. A linha ameixa é a média do painel, e
+          é uma só. Hoje a média do {turnoGrafico}º turno está em {fmt(serie.at(-1)?.l)}% para Lula
+          e {fmt(serie.at(-1)?.f)}% para Flávio.
         </p>
       </div>
     </Bloco>

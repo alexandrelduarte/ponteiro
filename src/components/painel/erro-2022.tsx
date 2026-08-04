@@ -12,19 +12,10 @@
  * do bloco e some por completo numa tabela espremida.
  */
 import { useMemo } from "react";
-import {
-  Bloco,
-  LinkExterno,
-  Nicho,
-  Pergunta,
-  Resposta,
-  Subtitulo,
-  Traduzindo,
-} from "@/components/ui/blocos";
+import { Bloco, Cabecalho, Detalhe, LinkExterno, Nicho, Subtitulo } from "@/components/ui/blocos";
 import { parEmCem } from "@/components/ui/textos";
-import { FONTES_ERROS } from "@/data/fontes-erros";
-import { HISTORICO_ERROS } from "@/data/historico-erros";
 import { calcReplay } from "@/lib/modelo";
+import { ERROS_TRADUZIDOS, FONTES_TRADUZIDAS } from "./copia-erros";
 import { CurvaSensibilidade } from "./curva-sensibilidade";
 import { Replay2022 } from "./replay-2022";
 import { usePainel } from "./estado";
@@ -36,39 +27,49 @@ export function Erro2022() {
 
   return (
     <Bloco rotuladoPor="titulo-erro-2022">
-      <Pergunta id="titulo-erro-2022">E se as pesquisas errarem como em 2022?</Pergunta>
-      <Resposta>
-        Se o erro do 2º turno de 2022 se repetisse igual, Lula continuaria à frente — eleito em{" "}
-        <span className="numeros">{elDia}</span> de cada 100 cenários, e por pouco, como em 2022.
-      </Resposta>
-      <Traduzindo>
-        Esta seção compara o que as pesquisas de véspera diziam com o resultado real, em cinco
-        eleições. Serve para dar tamanho ao erro possível. Não é uma previsão de que ele vai
-        acontecer de novo.
-      </Traduzindo>
+      <Cabecalho
+        id="titulo-erro-2022"
+        pergunta="E se as pesquisas errarem como em 2022?"
+        resposta={
+          <>
+            Se o erro do 2º turno de 2022 se repetisse igual, Lula continuaria à frente — eleito em{" "}
+            <span className="numeros">{elDia}</span> de cada 100 cenários, e por pouco, como em
+            2022.
+          </>
+        }
+        traduzindo={
+          <>
+            Esta seção compara o que as pesquisas de véspera diziam com o resultado real, em cinco
+            eleições. Serve para dar tamanho ao erro possível. Não é uma previsão de que ele vai
+            acontecer de novo.
+          </>
+        }
+      />
 
-      {/* ---------- abaixo de md: cartões ---------- */}
+      {/* ---------- abaixo de lg: cartões ----------
+          A 768 a coluna "De quanto foi o erro" — a razão de existir do bloco —
+          saía cortada em x≈712 dentro de uma tabela que rolava de lado. */}
       <ul
-        className="mt-5 flex flex-col gap-3 md:hidden"
+        className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2 lg:hidden"
         aria-label="Erro das pesquisas, eleição a eleição"
       >
-        {HISTORICO_ERROS.map((h) => (
+        {ERROS_TRADUZIDOS.map((h) => (
           <li key={h.pleito}>
+            {/* Rótulo e valor na MESMA linha: empilhados, os cinco cartões
+                custavam ~1 500px de altura a 390 sem dizer nada a mais. */}
             <Nicho>
               <p className="text-secao text-tinta">{h.pleito}</p>
-              <dl className="mt-2 space-y-2 text-micro">
-                <div>
-                  <dt className="text-etiqueta text-tinta-media">O resultado real</dt>
+              <dl className="mt-2 text-micro">
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="text-tinta-media">O resultado real:</dt>
                   <dd className="text-tinta numeros">{h.urna}</dd>
                 </div>
-                <div>
-                  <dt className="text-etiqueta text-tinta-media">
-                    O que as pesquisas de véspera diziam
-                  </dt>
+                <div className="mt-1 flex flex-wrap gap-x-2">
+                  <dt className="text-tinta-media">As pesquisas de véspera:</dt>
                   <dd className="text-tinta numeros">{h.pesq}</dd>
                 </div>
-                <div>
-                  <dt className="text-etiqueta text-tinta-media">De quanto foi o erro</dt>
+                <div className="mt-2">
+                  <dt className="sr-only">De quanto foi o erro</dt>
                   <dd className="text-corpo text-tinta">{h.erro}</dd>
                 </div>
               </dl>
@@ -77,9 +78,9 @@ export function Erro2022() {
         ))}
       </ul>
 
-      {/* ---------- md+: tabela ---------- */}
+      {/* ---------- lg+: tabela ---------- */}
       <div
-        className="rolagem-x relative mt-5 hidden overflow-x-auto md:block"
+        className="rolagem-x relative mt-5 hidden overflow-x-auto lg:block"
         role="group"
         tabIndex={0}
         aria-labelledby="titulo-erro-2022"
@@ -105,7 +106,7 @@ export function Erro2022() {
             </tr>
           </thead>
           <tbody>
-            {HISTORICO_ERROS.map((h) => (
+            {ERROS_TRADUZIDOS.map((h) => (
               <tr key={h.pleito} className="border-t border-filete align-top">
                 <th
                   scope="row"
@@ -143,8 +144,14 @@ export function Erro2022() {
         </Nicho>
       </div>
 
-      <div className="mt-5 max-w-texto">
-        <Subtitulo>Por que o erro do 1º turno importa agora, se o do 2º é menor</Subtitulo>
+      {/* Quatro parágrafos de aprofundamento — a resposta da seção já foi dada
+          acima, e a 390 eles custavam mais de mil pixels de rolagem antes do
+          gráfico. Viram detalhe, com afordância de controle: nada saiu da
+          página, e quem quer a íntegra alcança num toque. */}
+      <Detalhe
+        titulo="Por que o erro do 1º turno importa agora, se o do 2º é menor"
+        className="mt-5 max-w-texto"
+      >
         <div className="mt-2 space-y-3 text-corpo text-tinta-media numeros">
           <p>
             O erro pequeno da decisão de 2022 (3,1 pontos) só foi possível porque, entre um turno e
@@ -182,17 +189,14 @@ export function Erro2022() {
             acima.
           </p>
         </div>
-      </div>
+      </Detalhe>
 
       <CurvaSensibilidade />
       <Replay2022 />
 
-      <details className="mt-6">
-        <summary className="inline-flex min-h-toque items-center text-corpo font-semibold text-ameixa">
-          De onde vieram os números de erro
-        </summary>
+      <Detalhe titulo="De onde vieram os números de erro" className="mt-6">
         <ul className="mt-1">
-          {FONTES_ERROS.map((f) => (
+          {FONTES_TRADUZIDAS.map((f) => (
             <li key={f.url} className="flex min-h-toque items-center">
               <LinkExterno href={f.url} className="text-micro">
                 {f.nome}
@@ -200,7 +204,7 @@ export function Erro2022() {
             </li>
           ))}
         </ul>
-      </details>
+      </Detalhe>
     </Bloco>
   );
 }

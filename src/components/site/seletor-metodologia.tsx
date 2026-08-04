@@ -11,7 +11,7 @@
  *
  * A camada técnica é a mesma que sempre esteve aqui, palavra por palavra.
  */
-import { useState, type ReactNode } from "react";
+import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { Secao } from "@/components/ui/blocos";
 
 export type ModoMetodologia = "simples" | "tecnica";
@@ -21,8 +21,31 @@ const OPCOES: { valor: ModoMetodologia; rotulo: string }[] = [
   { valor: "tecnica", rotulo: "Explicação técnica" },
 ];
 
+/** A âncora que pede a explicação técnica logo de cara. */
+const ANCORA_TECNICA = "#explicacao-tecnica";
+
+const assinarHash = (aoMudar: () => void) => {
+  window.addEventListener("hashchange", aoMudar);
+  return () => window.removeEventListener("hashchange", aoMudar);
+};
+const lerHash = () => window.location.hash;
+/** No servidor não existe hash: o HTML nasce sempre na explicação simples. */
+const hashNoServidor = () => "";
+
 export function SeletorMetodologia({ children }: { children: ReactNode }) {
-  const [modo, setModo] = useState<ModoMetodologia>("simples");
+  /**
+   * Quem chega por "ver a fórmula exata na explicação técnica" já cai nela.
+   * O padrão continua sendo a explicação simples — a âncora é a única coisa
+   * que muda o modo inicial, e ela só existe em links que prometem a conta.
+   *
+   * `useSyncExternalStore` em vez de efeito com `setState`: o hash é estado de
+   * fora do React, e ler daqui evita render em cascata e mantém a página
+   * estática (nada de `useSearchParams`, nada de renderização dinâmica).
+   */
+  const hash = useSyncExternalStore(assinarHash, lerHash, hashNoServidor);
+  const [escolhido, setEscolhido] = useState<ModoMetodologia | null>(null);
+  const modo: ModoMetodologia = escolhido ?? (hash === ANCORA_TECNICA ? "tecnica" : "simples");
+  const setModo = setEscolhido;
 
   return (
     <>
@@ -32,9 +55,10 @@ export function SeletorMetodologia({ children }: { children: ReactNode }) {
             Como você quer ler esta página?
           </p>
           <div
+            id="explicacao-tecnica"
             role="radiogroup"
             aria-labelledby="rotulo-modo"
-            className="mt-2 inline-flex flex-wrap gap-1 rounded-plena bg-nicho p-1"
+            className="mt-2 inline-flex scroll-mt-4 flex-wrap gap-1 rounded-plena bg-nicho p-1"
           >
             {OPCOES.map((o) => (
               <button

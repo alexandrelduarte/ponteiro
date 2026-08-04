@@ -56,12 +56,29 @@ test.describe("páginas de apoio", () => {
     expect(og.headers()["content-type"]).toContain("image/png");
   });
 
-  test("navegação do rodapé leva às outras páginas", async ({ page }) => {
+  test("navegação leva às outras páginas, do cabeçalho e do rodapé", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("link", { name: "Metodologia", exact: true }).click();
+    // O cabeçalho ganhou saída visível na primeira dobra (era só wordmark).
+    const noCabecalho = page
+      .getByRole("banner")
+      .getByRole("link", { name: "Metodologia", exact: true });
+    await expect(noCabecalho).toBeVisible();
+    await noCabecalho.click();
     await expect(page).toHaveURL(/\/metodologia$/);
     await page.getByRole("link", { name: /voltar ao painel/ }).click();
     await expect(page).toHaveURL(/\/$/);
+
+    await page
+      .getByRole("contentinfo")
+      .getByRole("link", { name: "Metodologia", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/metodologia$/);
+  });
+
+  test("o link da fórmula abre a metodologia já na explicação técnica", async ({ page }) => {
+    await page.goto("/metodologia#explicacao-tecnica");
+    await expect(page.getByTestId("modo-tecnica")).toHaveAttribute("aria-checked", "true");
+    await expect(page.getByText(/decaimento exponencial/)).toBeVisible();
   });
 
   test("a marca leva de volta ao painel", async ({ page }) => {
@@ -71,5 +88,14 @@ test.describe("páginas de apoio", () => {
       .first()
       .click();
     await expect(page).toHaveURL(/\/$/);
+  });
+
+  test("o símbolo da marca aparece uma vez por tela", async ({ page }) => {
+    for (const rota of ["/", "/historico", "/metodologia"]) {
+      await page.goto(rota);
+      // O símbolo é o único SVG com este viewBox; MARCA.md §6.6.10.
+      const simbolos = page.locator('svg[viewBox="0 0 200 220.49"]');
+      expect(await simbolos.count(), `símbolo repetido em ${rota}`).toBe(1);
+    }
   });
 });

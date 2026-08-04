@@ -103,6 +103,30 @@ export default function GraficoEvolucao({
   const folga = 1.5;
   const dominio: [number, number] = [Math.min(...todos) - folga, Math.max(...todos) + folga];
 
+  /**
+   * Marcas do eixo vertical com PASSO CONSTANTE.
+   * O passo automático do Recharts saía irregular (3, 4, 4, 4 pontos entre as
+   * marcas), e uma régua com passo desigual mente sobre distância. O zero
+   * entra sempre — é a régua do empate.
+   */
+  const alcance = dominio[1] - dominio[0];
+  const passoY = alcance > 32 ? 10 : alcance > 16 ? 5 : alcance > 8 ? 2 : 1;
+  const marcasY: number[] = [];
+  for (let v = Math.ceil(dominio[0] / passoY) * passoY; v <= dominio[1]; v += passoY) {
+    marcasY.push(Math.round(v * 100) / 100);
+  }
+
+  /**
+   * Marcas do eixo horizontal: só datas com significado editorial — o começo
+   * da lista, HOJE e o dia da votação. O passo automático sorteava uma data do
+   * meio ("09/06") que não quer dizer nada para ninguém.
+   */
+  const primeiroX = dados.length ? dados[0].x : hojeMs;
+  const ultimoX = dados.length ? dados[dados.length - 1].x : hojeMs;
+  const marcasX = Array.from(
+    new Set([primeiroX, hojeMs, ultimoX].filter((t) => t >= primeiroX && t <= ultimoX)),
+  ).sort((a, b) => a - b);
+
   const scatter = pontos.map((p) => ({ ...p, dif: p.lVal - p.fVal }));
 
   return (
@@ -113,14 +137,15 @@ export default function GraficoEvolucao({
           dataKey="x"
           type="number"
           domain={["dataMin", "dataMax"]}
+          ticks={marcasX}
           tickFormatter={(t: number) => ddmmDeMs(t)}
           tick={TICK}
           stroke={COR.contorno}
-          interval="preserveStartEnd"
-          minTickGap={52}
+          interval={0}
         />
         <YAxis
           domain={dominio}
+          ticks={marcasY}
           tickFormatter={(v: number) => String(Math.round(v))}
           tick={TICK}
           stroke={COR.contorno}
@@ -165,6 +190,24 @@ export default function GraficoEvolucao({
             className: "rotulo-grafico",
           }}
         />
+
+        {/* HOJE — a fronteira entre o que foi medido e o que é projetado.
+            Sem ela a linha da média terminava em corte seco e a borda da faixa
+            simplesmente virava tracejada, sem nada dizendo onde nem por quê. */}
+        {ultimoX > hojeMs ? (
+          <ReferenceLine
+            x={hojeMs}
+            stroke={COR.ameixaClara}
+            strokeWidth={1.5}
+            label={{
+              value: "hoje",
+              position: "insideTopRight",
+              fontSize: 13,
+              fill: COR.ameixa,
+              className: "rotulo-grafico",
+            }}
+          />
+        ) : null}
 
         {/* A leitura do painel sobre a evidência — ameixa, dentro da faixa. */}
         <Line

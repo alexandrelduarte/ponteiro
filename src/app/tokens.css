@@ -69,6 +69,47 @@
   --color-flavio-fundo: #dde3f2; /* chip de valor · L 0,916 · tinta 12,98:1 */
 
   /* ======================================================================
+     4b. DEMAIS CANDIDATOS — a escala NEUTRA de exibição (Fase 7, B1)
+     Carmim e naval são de Lula e de Flávio. Os outros sete nomes testados no
+     1º turno precisavam de cor própria sem tomar emprestada a de ninguém: nem
+     a da marca (ameixa), nem a da atenção (âmbar), nem a de um candidato.
+     A resposta é uma rampa NEUTRA de 7 degraus — croma OKLCH ≤ 0,034, contra
+     0,081 da ameixa e 0,111 do âmbar: nenhuma delas consegue ser lida como
+     cor de sistema. A diferenciação é CLAREZA (passo ΔL ≈ 0,051) mais um
+     ciclo de temperatura de três tempos (morno h≈62 → cinza C≈0,004 →
+     ameixa-cinza h≈316), que separa os degraus vizinhos também em matiz.
+     SEM VERDE (nenhuma matiz na faixa 120–200°) e sem o roxo da marca.
+
+     Medido com a fórmula de luminância do WCAG 2 e ΔE em OKLab
+     (scripts de cálculo na Fase 7; JND do OKLab ≈ 0,02):
+
+       token          hex      L      C      h    vs placa   vs nicho
+       cand-1      #413225   0,330  0,031   62°   12,30:1    11,17:1
+       cand-2      #434244   0,381  0,004  308°    9,99:1     9,08:1
+       cand-3      #584b5d   0,433  0,033  317°    8,14:1     7,40:1
+       cand-4      #6b5b4d   0,483  0,030   63°    6,50:1     5,91:1
+       cand-5      #6e6c6e   0,534  0,004  326°    5,21:1     4,73:1
+       cand-6      #84768a   0,585  0,034  316°    4,25:1     3,86:1
+       cand-7      #998779   0,636  0,030   60°    3,44:1     3,13:1
+
+     Piso 3:1 de objeto gráfico (SC 1.4.11) cumprido pelos SETE contra placa
+     E contra nicho — o pior par é `cand-7` × nicho, 3,13:1.
+     ΔE(OKLab) mínimo entre duas das NOVE cores de exibição: 0,0596
+     (`cand-4` × `cand-5`) — 3× o limiar de percepção.
+     ΔE(OKLab) mínimo de qualquer uma delas contra ameixa/ameixa-forte/
+     ameixa-pressa/ameixa-clara/atenção: 0,0556 (`cand-3` × ameixa).
+     Nenhuma colisão possível: as antigas cores do protótipo davam 1,11:1
+     entre dois candidatos e 1,00:1 contra a cor da marca.
+     ====================================================================== */
+  --color-cand-1: #413225;
+  --color-cand-2: #434244;
+  --color-cand-3: #584b5d;
+  --color-cand-4: #6b5b4d;
+  --color-cand-5: #6e6c6e;
+  --color-cand-6: #84768a;
+  --color-cand-7: #998779;
+
+  /* ======================================================================
      5. ATENÇÃO — âmbar-queimado, e só ele
      É TINTA (texto, traço, contorno de chip), não campo. Não existe "sucesso
      verde" nem "perigo vermelho" neste sistema: vermelho é de candidato, e o

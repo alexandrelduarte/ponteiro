@@ -187,3 +187,32 @@ var(--color-linha-forte) 55%, transparent)` → mantém "zero hex em componente"
   medidor animado de probabilidade no hero → o "needle" do NYT 2016 é o contraexemplo canônico
   (TENDENCIAS-2026 P1); o hero comunica probabilidade pelo campo contável de 100 unidades
   (quantile dotplot, melhor evidência para baixa numeracia).
+
+## Fase 3 — direção visual
+
+- Três conceitos materializados em style tiles reais (/design-lab) com números do modelo:
+  A·LATÃO (régua de instrumento), B·ENXAME (quantile dotplot, serifa display + violeta),
+  C·CHUMBO (grade 10×10 acromática) → vencedor **B·ENXAME** pelos 4 critérios de peso igual →
+  o mais bonito/moderno com folga, metáfora mais intuitiva ("cada bolinha é uma eleição
+  possível"), neutralidade por POSIÇÃO (não cor); fraquezas corrigíveis viram requisitos:
+  (1) manchete usa o número de SER ELEITO (83/17) e o enxame vira visual da diferença do 2ºT
+  com micro-legenda (veto do data-scientist pendente na Fase 5/6); (2) bolinhas ≥8px a 390.
+  Descartes: A falha na própria assinatura a 390; C é frio e o campo vermelho grita.
+- Integração sem quebrar a v1 durante a transição: o design-lead escreve `tokens-v2.css` como
+  arquivo NOVO; a Fase 6 troca o tokens.css e deleta os tokens v1 → todo commit da branch
+  permanece com gates verdes (a regra "reescrever do zero" se cumpre na troca, não na criação).
+- Tokenização do ENXAME (detalhes em docs/DESIGN-V2.md §10–11): gráfico do conceito C adotado
+  ADAPTADO (barra monocromática lilás — isocromia dos fundos de candidato exigida por R4
+  tornaria a divisão bicolor invisível; a régua de tinta mostra o cruzamento) → "dúvida =
+  lilás" vale no produto inteiro e fecha as 3 escalas de P12; domínio do enxame passa a ser
+  derivado dos 100 quantis (piso de 8px vira consequência, não constante); faixa de incerteza
+  com borda obrigatória (1.4.11 sem escurecer o campo); sem verde-sucesso/vermelho-perigo em
+  lugar nenhum (inclusive /admin) — só âmbar e ameixa; sombra proibida em bloco parado; mono
+  NÃO volta nem para dados (tabular-nums da própria Lexend); reduced-motion zera
+  duração/deslocamento/stagger mas nunca `transform` (também posiciona); stagger por coluna
+  (o bin é o acúmulo), teto 260ms.
+- Fase 4 executada pelo orquestrador no MCP (sessão autenticada): 4 variantes de símbolo em 1
+  chamada → escolhido S0 (agulha rompendo o anel — relógio+medidor sem virar velocímetro;
+  S2 descartado por ser um velocímetro literal) → remove_background → upscale 2K → novo
+  remove_background (o upscaler achata alfa) → PNG 2160² RGBA. 7 operações no total,
+  abaixo do teto de ~10.

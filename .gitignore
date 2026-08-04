@@ -40,8 +40,27 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# QA screenshots do loop da Fase 6 (prints locais; relatórios entram via docs/)
-.qa/
+# QA — Fase 6: prints intermediários ficam locais (113MB); versionam-se as
+# críticas de todas as iterações, os relatórios Lighthouse e os prints FINAIS
+# (iter-5), que provam o estado entregue.
+.qa/*
+!.qa/iter-1
+!.qa/iter-2
+!.qa/iter-3
+!.qa/iter-4
+!.qa/iter-5
+.qa/iter-1/*
+.qa/iter-2/*
+.qa/iter-3/*
+.qa/iter-4/*
+!.qa/iter-1/critica.md
+!.qa/iter-2/critica.md
+!.qa/iter-3/critica.md
+!.qa/iter-4/critica.md
+!.qa/iter-1/lighthouse.json
+!.qa/iter-2/lighthouse.json
+!.qa/iter-3/lighthouse.json
+!.qa/iter-4/lighthouse.json
 
 # Playwright
 /test-results/

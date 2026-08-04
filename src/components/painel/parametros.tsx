@@ -115,15 +115,15 @@ export function Parametros() {
       <div className="mt-4 space-y-1 rounded-controle bg-mini p-3 font-mono text-xs text-cinza">
         <p>
           margem: bruta {fmtSinal(M.margem)} − viés {fmt(params.vies)} ={" "}
-          <b className="text-tinta">{fmtSinal(M.margemAj)} p.p.</b>
+          <b className="text-tinta">{fmtSinal(M.margemAj)}&nbsp;p.p.</b>
         </p>
         <p>
           hoje: √({fmt(M.seAgora)}² + {fmt(params.sigmaSys)}²) ={" "}
-          <b className="text-tinta">±{fmt(M.sigmaHoje)} p.p.</b>
+          <b className="text-tinta">±{fmt(M.sigmaHoje)}&nbsp;p.p.</b>
         </p>
         <p>
           dia da votação: √(hoje² + {fmt(M.deriva2)}²) ={" "}
-          <b className="text-tinta">±{fmt(M.sigmaDia2)} p.p.</b>
+          <b className="text-tinta">±{fmt(M.sigmaDia2)}&nbsp;p.p.</b>
         </p>
       </div>
 

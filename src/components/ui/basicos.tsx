@@ -37,7 +37,9 @@ export function Secao({
  * Links                                                              *
  * ------------------------------------------------------------------ */
 
-/** Link para fora do site — sempre `noopener noreferrer` e sublinhado pontilhado. */
+/** Link para fora do site — sempre `noopener noreferrer` e sublinhado pontilhado.
+    A área de toque cresce até ~44px por padding compensado com margem negativa:
+    o glifo não muda de lugar, mas o dedo tem onde acertar (rubrica item 6). */
 export function LinkExterno({
   href,
   children,
@@ -52,7 +54,11 @@ export function LinkExterno({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={["underline decoration-dotted underline-offset-2", className ?? ""]
+      className={[
+        "inline-block px-2.5 py-[15px] -mx-2.5 -my-[15px]",
+        "underline decoration-dotted underline-offset-2",
+        className ?? "",
+      ]
         .filter(Boolean)
         .join(" ")}
     >

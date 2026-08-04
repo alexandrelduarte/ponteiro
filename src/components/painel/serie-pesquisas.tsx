@@ -207,14 +207,15 @@ export function SeriePesquisas() {
                 { t: "1ºT L×F" },
                 { t: "2ºT L×F" },
                 { t: "Leitura 2ºT" },
-                { t: "Peso" },
+                { t: "Peso", numerica: true },
                 { t: "Registro TSE" },
-              ].map(({ t, secundaria }) => (
+              ].map(({ t, secundaria, numerica }) => (
                 <th
                   key={t}
                   scope="col"
                   className={[
                     "py-2 pr-1.5 lg:pr-3 font-medium",
+                    numerica ? "text-right" : "",
                     secundaria ? COLUNA_SECUNDARIA : "",
                     linhas.length > 15 ? "sticky top-0 bg-cartao" : "",
                   ]

@@ -70,14 +70,18 @@ export function Frente() {
         <Nicho>
           <Subtitulo>2º turno · 25 de outubro · é aqui que se decide</Subtitulo>
 
+          {/* O «×» viaja preso ao segundo nome: se a linha quebrar, quebra
+              inteira («× Flávio 42,2%»), nunca deixando o separador órfão. */}
           <p className="mt-2 flex flex-wrap items-baseline gap-x-3 font-display text-manchete-2">
             <span data-testid="media-2t-lula" className="text-lula numeros">
               Lula {fmt(M.mediaL2)}%
             </span>
-            <span aria-hidden="true" className="text-intro text-tinta-media">
-              ×
+            <span className="flex items-baseline gap-x-3 whitespace-nowrap">
+              <span aria-hidden="true" className="text-intro text-tinta-media">
+                ×
+              </span>
+              <span className="text-flavio numeros">Flávio {fmt(M.mediaF2)}%</span>
             </span>
-            <span className="text-flavio numeros">Flávio {fmt(M.mediaF2)}%</span>
           </p>
           <p className="mt-1 text-corpo text-tinta numeros">diferença de {abs1(M.margem)} pontos</p>
 
@@ -139,10 +143,12 @@ export function Frente() {
 
           <p className="mt-2 flex flex-wrap items-baseline gap-x-3 font-display text-manchete-2">
             <span className="text-lula numeros">Lula {fmt(M.t1raw?.valor)}%</span>
-            <span aria-hidden="true" className="text-intro text-tinta-media">
-              ×
+            <span className="flex items-baseline gap-x-3 whitespace-nowrap">
+              <span aria-hidden="true" className="text-intro text-tinta-media">
+                ×
+              </span>
+              <span className="text-flavio numeros">Flávio {fmt(M.t1rawF?.valor)}%</span>
             </span>
-            <span className="text-flavio numeros">Flávio {fmt(M.t1rawF?.valor)}%</span>
           </p>
           <p className="mt-1 text-corpo text-tinta">
             É a média das pesquisas em que o entrevistador mostra a lista de nomes.

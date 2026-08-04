@@ -352,7 +352,11 @@
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    /* `none`, nunca `translateY(0)`: com fill-mode `both` o quadro final
+       PERSISTE, e um transform persistido (mesmo identidade) cria contexto de
+       empilhamento e vira bloco contentor de `position: fixed` — a folha do
+       glossário ficava presa dentro do parágrafo animado. */
+    transform: none;
   }
 }
 

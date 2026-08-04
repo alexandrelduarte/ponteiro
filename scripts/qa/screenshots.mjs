@@ -43,6 +43,14 @@ const servidor = spawn("pnpm", ["exec", "next", "start", "-p", "3100"], {
   detached: false,
 });
 
+/** Falhas de captura: evidência ausente NUNCA pode parecer evidência limpa
+    (condição 2 do qa-critic, iter-7) — o processo termina com código ≠ 0. */
+let falhasDeCaptura = 0;
+const falhou = (mensagem) => {
+  falhasDeCaptura++;
+  console.warn(`FALHA DE CAPTURA: ${mensagem}`);
+};
+
 /** Abre todos os disclosures da página (details + aria-expanded). */
 const abrirTudo = async (page) => {
   await page.evaluate(async () => {
@@ -105,7 +113,7 @@ try {
           },
           { timeout: 15000 },
         )
-        .catch(() => console.warn(`gráficos não pintaram em ${pg.nome}-${vp.nome}`));
+        .catch(() => falhou(`gráficos não pintaram em ${pg.nome}-${vp.nome}`));
       await page.waitForTimeout(400);
       await page.screenshot({
         path: join(DIR, `${pg.nome}-${vp.nome}-full.png`),
@@ -119,7 +127,7 @@ try {
             await page.waitForTimeout(350);
             await page.screenshot({ path: join(DIR, `home-${vp.nome}-${a.nome}.png`) });
           } catch {
-            console.warn(`âncora não encontrada: ${a.nome} em ${vp.nome}px`);
+            falhou(`âncora não encontrada: ${a.nome} em ${vp.nome}px`);
           }
         }
         // aba "Todos os candidatos" (contrastes das 9 cores; §5.5 do DESIGN)
@@ -132,7 +140,7 @@ try {
             fullPage: true,
           });
         } catch {
-          console.warn(`aba candidatos não capturada em ${vp.nome}px`);
+          falhou(`aba candidatos não capturada em ${vp.nome}px`);
         }
         // home com TODOS os disclosures abertos (o conteúdo escondido também é auditado)
         await page.goto(BASE + "/", { waitUntil: "networkidle" });
@@ -151,7 +159,37 @@ try {
           await page.waitForTimeout(500);
           await page.screenshot({ path: join(DIR, `home-${vp.nome}-popover.png`) });
         } catch {
-          console.warn(`popover não capturado em ${vp.nome}px`);
+          falhou(`popover não capturado em ${vp.nome}px`);
+        }
+        // Evidência DIRIGIDA dos chips nomeados (condição 3 do qa-critic, iter-7):
+        // chance (colado à manchete/LCP) e registro no TSE nos 3 viewports; a 768
+        // também o pior caso do clamp (votos válidos, deslocamento −117px).
+        const chipsDirigidos = [
+          { nome: "chip-chance", localizar: () => page.getByTestId("chip-glossario-chance") },
+          {
+            nome: "chip-tse",
+            localizar: () => page.getByRole("button", { name: /registro no TSE/i }).first(),
+          },
+          ...(vp.nome === "768"
+            ? [
+                {
+                  nome: "chip-pior",
+                  localizar: () => page.getByRole("button", { name: /votos válidos/i }).first(),
+                },
+              ]
+            : []),
+        ];
+        for (const c of chipsDirigidos) {
+          try {
+            await page.goto(BASE + "/", { waitUntil: "networkidle" });
+            const alvo = c.localizar();
+            await alvo.scrollIntoViewIfNeeded();
+            await alvo.click();
+            await page.waitForTimeout(500);
+            await page.screenshot({ path: join(DIR, `home-${vp.nome}-${c.nome}.png`) });
+          } catch {
+            falhou(`${c.nome} não capturado em ${vp.nome}px`);
+          }
         }
       }
       if (pg.nome === "metodologia") {
@@ -164,7 +202,7 @@ try {
             fullPage: true,
           });
         } catch {
-          console.warn("estado técnica não capturado");
+          falhou(`estado técnica não capturado em ${vp.nome}px`);
         }
         // /metodologia e /historico também com disclosures abertos
         await page.goto(BASE + "/metodologia", { waitUntil: "networkidle" });
@@ -185,7 +223,12 @@ try {
     await page.close();
   }
   await browser.close();
-  console.log(`ok: screenshots em .qa/iter-${ITER}/`);
+  if (falhasDeCaptura > 0) {
+    console.error(`${falhasDeCaptura} captura(s) faltando — a evidência NÃO está completa.`);
+    process.exitCode = 1;
+  } else {
+    console.log(`ok: screenshots em .qa/iter-${ITER}/`);
+  }
 } finally {
   servidor.kill("SIGTERM");
 }

@@ -62,6 +62,7 @@ try {
     const page = await browser.newPage({
       viewport: { width: vp.width, height: vp.height },
       deviceScaleFactor: 1,
+      locale: "pt-BR",
     });
     for (const pg of PAGINAS) {
       await page.goto(BASE + pg.caminho, { waitUntil: "networkidle" });

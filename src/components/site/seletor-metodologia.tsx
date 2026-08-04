@@ -64,6 +64,11 @@ export function SeletorMetodologia({ children }: { children: ReactNode }) {
           id="explicacao-tecnica"
           role="radiogroup"
           aria-labelledby="rotulo-modo"
+          /* Raio condicional: abaixo de `sm` os dois botões empilham e o trilho
+             vira um "estádio" de raio ~50px — arco que NÃO contém a pílula de
+             raio 22 (ela transbordava o anel em até 4,3px). Retângulo de raio
+             16 quando empilha; o estádio (`rounded-plena`) volta quando o
+             controle cabe em uma linha. */
           className="mt-2 inline-flex scroll-mt-4 flex-wrap gap-1 rounded-nicho bg-placa p-1 shadow-[inset_0_0_0_1.5px_var(--color-contorno)] sm:rounded-plena"
         >
           {OPCOES.map((o) => (

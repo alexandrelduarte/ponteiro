@@ -4,14 +4,13 @@
  * Gráficos carregados sob demanda — em dois estágios.
  *
  * 1) `next/dynamic` com `ssr: false` de propósito: o Recharts mede o contêiner
- *    para desenhar, então no servidor ele renderiza vazio e reclamaria de
+ *    para desenhar, então no servidor renderizaria vazio e reclamaria de
  *    largura 0. O esqueleto tem a altura exata do gráfico, então a troca não
- *    move nada na página (CLS 0) — e nenhum NÚMERO do painel depende disto:
- *    a manchete já veio do servidor.
- * 2) `SoQuandoVisivel`: o chunk do Recharts (~200 KB) só é baixado quando o
- *    gráfico se aproxima do viewport (IntersectionObserver, margem de 400px).
- *    Quem só lê a manchete nunca paga pelos gráficos — e o LCP simulado em
- *    4G lento deixa de arrastar o bundle inteiro no grafo crítico.
+ *    move nada na página (CLS 0) — e nenhum NÚMERO do painel depende disto: a
+ *    manchete e o ENXAME já vieram prontos do servidor, sem Recharts.
+ * 2) `soQuandoVisivel`: o chunk do Recharts só é baixado quando o gráfico se
+ *    aproxima do viewport (IntersectionObserver, margem de 400px). Quem só lê
+ *    a manchete nunca paga pelos gráficos.
  */
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, type ComponentProps, type ComponentType } from "react";
@@ -54,11 +53,6 @@ const EvolucaoDinamico = dynamic(() => import("./evolucao"), {
   loading: EsqueletoGrafico,
 });
 
-const DistribuicaoDinamico = dynamic(() => import("./distribuicao"), {
-  ssr: false,
-  loading: EsqueletoGrafico,
-});
-
 const SensibilidadeDinamico = dynamic(() => import("./sensibilidade"), {
   ssr: false,
   loading: EsqueletoGrafico,
@@ -71,8 +65,6 @@ const ProbabilidadeTempoDinamico = dynamic(() => import("./probabilidade-tempo")
 
 export const EvolucaoLazy: ComponentType<ComponentProps<typeof EvolucaoDinamico>> =
   soQuandoVisivel(EvolucaoDinamico);
-export const DistribuicaoLazy: ComponentType<ComponentProps<typeof DistribuicaoDinamico>> =
-  soQuandoVisivel(DistribuicaoDinamico);
 export const SensibilidadeLazy: ComponentType<ComponentProps<typeof SensibilidadeDinamico>> =
   soQuandoVisivel(SensibilidadeDinamico);
 export const ProbabilidadeTempoLazy: ComponentType<

@@ -1,15 +1,19 @@
 /**
- * Imagem de compartilhamento (1200×630), gerada a partir dos números reais do
- * modelo. Tipográfica: nenhuma foto de pessoa, partido ou bandeira (R4).
+ * Cartão de compartilhamento (1200×630), composto sobre `public/brand/og-base.png`.
+ *
+ * O cartão base já traz a marca, a tagline, a moldura e a procedência, e foi
+ * desenhado com ~170px de bruma livre no meio exatamente para esta fase
+ * sobrepor o número-manchete sem redesenhar nada (MARCA.md §6.9, decisão 6).
+ *
+ * O número publicado é o MESMO da manchete da página: a chance de SER ELEITO
+ * (`eleito.dia`), com os dois lados somando 100 e a ordem fixa Lula → Flávio.
+ * Tipográfico: nenhuma foto de pessoa, partido ou bandeira (R4).
  *
  * NOTA SOBRE HEX LITERAL — este é o único arquivo do produto que escreve cor em
  * hexadecimal, e por necessidade: o `next/og` (Satori) renderiza fora do
  * navegador, sem CSS, sem Tailwind e sem `var(--color-*)`. Os valores abaixo são
  * cópia EXATA dos tokens de `src/app/tokens.css`; qualquer mudança lá precisa
  * ser espelhada aqui.
- *
- * As fontes são lidas de arquivos locais do repositório (`./_og/fontes`), então
- * não existe request externo em runtime.
  */
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -19,32 +23,25 @@ import { getPesquisasPublicadas } from "@/lib/dados";
 import { rodarModelo } from "@/lib/modelo";
 
 export const runtime = "nodejs";
-// Gerada UMA vez, no build: os .ttf são lidos do repositório durante o
+// Gerada UMA vez, no build: os arquivos são lidos do repositório durante o
 // prerender e a imagem vira asset estático — nada de I/O em runtime.
 export const dynamic = "force-static";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt =
-  "Agregador Presidencial 2026: chance de eleição de Lula e de Flávio Bolsonaro " +
-  "projetada para o dia da votação, segundo o agregado de pesquisas registradas no TSE.";
+  "PONTEIRO: em 100 eleições parecidas com esta, em quantas Lula e Flávio Bolsonaro terminam " +
+  "eleitos, segundo as pesquisas registradas no TSE. Não é previsão.";
 
 /** Espelho literal de tokens.css — ver nota no topo. */
 const COR = {
-  papel: "#E8E8DF",
-  tinta: "#181C18",
-  cinza: "#63685F",
-  linha: "#C6C6B8",
-  tela: "#0E241A",
-  telaBorda: "#1E3A2C",
-  telaFundo: "#0A1A12",
-  fosforo: "#A7EFBB",
-  fosforoForte: "#D8FBE2",
-  lula: "#C4122F",
-  flavio: "#16418C",
-  confirmaTexto: "#155A34",
+  tinta: "#211C26",
+  tintaMedia: "#5C5566",
+  lula: "#BE1745",
+  flavio: "#26418B",
 };
 
 const PASTA_FONTES = join(process.cwd(), "src", "app", "_og", "fontes");
+const BASE_OG = join(process.cwd(), "public", "brand", "og-base.png");
 
 /**
  * `fetch(new URL(..., import.meta.url))` não funciona sob o Turbopack (fetch de
@@ -52,167 +49,82 @@ const PASTA_FONTES = join(process.cwd(), "src", "app", "_og", "fontes");
  * prerender. Com `dynamic = "force-static"` isso acontece só no build.
  */
 async function carregarFontes() {
-  const [archivo, mono] = await Promise.all([
-    readFile(join(PASTA_FONTES, "Archivo-900.ttf")),
-    readFile(join(PASTA_FONTES, "IBMPlexMono-600.ttf")),
+  const [serif, lexend, lexendForte] = await Promise.all([
+    readFile(join(PASTA_FONTES, "InstrumentSerif-400.ttf")),
+    readFile(join(PASTA_FONTES, "Lexend-400.ttf")),
+    readFile(join(PASTA_FONTES, "Lexend-600.ttf")),
   ]);
   return [
-    { name: "Archivo", data: archivo, weight: 900 as const, style: "normal" as const },
-    { name: "PlexMono", data: mono, weight: 600 as const, style: "normal" as const },
+    { name: "InstrumentSerif", data: serif, weight: 400 as const, style: "normal" as const },
+    { name: "Lexend", data: lexend, weight: 400 as const, style: "normal" as const },
+    { name: "Lexend", data: lexendForte, weight: 600 as const, style: "normal" as const },
   ];
 }
 
-function ddmm(ms: number): string {
-  const d = new Date(ms - 3 * 3600e3);
-  return `${String(d.getUTCDate()).padStart(2, "0")}/${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
-}
-
 export default async function Imagem() {
-  const fonts = await carregarFontes();
-  const hojeMs = Date.now();
+  const [fonts, base] = await Promise.all([carregarFontes(), readFile(BASE_OG)]);
+  const fundo = `data:image/png;base64,${base.toString("base64")}`;
 
   let lula = 50;
   let ok = false;
   try {
     const pesquisas = await getPesquisasPublicadas();
-    const m = rodarModelo(pesquisas, PARAMS_PADRAO, hojeMs);
+    const m = rodarModelo(pesquisas, PARAMS_PADRAO, Date.now());
     if (m) {
+      // Arredonda UM e complementa o outro: os dois somam 100 (H3).
       lula = Math.round(m.eleito.dia.l * 100);
       ok = true;
     }
   } catch (erro) {
-    console.error("[og] modelo indisponível, usando cartão estático:", erro);
+    console.error("[og] modelo indisponível, usando o cartão base:", erro);
   }
   const flavio = 100 - lula;
 
   return new ImageResponse(
     <div
       style={{
+        position: "relative",
         width: "100%",
         height: "100%",
         display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        background: COR.papel,
-        padding: 56,
-        fontFamily: "Archivo",
+        fontFamily: "Lexend",
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column" }}>
+      {/* Satori não conhece next/image: aqui `img` é o elemento certo. */}
+      <img src={fundo} alt="" width={1200} height={630} style={{ position: "absolute" }} />
+
+      {ok ? (
         <div
           style={{
-            fontFamily: "PlexMono",
-            fontSize: 22,
-            letterSpacing: 4,
-            color: COR.confirmaTexto,
+            position: "absolute",
+            left: 72,
+            right: 72,
+            top: 296,
+            height: 172,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
           }}
         >
-          APURAÇÃO DE PESQUISAS · REGISTRO OBRIGATÓRIO NO TSE
-        </div>
-        <div style={{ display: "flex", fontSize: 74, color: COR.tinta, marginTop: 6 }}>
-          <span>PRESIDENTE&nbsp;</span>
-          <span style={{ color: COR.cinza }}>2026</span>
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          background: COR.tela,
-          border: `2px solid ${COR.telaBorda}`,
-          borderRadius: 12,
-          padding: 36,
-        }}
-      >
-        <div
-          style={{
-            fontFamily: "PlexMono",
-            fontSize: 22,
-            letterSpacing: 4,
-            color: COR.fosforo,
-          }}
-        >
-          {ok ? "CHANCE DE SER ELEITO · LULA (esq.) × FLÁVIO (dir.)" : "LEITURA DOS DADOS"}
-        </div>
-
-        {ok ? (
+          <div style={{ display: "flex", fontSize: 28, color: COR.tintaMedia }}>
+            Em 100 eleições parecidas com esta, cada um termina eleito em:
+          </div>
           <div
             style={{
               display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginTop: 18,
+              alignItems: "baseline",
+              marginTop: 14,
+              fontFamily: "InstrumentSerif",
+              fontSize: 92,
+              color: COR.tinta,
             }}
           >
-            <div
-              style={{
-                fontFamily: "PlexMono",
-                fontSize: 108,
-                color: COR.fosforoForte,
-              }}
-            >
-              {`${lula}%`}
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flex: 1,
-                height: 22,
-                margin: "0 28px",
-                borderRadius: 999,
-                overflow: "hidden",
-                background: COR.telaFundo,
-              }}
-            >
-              <div style={{ width: `${lula}%`, background: COR.lula }} />
-              <div style={{ width: `${flavio}%`, background: COR.flavio }} />
-            </div>
-            <div
-              style={{
-                fontFamily: "PlexMono",
-                fontSize: 108,
-                color: COR.fosforoForte,
-              }}
-            >
-              {`${flavio}%`}
-            </div>
+            <span style={{ color: COR.lula }}>Lula&nbsp;{lula}</span>
+            <span style={{ color: COR.tintaMedia, margin: "0 24px", fontSize: 56 }}>×</span>
+            <span style={{ color: COR.flavio }}>Flávio&nbsp;{flavio}</span>
           </div>
-        ) : (
-          <div style={{ display: "flex", fontSize: 52, color: COR.fosforoForte, marginTop: 18 }}>
-            Agregado de pesquisas · Lula × Flávio Bolsonaro
-          </div>
-        )}
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            fontFamily: "PlexMono",
-            fontSize: 24,
-            color: COR.fosforo,
-            marginTop: 10,
-          }}
-        >
-          <span>LULA (PT)</span>
-          <span>FLÁVIO BOLSONARO (PL)</span>
         </div>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          fontFamily: "PlexMono",
-          fontSize: 24,
-          color: COR.cinza,
-          borderTop: `2px solid ${COR.linha}`,
-          paddingTop: 18,
-        }}
-      >
-        <span>projeção para o dia da votação · 25/10</span>
-        <span>{`atualizado ${ddmm(hojeMs)} · NÃO É PREVISÃO`}</span>
-      </div>
+      ) : null}
     </div>,
     { ...size, fonts },
   );

@@ -4,8 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## O que é
 
-Agregador de pesquisas presidenciais Brasil 2026 (Lula × Flávio Bolsonaro): Next.js 16
-(App Router, React 19, TS strict) + Tailwind v4 + Supabase + Recharts, deploy na Vercel.
+PONTEIRO — "para onde apontam as pesquisas": agregador de pesquisas presidenciais Brasil 2026
+(Lula × Flávio Bolsonaro). Next.js 16 (App Router, React 19, TS strict) + Tailwind v4 +
+Supabase + Recharts, deploy na Vercel.
 O protótipo `agregador-presidencial-2026.jsx` na raiz é a **fonte da verdade** do modelo
 estatístico, dos dados e dos textos editoriais — não é código do app (está fora de lint/tsc).
 

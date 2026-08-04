@@ -1,11 +1,14 @@
 @import "tailwindcss";
 @import "./tokens.css";
 
-/* Base do produto: papel de boletim, tinta, Archivo (via next/font no layout).
-   O grão do papel (public/grao-papel.svg, feTurbulence a 5% de alfa) é decorativo
-   e quase imperceptível — a cor de fundo segura a identidade se a imagem faltar. */
+/* ===========================================================================
+   BASE — a página tingida de ameixa (docs/DESIGN-V2.md §3.1)
+   Profundidade vem de TINTA DE FUNDO: bruma (página) → placa (bloco) → nicho
+   (caixa dentro do bloco). Nenhuma textura, nenhum grão, nenhuma sombra em
+   bloco parado. A família padrão do documento é a Lexend, via `--font-sans`.
+   =========================================================================== */
 body {
-  background: var(--color-papel) url("/grao-papel.svg") repeat;
+  background: var(--color-bruma);
   color: var(--color-tinta);
   font-family: var(--font-sans);
 }
@@ -16,10 +19,56 @@ details > summary {
 }
 
 /* ===========================================================================
-   DESLIZADOR (input[type=range]) — docs/DESIGN.md §7.7
-   Thumb visível de 24px (--spacing-thumb) dentro de um alvo de toque de 44px
-   (--spacing-toque). O preenchimento do trilho vem da variável --preenchido,
-   escrita pelo componente (é um percentual, não uma cor).
+   ENTRADA ORQUESTRADA — CSS puro, sem esperar JS (docs/DESIGN-V2.md §7)
+   Só `transform` e `opacity`. Roda uma vez, no carregamento; `--atraso` faz o
+   escalonamento. Em prefers-reduced-motion `--desloc-entrada` vai a 0 e a rede
+   de segurança dos tokens zera a duração — o elemento nasce assentado.
+   NUNCA aplicar em número-manchete: ele é o LCP e não pode nascer invisível.
+   =========================================================================== */
+.entra {
+  animation: assenta var(--dur-base) var(--ease-padrao) both;
+  animation-delay: var(--atraso, 0ms);
+}
+
+/* ===========================================================================
+   ENXAME — a queda das 100 bolinhas (elemento-assinatura, §4.1)
+   O atraso é por COLUNA (`--atraso`, teto `--stagger-teto`), nunca por bolinha.
+   Sem o atributo `data-assenta` as bolinhas nascem assentadas: é isso que
+   mantém o desenho inteiro no HTML do servidor, com ou sem JavaScript.
+   =========================================================================== */
+[data-assenta="sim"] .bolinha {
+  animation: assenta var(--dur-entrada) var(--ease-mola) both;
+  animation-delay: var(--atraso, 0ms);
+}
+
+/* ===========================================================================
+   MICRO-CELEBRAÇÃO — só transform, e só depois de uma ação do leitor
+   Aplicada por classe (React) ao aplicar um cenário; some sozinha.
+   =========================================================================== */
+@keyframes pulso {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.celebra {
+  animation: pulso var(--dur-base) var(--ease-mola);
+}
+
+/* ===========================================================================
+   DESLIZADOR (input[type=range]) — docs/DESIGN-V2.md §5.5 e §6.6
+   Thumb VISÍVEL de 24px (--spacing-thumb) dentro de um alvo de 44px
+   (--spacing-toque). O preenchimento do trilho vem de --preenchido, escrito
+   pelo componente (é um percentual, não uma cor).
+   O anel do thumb é `box-shadow` de blur zero, nunca `border`: com borda o
+   Chrome desconta a espessura do próprio diâmetro (box-sizing do UA) e sobram
+   20px de disco visível.
    =========================================================================== */
 .deslizador {
   -webkit-appearance: none;
@@ -33,18 +82,14 @@ details > summary {
 
 .deslizador::-webkit-slider-runnable-track {
   height: 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-plena);
   background: linear-gradient(
     to right,
-    var(--color-confirma) 0 var(--preenchido, 0%),
-    var(--color-linha-forte) var(--preenchido, 0%) 100%
+    var(--color-ameixa) 0 var(--preenchido, 0%),
+    var(--color-grade) var(--preenchido, 0%) 100%
   );
 }
 
-/* O disco VISÍVEL tem que medir --spacing-thumb (24px) de verdade: com
-   `border` o Chrome desconta a borda do próprio diâmetro (box-sizing do UA) e
-   sobravam 20px de verde. O anel de separação do trilho vira `box-shadow` de
-   blur zero — pintado FORA da caixa, sem comer o raio (docs/DESIGN.md §7.7). */
 .deslizador::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -53,84 +98,83 @@ details > summary {
   height: var(--spacing-thumb);
   margin-top: calc((6px - var(--spacing-thumb)) / 2);
   border: 0;
-  border-radius: 999px;
-  background: var(--color-confirma);
-  box-shadow: 0 0 0 2px var(--color-cartao);
+  border-radius: var(--radius-plena);
+  background: var(--color-ameixa);
+  box-shadow: 0 0 0 2px var(--color-placa);
+  transition: background-color var(--dur-rapida) var(--ease-padrao);
+}
+
+.deslizador:active::-webkit-slider-thumb {
+  background: var(--color-ameixa-pressa);
 }
 
 .deslizador::-moz-range-track {
   height: 6px;
-  border-radius: 999px;
-  background: var(--color-linha-forte);
+  border-radius: var(--radius-plena);
+  background: var(--color-grade);
 }
 
 .deslizador::-moz-range-progress {
   height: 6px;
-  border-radius: 999px;
-  background: var(--color-confirma);
+  border-radius: var(--radius-plena);
+  background: var(--color-ameixa);
 }
 
 .deslizador::-moz-range-thumb {
   box-sizing: border-box;
   width: var(--spacing-thumb);
   height: var(--spacing-thumb);
-  border-radius: 999px;
-  background: var(--color-confirma);
   border: 0;
-  box-shadow: 0 0 0 2px var(--color-cartao);
+  border-radius: var(--radius-plena);
+  background: var(--color-ameixa);
+  box-shadow: 0 0 0 2px var(--color-placa);
 }
 
 /* ===========================================================================
-   ROLAGEM HORIZONTAL COM AFORDÂNCIA — docs/DESIGN.md §7.5
-   Quando a tabela não cabe na coluna, o leitor precisa VER que há mais conteúdo
-   à direita. Truque clássico de duas camadas: os "tampões" cor-do-cartão rolam
-   com o conteúdo (`local`) e cobrem a sombra quando a borda correspondente está
-   no fim do curso; as sombras ficam presas ao contêiner (`scroll`). Nada aqui é
-   gradiente decorativo (§3.3): é o único indicador de conteúdo cortado, e as
-   duas cores saem de token (`color-mix` só ajusta o alfa da linha-forte).
+   ROLAGEM HORIZONTAL COM AFORDÂNCIA
+   Quando a tabela não cabe na coluna, o leitor precisa VER que há mais à
+   direita. Duas camadas: os tampões cor-da-placa rolam com o conteúdo
+   (`local`) e cobrem a sombra quando a borda está no fim do curso; as sombras
+   ficam presas ao contêiner (`scroll`). Não é gradiente decorativo: é o único
+   indicador de conteúdo cortado, e as duas cores saem de token.
    =========================================================================== */
 .rolagem-x {
   background:
-    linear-gradient(to right, var(--color-cartao) 35%, transparent) left center / 28px 100%
-      no-repeat local,
-    linear-gradient(to left, var(--color-cartao) 35%, transparent) right center / 28px 100%
-      no-repeat local,
+    linear-gradient(to right, var(--color-placa) 35%, transparent) left center / 28px 100% no-repeat
+      local,
+    linear-gradient(to left, var(--color-placa) 35%, transparent) right center / 28px 100% no-repeat
+      local,
     linear-gradient(
         to right,
-        color-mix(in srgb, var(--color-linha-forte) 55%, transparent),
+        color-mix(in srgb, var(--color-contorno) 55%, transparent),
         transparent
       )
       left center / 14px 100% no-repeat scroll,
     linear-gradient(
         to left,
-        color-mix(in srgb, var(--color-linha-forte) 55%, transparent),
+        color-mix(in srgb, var(--color-contorno) 55%, transparent),
         transparent
       )
       right center / 14px 100% no-repeat scroll;
 }
 
 /* ===========================================================================
-   GRÁFICOS — o wrapper do Recharts não deve capturar o foco do teclado nem
-   deixar o SVG estourar a coluna em 390px.
+   GRÁFICOS — o wrapper do Recharts não captura o foco do teclado nem deixa o
+   SVG estourar a coluna em 390px.
    =========================================================================== */
 .recharts-wrapper,
 .recharts-surface {
   outline: none;
 }
 
-/* ---------------------------------------------------------------------------
-   ANOTAÇÃO DENTRO DA ÁREA DE PLOTAGEM — docs/DESIGN.md §4.1 e §7.8
-   Anotação de gráfico É dado: sai em IBM Plex Mono, como o tick e o tooltip.
-   E, por ficar sobre a plotagem, ganha contorno na cor do papel do cartão via
-   `paint-order: stroke` — sem isso a própria curva atravessa o glifo («virada
-   (+4,7)» cortado pelas duas linhas, «◆ atual» partido pela linha verde). O
-   contorno é pintado ANTES do preenchimento, então não engorda a letra: só
-   abre a folga que separa o texto do traço.
-   --------------------------------------------------------------------------- */
+/* Anotação DENTRO da área de plotagem: ganha contorno na cor da placa via
+   `paint-order: stroke`, senão a própria curva atravessa o glifo. O contorno é
+   pintado ANTES do preenchimento, então não engorda a letra — só abre a folga
+   que separa o texto do traço. Família: Lexend, como todo o resto (P7). */
 .rotulo-grafico {
-  font-family: var(--font-mono);
+  font-family: var(--font-texto);
   paint-order: stroke;
-  stroke: var(--color-cartao);
+  stroke: var(--color-placa);
   stroke-width: 3px;
   stroke-linejoin: round;
 }

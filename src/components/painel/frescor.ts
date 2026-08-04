@@ -1,7 +1,7 @@
 /**
- * Selo de frescor (R3 / docs/DESIGN.md §8.5) — substitui o botão público
- * "Atualizar agora" do protótipo. É informativo: não é botão, não tem
- * afordância de clique.
+ * Selo de frescor (R3 · COPY-DECK §Q) — substitui o botão público "Atualizar
+ * agora" do protótipo. É informativo: não é botão e não tem afordância de
+ * clique.
  *
  * Calculado no SERVIDOR e entregue já formatado ao componente, para que o
  * cliente não precise ler o relógio (nada de mismatch de hidratação).
@@ -15,9 +15,14 @@ const DIA_MS = 864e5;
 
 export interface SeloFrescor {
   texto: string;
-  /** verificação com mais de 48h (ou ausente) → cores de alerta */
+  /** verificação com mais de 48h (ou ausente) → tinta de atenção */
   alerta: boolean;
 }
+
+/** O que o robô faz e o que ele NÃO pode fazer sozinho (R3). */
+export const EXPLICA_FRESCOR =
+  "Todo dia um robô procura pesquisas novas. Nada entra sem uma pessoa conferir e aprovar, e " +
+  "tudo o que entra fica registrado numa lista pública.";
 
 function diaEm(ms: number): string {
   return formatInTimeZone(ms, TZ, "yyyy-MM-dd");
@@ -59,8 +64,8 @@ export function montarSelo(frescor: Frescor, agoraMs: number): SeloFrescor {
       partes.push(`verificado automaticamente ${quando} às ${hora}h`);
     }
   } else {
-    // Sem banco (R8): a série exibida é o seed editorial.
-    partes.push(`base editorial de ${ULTIMA_ATUALIZACAO}`);
+    // Sem banco (R8): a lista exibida é a que está guardada no próprio site.
+    partes.push(`lista guardada aqui no site, de ${ULTIMA_ATUALIZACAO}`);
   }
 
   if (frescor.ultimaPesquisaFim) {

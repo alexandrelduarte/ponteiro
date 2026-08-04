@@ -1,56 +1,53 @@
 "use client";
 
 /**
- * Deslizador (docs/DESIGN.md §7.7).
+ * Régua (docs/DESIGN-V2.md §5.5 e §6.6, COPY-DECK §K).
  *
- * Alvo de toque de 44×44 (o mínimo do WCAG 2.2 AA é 24; o alvo do produto é o
- * de plataforma) e `aria-valuetext` em português COM unidade — `aria-valuenow`
- * sozinho lê "4" e não significa nada.
+ * "Régua", não "parâmetro": são conteúdo editorial, não configuração avançada —
+ * se o leitor pode supor uma puxada de 6,3 pontos e ver a página inteira passar
+ * a descrever a vitória do outro candidato, ele aprende que o "cenário mais
+ * provável" é função das suposições.
+ *
+ * Thumb de 24px VISÍVEIS dentro de alvo de 44px, com o anel por `box-shadow` de
+ * blur zero (o CSS mora em globals.css). `aria-valuetext` em português COM
+ * unidade: `aria-valuenow` sozinho lê "4" e não significa nada.
  */
 import { useId, type CSSProperties, type ReactNode } from "react";
-import { fmt } from "@/lib/modelo";
 import type { FaixaSlider } from "./parametros-url";
 
 export function Deslizador({
   rotulo,
+  valorExibido,
+  leituraAcessivel,
   valor,
   faixa,
-  sufixo,
-  unidadeLeitura,
   dica,
   idTeste,
-  className,
   onChange,
 }: {
   rotulo: string;
+  /** o valor como a pessoa lê ("21 dias", "nenhuma puxada") */
+  valorExibido: string;
+  /** a frase inteira que o leitor de tela ouve, com unidade */
+  leituraAcessivel: string;
   valor: number;
   faixa: FaixaSlider;
-  /** sufixo curto exibido ao lado do número */
-  sufixo: string;
-  /** unidade por extenso, lida por leitor de tela */
-  unidadeLeitura: string;
-  /** ênfase da dica é NEGRITO (§4.3) — nunca caixa alta no meio da prosa */
   dica: ReactNode;
   idTeste?: string;
-  className?: string;
   onChange: (v: number) => void;
 }) {
   const id = useId();
   const idDica = `${id}-dica`;
-  const texto = fmt(valor, faixa.casas);
   const preenchido = ((valor - faixa.min) / (faixa.max - faixa.min)) * 100;
 
   return (
-    <div className={className}>
-      <div className="flex items-baseline justify-between gap-2">
-        <label htmlFor={id} className="text-sm font-semibold text-tinta">
-          {rotulo}
-        </label>
-        <output htmlFor={id} className="font-mono text-sm text-confirma-texto">
-          {texto}
-          {sufixo}
-        </output>
-      </div>
+    <div>
+      <label htmlFor={id} className="block text-secao text-tinta">
+        {rotulo}
+      </label>
+      <output htmlFor={id} className="mt-1 block text-corpo font-semibold text-ameixa numeros">
+        {valorExibido}
+      </output>
       <input
         id={id}
         data-testid={idTeste}
@@ -61,11 +58,11 @@ export function Deslizador({
         step={faixa.passo}
         value={valor}
         aria-describedby={idDica}
-        aria-valuetext={`${texto} ${unidadeLeitura}`}
+        aria-valuetext={leituraAcessivel}
         onChange={(e) => onChange(parseFloat(e.target.value))}
         style={{ "--preenchido": `${preenchido}%` } as CSSProperties}
       />
-      <p id={idDica} className="mt-1 text-xs leading-snug text-cinza">
+      <p id={idDica} className="mt-1 max-w-texto text-micro text-tinta-media">
         {dica}
       </p>
     </div>

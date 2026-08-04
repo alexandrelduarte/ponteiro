@@ -34,7 +34,7 @@ export function criarClienteAdmin(): SupabaseClient | null {
   if (!envs) return null;
   cliente = createClient(envs.url, envs.serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-    global: { headers: { "x-application-name": "agregador-presidencial-2026/admin" } },
+    global: { headers: { "x-application-name": "ponteiro/admin" } },
   });
   return cliente;
 }

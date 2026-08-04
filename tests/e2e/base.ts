@@ -30,7 +30,10 @@ export const test = base.extend<{ consoleLimpo: void }>({
 
 export { expect };
 
-/** Número da manchete (chance de Lula projetada para o dia da votação). */
+/**
+ * O número da manchete: em quantas de 100 eleições parecidas Lula é eleito.
+ * A v2 publica FREQUÊNCIA, não percentual solto — por isso é só o inteiro.
+ */
 export async function manchete(page: Page): Promise<string> {
   return (await page.getByTestId("manchete-lula").innerText()).trim();
 }
@@ -38,6 +41,16 @@ export async function manchete(page: Page): Promise<string> {
 /** Espera o painel estar interativo (hidratado) antes de clicar em algo. */
 export async function painelPronto(page: Page): Promise<void> {
   await expect(page.getByTestId("manchete-lula")).toBeVisible();
-  // O botão de restaurar só reage depois da hidratação.
+  // O botão de voltar as réguas ao padrão só reage depois da hidratação.
   await expect(page.getByTestId("restaurar-parametros")).toBeDisabled();
+}
+
+/** Larguras auditadas: o viewport onde o conceito nasce, md e lg. */
+export const LARGURAS = [390, 768, 1440] as const;
+
+/** Rolagem horizontal da PÁGINA — tem de ser zero em toda largura. */
+export async function sobraHorizontal(page: Page): Promise<number> {
+  return page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
 }

@@ -1,229 +1,356 @@
 /**
- * tokens.css — sistema de design "boletim de urna" · Tailwind CSS v4
- * ---------------------------------------------------------------------------
- * Fonte da verdade: `agregador-presidencial-2026.jsx` (paleta CORES) e
- * `docs/DESIGN.md` (princípios, contrastes verificados e specs por breakpoint).
+ * tokens.css — sistema de design "ENXAME" · PONTEIRO · Tailwind CSS v4
+ * ===========================================================================
+ * Conceito vencedor da Fase 3: **B · ENXAME** (ver docs/DESIGN-V2.md).
+ * Marca: PONTEIRO (docs/MARCA.md). Contraexemplo permanente: a estética v1
+ * "boletim de urna" (CLAUDE.md) — este arquivo NÃO herda um único valor dela.
+ * Nasceu como `tokens-v2.css` na Fase 3 e substituiu o arquivo v1 na Fase 6;
+ * o antigo foi apagado, não adaptado.
  *
  * REGRAS DE USO
  *  - Nenhum componente escreve hex. Só `text-*`, `bg-*`, `border-*`, `fill-*`,
- *    `stroke-*` ou `var(--color-*)` (necessário nos inline styles do Recharts).
- *  - `@theme static` garante que TODA variável seja emitida em `:root`, mesmo
- *    sem classe utilitária correspondente — o Recharts consome as cores por
- *    `var()` em props (fill/stroke/tick), fora do alcance do scanner.
- *  - Famílias tipográficas vêm de `next/font` no layout (`--font-archivo`,
- *    `--font-plex-mono`). Proibido `@import` de fonte por URL (self-host).
- *  - Contraste AA (4,5:1 texto · 3:1 não-texto) é PISO: ver a tabela de
- *    contrastes em docs/DESIGN.md §5.4 antes de criar qualquer par novo.
+ *    `stroke-*` ou `var(--color-*)` (obrigatório nos inline styles do Recharts).
+ *  - `@theme static` emite TODA variável em `:root`, mesmo sem utilitário
+ *    correspondente — o Recharts e o SVG recebem cor por prop, fora do alcance
+ *    do scanner do Tailwind.
+ *  - Famílias tipográficas entram por `next/font` no layout raiz
+ *    (`--font-instrument-serif`, `--font-lexend`). Proibido `@import` de fonte
+ *    por URL: self-host, zero request a terceiros em runtime.
+ *  - Contraste WCAG 2 AA (4,5:1 texto · 3:1 não-texto) é PISO, e vem CALCULADO:
+ *    todo par está anotado ao lado do token e tabelado em docs/DESIGN-V2.md §10.
+ *    Par novo só entra com o número calculado junto.
+ *  - Vermelho e azul pertencem EXCLUSIVAMENTE aos dois candidatos, em qualquer
+ *    superfície do produto — inclusive /admin (R4). A marca é ameixa.
  */
 
 @theme static {
   /* ======================================================================
-     1. SUPERFÍCIES — o papel do boletim e a tela da urna
+     1. SUPERFÍCIES — a página tingida de ameixa e a placa branca
+     A profundidade vem de TINTA DE FUNDO (bruma → placa), não de sombra:
+     sombra aqui só existe para o que de fato flutua (ver §10).
      ====================================================================== */
-  --color-papel: #e8e8df; /* fundo da página (CORES.papel) */
-  --color-cartao: #f6f6f0; /* cartão sobre o papel (CORES.cartao) */
-  --color-mini: #efefe6; /* mini-cartão / caixa de nota dentro do cartão */
-  --color-campo: #ffffff; /* fundo de input */
-
-  --color-tela: #0e241a; /* tela fósforo da urna (CORES.tela) */
-  --color-tela-fundo: #0a1a12; /* trilho/sulco interno da tela */
-  --color-tela-borda: #1e3a2c; /* moldura e filetes internos (decorativo) */
+  --color-bruma: #efecf1; /* fundo da página (bruma-ameixa) · 1,17:1 vs placa */
+  --color-placa: #ffffff; /* superfície dos blocos-conversa */
+  --color-nicho: #f6f3f7; /* caixa DENTRO da placa (nota, campo, esqueleto) */
+  --color-veu: rgb(33 28 38 / 0.55); /* escurecedor atrás do bottom sheet */
 
   /* ======================================================================
-     2. TINTA — texto e filetes sobre papel
+     2. TINTA — texto sobre as superfícies claras
      ====================================================================== */
-  --color-tinta: #181c18; /* texto principal (CORES.tinta) */
-  --color-cinza: #63685f; /* texto secundário (CORES.cinza) — AA por 0,14 */
-  --color-linha: #c6c6b8; /* filete DECORATIVO (CORES.linha) — 1,40:1 */
-  --color-linha-forte: #727267; /* borda SIGNIFICATIVA — 3,95:1 sobre papel */
-  --color-texto-inverso: #f2f2ea; /* texto sobre tinta (tooltip escuro) */
+  --color-tinta: #211c26; /* texto principal · 16,68:1 placa · 14,25:1 bruma */
+  --color-tinta-media: #5c5566; /* texto secundário · 7,13:1 placa · 6,09:1 bruma */
+  --color-tinta-inversa: #faf8fb; /* texto sobre ameixa/tinta · 8,91:1 na ameixa */
 
   /* ======================================================================
-     3. FÓSFORO — só dentro da tela da urna
+     3. AMEIXA — a família cromática TERCEIRA da marca (R4/P6)
+     Neutra em relação à disputa: não é o vermelho de ninguém nem o azul de
+     ninguém. Todos os degraus dividem a mesma matiz OKLCH (~316°), então
+     hover/pressed são o MESMO tom mais fundo, nunca outra cor.
      ====================================================================== */
-  --color-fosforo: #a7efbb; /* rótulos e corpo na tela (CORES.fosforo) */
-  --color-fosforo-forte: #d8fbe2; /* manchete e números (CORES.fosforoForte) */
-  --color-tela-alerta: #f0b27a; /* aviso de viés dentro da tela */
+  --color-ameixa: #5a3a66; /* identidade · L 0,404 · 9,41:1 placa · 8,04:1 bruma */
+  --color-ameixa-forte: #452c4e; /* hover de superfície ameixa · inversa 11,54:1 */
+  --color-ameixa-pressa: #33203a; /* pressed · inversa 15,80:1 (não é foco) */
+  --color-ameixa-clara: #7c5a88; /* traço secundário em gráfico · 5,71:1 na placa */
+  --color-ameixa-bruma: #e4dbe9; /* chip/pressed de botão-fantasma · tinta 12,40:1 */
+  --color-ameixa-tenue: #f3eef5; /* hover de botão-fantasma · ameixa 8,23:1 */
 
   /* ======================================================================
-     4. CANDIDATOS — escalas espelhadas (R4: peso perceptual equivalente)
-     Cada degrau tem par vermelho/azul com mesma clareza OKLCH e mesmo papel.
-     `--color-lula` / `--color-flavio` são as cores de MARCA (barras, linhas,
-     pontos) e vêm literais de CORES — nunca use para texto: ver `-escuro`.
+     4. CANDIDATOS — carmim × naval, recalibrados para o ENXAME
+     ΔL(OKLCH) = 0,119: a separação existe em CLAREZA, não só em matiz — o par
+     sobrevive ao print P&B e ao filtro de daltonismo (P6). O par de fundos
+     claros é deliberadamente ISOCROMO em clareza (ΔL = 0,003): nenhum dos dois
+     lados pode parecer "mais pesado" numa tela de placar (R4).
+     A cor NUNCA é o único canal: quem está de que lado é POSIÇÃO em relação à
+     régua do empate, e o nome do candidato acompanha sempre.
      ====================================================================== */
-  --color-lula: #c4122f; /* marca (CORES.lula) · L 0,524 */
-  --color-lula-escuro: #b30026; /* TEXTO/numeral · 5,79:1 no papel · L 0,484 */
-  --color-lula-medio: #d96a7a; /* banda "Lula 5–10" · L 0,659 */
-  --color-lula-suave: #e8a4ae; /* banda "Lula 10+" · L 0,786 */
-  --color-lula-claro: #ff9aa8; /* sobre tela/tooltip escuro · L 0,794 */
-  --color-lula-fundo: #ffdfdd; /* tinta de fundo (área, realce) · L 0,929 */
-
-  --color-flavio: #16418c; /* marca (CORES.flavio) · L 0,393 */
-  --color-flavio-escuro: #2a55a2; /* TEXTO/numeral · 5,84:1 no papel · L 0,462 */
-  --color-flavio-medio: #648fe7; /* espelho da banda média · L 0,659 */
-  --color-flavio-suave: #9ebaee; /* espelho da banda suave · L 0,787 */
-  --color-flavio-claro: #9fc0ff; /* sobre tela/tooltip escuro · L 0,807 */
-  --color-flavio-fundo: #dbe9ff; /* tinta de fundo (área, realce) · L 0,930 */
+  --color-lula: #be1745; /* carmim · L 0,518 · 6,18:1 placa · 5,28:1 bruma */
+  --color-lula-fundo: #f7dce4; /* chip de valor · L 0,919 · tinta 12,96:1 */
+  --color-flavio: #26418b; /* naval · L 0,399 · 9,50:1 placa · 8,11:1 bruma */
+  --color-flavio-fundo: #dde3f2; /* chip de valor · L 0,916 · tinta 12,98:1 */
 
   /* ======================================================================
-     5. SEMÂNTICAS — alerta (âmbar) e confirmação (verde)
-     `--color-alerta` e `--color-confirma` são cores de PREENCHIMENTO/BORDA.
-     Para texto sobre papel use sempre as variantes `-texto`.
+     5. ATENÇÃO — âmbar-queimado, e só ele
+     É TINTA (texto, traço, contorno de chip), não campo. Não existe "sucesso
+     verde" nem "perigo vermelho" neste sistema: vermelho é de candidato, e o
+     produto não tem nada a comemorar (ver docs/DESIGN-V2.md §5.4).
      ====================================================================== */
-  --color-alerta: #d96a1b; /* borda/marca (CORES.alerta) · 2,83:1 → não é texto */
-  --color-alerta-texto: #8a4510; /* texto âmbar · 5,80:1 no papel */
-  --color-alerta-fundo: #f7e4d2; /* chip/aviso âmbar */
-
-  --color-confirma: #1e7a46; /* botão primário, borda (CORES.confirma) */
-  --color-confirma-texto: #155a34; /* texto verde · 6,70:1 no papel */
-  --color-confirma-fundo: #dff0e5; /* chip/aviso verde */
-
-  --color-rodape-fundo: #f3e7d9; /* faixa do aviso legal */
-  --color-rodape-texto: #6b3a0e; /* aviso legal · 7,71:1 */
-
-  /* Anel de foco: verde escuro no papel, fósforo dentro da tela. */
-  --color-foco: #155a34;
-  --color-foco-tela: #a7efbb;
+  --color-atencao: #8f5407; /* 6,11:1 placa · 5,22:1 bruma · inversa 5,78:1 */
+  --color-atencao-fundo: #f8ecda; /* campo do aviso · atenção 5,23:1 · tinta 14,30:1 */
 
   /* ======================================================================
-     6. TIPOGRAFIA — famílias (self-host via next/font, Fase 4)
+     6. INCERTEZA E ESTRUTURA — o lilás da faixa e as linhas
+     A faixa da dúvida é a FORMA DOMINANTE do gráfico (P4). O preenchimento é
+     claro de propósito (a linha e os rótulos vivem em cima dele), então quem
+     cumpre o 3:1 de objeto gráfico (1.4.11) é a BORDA da faixa — é ela que
+     desenha o limite da dúvida, e ela é obrigatória, não enfeite.
      ====================================================================== */
-  --font-sans:
-    var(--font-archivo), "Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+  --color-faixa: #e2d8e8; /* campo da faixa de 80% · tinta 12,09:1 em cima */
+  --color-faixa-borda: #756580; /* limite da faixa · 5,34:1 placa · 3,87:1 faixa */
+  --color-contorno: #8e8598; /* borda SIGNIFICATIVA · 3,52:1 placa · 3,01:1 bruma */
+  --color-grade: #e7e2ea; /* grade quase invisível · 1,28:1 · DECORATIVA */
+  --color-filete: #d8d1dd; /* separador dentro do bloco · 1,49:1 · DECORATIVO */
+
+  /* ======================================================================
+     7. FOCO — anel único, ameixa, em toda superfície clara
+     3:1 contra placa (9,41), bruma (8,04), ameixa-bruma (6,99), lula-fundo
+     (7,31) e flavio-fundo (7,32). Sobre campo ameixa/tinta, inverte.
+     ====================================================================== */
+  --color-foco: #5a3a66;
+  --color-foco-inverso: #ffffff; /* 9,41:1 sobre a ameixa */
+
+  /* ======================================================================
+     8. TIPOGRAFIA
+     Display: Instrument Serif 400 — SÓ em corpo grande (manchete, número de
+     placar). Nunca em rótulo, nunca em caixa alta, nunca abaixo de 32px.
+     Texto: Lexend — desenhada para legibilidade, cobre 100% do corpo, dos
+     rótulos e dos números tabulares (P7: mono NÃO volta como identidade).
+     As duas famílias entram por next/font na Fase 6.
+     ====================================================================== */
+  --font-display:
+    var(--font-instrument-serif), "Instrument Serif", Georgia, "Times New Roman", serif;
+  --font-texto:
+    var(--font-lexend), "Lexend", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
-  --font-mono:
-    var(--font-plex-mono), "IBM Plex Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
-    Consolas, "Liberation Mono", monospace;
+  /* `font-sans` é o padrão do documento (o preflight do Tailwind lê daqui). */
+  --font-sans: var(--font-texto);
 
-  /* ---- Escala fluida (390px → 1140px). Um único elemento usa `manchete`. --- */
-  --text-manchete: clamp(2.4rem, 8vw, 4.4rem); /* % na tela da urna */
-  --text-manchete--line-height: 1;
-  --text-manchete--font-weight: 600;
+  /* ---- Escala fluida 390 → 1140px. Cada passo: valor@390 → valor@1140. ----
+     Piso de 13px em TUDO (a v1 chegava a 11px em tick de gráfico); corpo nasce
+     em 16px, não em 13px como a v1 (P3/P7). */
+  --text-manchete: clamp(2.5rem, 1.655rem + 3.467vw, 4.125rem); /* 40 → 66 */
+  --text-manchete--line-height: 1.03;
+  --text-manchete--font-weight: 400;
+  --text-manchete--letter-spacing: -0.015em;
 
-  --text-manchete-2: clamp(1.3rem, 4vw, 2rem); /* linha "se fosse hoje" */
-  --text-manchete-2--line-height: 1;
-  --text-manchete-2--font-weight: 600;
+  --text-manchete-2: clamp(2rem, 1.74rem + 1.067vw, 2.5rem); /* 32 → 40 · placar serif */
+  --text-manchete-2--line-height: 1.08;
+  --text-manchete-2--font-weight: 400;
+  --text-manchete-2--letter-spacing: -0.01em;
 
-  --text-titulo: clamp(1.8rem, 5vw, 3rem); /* h1 "PRESIDENTE 2026" */
-  --text-titulo--line-height: 1;
-  --text-titulo--letter-spacing: -0.02em;
-  --text-titulo--font-weight: 900;
+  /* Wordmark PONTEIRO no cabeçalho: 30 → 36px (MARCA.md §8.2). Único corpo
+     display abaixo de 32px que o sistema autoriza, porque é a marca, não texto. */
+  --text-wordmark: clamp(1.875rem, 1.76rem + 0.48vw, 2.25rem); /* 30 → 36 */
+  --text-wordmark--line-height: 1;
+  --text-wordmark--font-weight: 400;
+  --text-wordmark--letter-spacing: -0.01em;
 
-  --text-veredito: clamp(1.05rem, 3vw, 1.5rem); /* título do veredito na tela */
-  --text-veredito--line-height: 1.2;
-  --text-veredito--letter-spacing: 0.02em;
-  --text-veredito--font-weight: 900;
+  --text-pergunta: clamp(1.3125rem, 1.15rem + 0.667vw, 1.625rem); /* 21 → 26 · h2 */
+  --text-pergunta--line-height: 1.25;
+  --text-pergunta--font-weight: 600;
+  --text-pergunta--letter-spacing: -0.005em;
 
-  --text-secao: clamp(1rem, 2.6vw, 1.35rem); /* título do cenário-base */
+  --text-secao: clamp(1.0625rem, 0.9975rem + 0.267vw, 1.1875rem); /* 17 → 19 · h3 */
   --text-secao--line-height: 1.35;
-  --text-secao--font-weight: 900;
+  --text-secao--font-weight: 600;
 
-  --text-placar: clamp(1.5rem, 5.5vw, 1.875rem); /* 48,3% × 43,6% nos cartões */
-  --text-placar--line-height: 1.05;
-  --text-placar--font-weight: 900;
+  --text-intro: clamp(1.0625rem, 0.965rem + 0.4vw, 1.25rem); /* 17 → 20 · linha de apoio */
+  --text-intro--line-height: 1.55;
+  --text-intro--font-weight: 400;
 
-  --text-dado: 1.25rem; /* número de mini-cartão / contador */
-  --text-dado--line-height: 1.1;
-  --text-dado--font-weight: 600;
+  --text-corpo: clamp(1rem, 0.935rem + 0.267vw, 1.125rem); /* 16 → 18 · corpo */
+  --text-corpo--line-height: 1.6;
+  --text-corpo--font-weight: 400;
 
-  /* ---- Tracking (todos observados no protótipo) ---- */
-  --tracking-titulo: -0.02em;
-  --tracking-botao: 0.06em;
-  --tracking-dado: 0.1em;
-  --tracking-etiqueta: 0.12em;
-  --tracking-tela: 0.14em;
-  --tracking-sobretitulo: 0.18em;
+  --text-dado: clamp(1.25rem, 1.12rem + 0.533vw, 1.5rem); /* 20 → 24 · número em prosa */
+  --text-dado--line-height: 1.2;
+  --text-dado--font-weight: 500;
 
-  /* ---- Leading para blocos de leitura ---- */
+  --text-etiqueta: clamp(0.875rem, 0.8425rem + 0.133vw, 0.9375rem); /* 14 → 15 · rótulo */
+  --text-etiqueta--line-height: 1.35;
+  --text-etiqueta--font-weight: 500;
+
+  --text-micro: clamp(0.8125rem, 0.78rem + 0.133vw, 0.875rem); /* 13 → 14 · legenda/tick */
+  --text-micro--line-height: 1.4;
+  --text-micro--font-weight: 400;
+
+  /* ---- Tracking e leading avulsos ----
+     Não existe tracking positivo de caixa alta neste sistema: rótulo em
+     CAIXA-ALTA ESPACEJADA é defeito da v1 e está banido (P3). */
+  --tracking-manchete: -0.015em;
+  --tracking-numero: -0.01em;
+
+  --leading-manchete: 1.03;
+  --leading-titulo: 1.25;
   --leading-leitura: 1.6;
-  --leading-compacto: 1.5;
+  --leading-compacto: 1.4;
 
   /* ======================================================================
-     7. ESPAÇAMENTO — base 4px; nomes só para o ritmo estrutural
+     9. ESPAÇO — base 4px; nome só para o ritmo estrutural
      ====================================================================== */
-  --spacing: 0.25rem; /* p-1 = 4px, p-2 = 8px, … tudo múltiplo de 4 */
+  --spacing: 0.25rem; /* p-1 = 4px · tudo é múltiplo de 4 */
 
-  --spacing-goteira: 1rem; /* 16 — px lateral da página (390px) */
-  --spacing-goteira-lg: 1.5rem; /* 24 — px lateral em lg */
-  --spacing-cartao: 1rem; /* 16 — padding de cartão no mobile */
-  --spacing-cartao-md: 1.25rem; /* 20 — padding de cartão em md+ */
-  --spacing-tela: 1.25rem; /* 20 — padding da tela da urna no mobile */
-  --spacing-tela-md: 1.75rem; /* 28 — padding da tela em md+ */
-  --spacing-secao: 1.5rem; /* 24 — respiro entre seções no mobile */
-  --spacing-secao-md: 2rem; /* 32 — respiro entre seções em md+ */
-  --spacing-secao-lg: 2.5rem; /* 40 — respiro entre seções em lg */
-  --spacing-toque: 2.75rem; /* 44 — alvo mínimo de toque (WCAG 2.5.5 AAA) */
-  --spacing-thumb: 1.5rem; /* 24 — diâmetro visível do thumb do slider */
-
-  /* ======================================================================
-     8. LARGURAS DE LEITURA
-     ====================================================================== */
-  --container-leitura: 64rem; /* 1024 — coluna principal (max-w-5xl do protótipo) */
-  --container-texto: 48rem; /* 768 — parágrafos longos (medida de leitura) */
+  --spacing-goteira: 1rem; /* 16 — margem lateral da página a 390 */
+  --spacing-goteira-md: 1.5rem; /* 24 — a partir de md */
+  --spacing-goteira-lg: 2.5rem; /* 40 — a partir de lg */
+  --spacing-bloco: 1.25rem; /* 20 — padding interno do bloco-conversa a 390 */
+  --spacing-bloco-md: 2rem; /* 32 — padding interno em md+ */
+  --spacing-respiro: 1rem; /* 16 — gap entre blocos a 390 */
+  --spacing-respiro-md: 1.5rem; /* 24 — gap entre blocos em md+ */
+  --spacing-toque: 2.75rem; /* 44 — alvo de toque do produto (ação primária) */
+  --spacing-alvo-min: 1.5rem; /* 24 — piso do WCAG 2.2 SC 2.5.8 (alvo secundário) */
+  --spacing-thumb: 1.5rem; /* 24 — diâmetro VISÍVEL do thumb do deslizador */
+  --spacing-bolinha: 0.5rem; /* 8 — PISO do diâmetro da bolinha do enxame a 390 */
+  --spacing-bolinha-folga: 0.125rem; /* 2 — folga entre bolinhas (mantém o 3:1 de cada
+                                        bolinha contra a placa; ver §10 do doc) */
 
   /* ======================================================================
-     9. RAIOS
-     ====================================================================== */
-  --radius-controle: 0.25rem; /* botão, input, chip retangular */
-  --radius-cartao: 0.375rem; /* cartão */
-  --radius-tela: 0.5rem; /* moldura da tela da urna */
-
-  /* ======================================================================
-     10. SOMBRAS — sem "elevação"; só o relevo físico do boletim
-     ====================================================================== */
-  --shadow-tela:
-    inset 0 0 60px rgba(0, 0, 0, 0.55), 0 2px 0 rgba(255, 255, 255, 0.35); /* vinheta do CRT + brilho da borda */
-  --shadow-botao: 0 2px 0 rgba(0, 0, 0, 0.25); /* tecla de urna, sem blur */
-  --shadow-ativo: 0 1px 0 rgba(0, 0, 0, 0.2); /* cartão de cenário selecionado */
-  --shadow-tip: 0 1px 3px rgba(0, 0, 0, 0.35); /* tooltip do gráfico */
-
-  /* ======================================================================
-     11. MOVIMENTO — só o cursor pisca; o resto é estático
-     ====================================================================== */
-  --duracao-cursor: 1.1s;
-  --duracao-transicao: 180ms;
-  --default-transition-duration: 180ms;
-  --animate-cursor: pisca var(--duracao-cursor) infinite;
-
-  /* ======================================================================
-     12. BREAKPOINTS — mobile 390 → md 768 → lg 1140
-     Valores em rem para acompanharem o zoom de fonte do usuário.
+     10. LARGURAS E BREAKPOINTS
+     Breakpoints em rem para acompanharem o zoom de fonte do usuário. 390px
+     NÃO é breakpoint: é o viewport onde o conceito nasce e o piso de todo
+     cálculo (P12) — por isso mora em `--container-base`, não aqui.
      ====================================================================== */
   --breakpoint-sm: 40rem; /* 640 */
-  --breakpoint-md: 48rem; /* 768 — tabela completa reaparece aqui */
-  --breakpoint-lg: 71.25rem; /* 1140 — coluna de 1024 + goteiras confortáveis */
+  --breakpoint-md: 48rem; /* 768 — a série vira tabela aqui */
+  --breakpoint-lg: 71.25rem; /* 1140 — coluna de 1080 + goteiras confortáveis */
+
+  --container-pagina: 67.5rem; /* 1080 — coluna máxima da página */
+  --container-texto: 32rem; /* 512 (~58ch em Lexend 17px) — medida de leitura */
+  --container-base: 24.375rem; /* 390 — o viewport onde o conceito nasce (P12) */
+
+  /* ======================================================================
+     11. RAIOS — a "conversa" é feita de blocos generosos sem borda
+     ====================================================================== */
+  --radius-bloco: 1.5rem; /* 24 — o bloco-conversa */
+  --radius-nicho: 1rem; /* 16 — caixa dentro do bloco */
+  --radius-campo: 0.75rem; /* 12 — input, textarea, select */
+  --radius-plena: 9999px; /* chip, botão-pílula, thumb */
+
+  /* ======================================================================
+     12. SOMBRA — dois níveis, e o nível 0 é o normal
+     NÃO usar sombra em bloco parado: o bloco já se separa do fundo pela tinta
+     (placa branca sobre bruma-ameixa). Sombra é só para o que de fato flutua
+     ACIMA do conteúdo — senão vira o neumorfismo banido pela TENDENCIAS §3.
+     ====================================================================== */
+  --shadow-flutua: 0 1px 2px rgb(33 28 38 / 0.05), 0 6px 16px rgb(33 28 38 / 0.07);
+  --shadow-erguido: 0 2px 6px rgb(33 28 38 / 0.08), 0 16px 36px rgb(33 28 38 / 0.14);
+
+  /* ======================================================================
+     13. MOVIMENTO — sistema tokenizado (P8)
+     Só `transform` e `opacity`. Nada acima de 300ms. Entrada em ease-out.
+     ====================================================================== */
+  --dur-rapida: 120ms; /* hover, pressed, troca de cor de chip */
+  --dur-base: 200ms; /* estado de componente, abrir/fechar de detalhe */
+  --dur-entrada: 300ms; /* teto absoluto: a queda das bolinhas do enxame */
+
+  --ease-padrao: cubic-bezier(0.2, 0, 0.2, 1); /* transição de estado */
+  --ease-saida: cubic-bezier(0.4, 0, 1, 1); /* saída: acelera e some */
+  --ease-mola: cubic-bezier(
+    0.22,
+    1.18,
+    0.36,
+    1
+  ); /* mola aproximada: assenta com
+                                                     ~4% de ultrapassagem */
+
+  --desloc-entrada: 0.75rem; /* 12 — translateY de onde a bolinha cai */
+  --stagger-passo: 18ms; /* atraso por COLUNA do enxame (nunca por bolinha) */
+  --stagger-teto: 260ms; /* atraso acumulado máximo: última coluna não fica para trás */
+
+  /* O `transition-*` do Tailwind passa a nascer no sistema. */
+  --default-transition-duration: var(--dur-base);
+  --default-transition-timing-function: var(--ease-padrao);
+}
+
+/* ===========================================================================
+   UTILITÁRIOS — o mínimo que não cabe em token
+   =========================================================================== */
+
+/**
+ * Numerais tabulares. O `tabular-nums` do Tailwind escreve só
+ * `font-variant-numeric`; aqui vai junto o `font-feature-settings` porque o
+ * fallback de sistema (Segoe UI, Roboto) responde melhor à feature literal.
+ *
+ * VERIFICAÇÃO DE ACEITAÇÃO (docs/DESIGN-V2.md §3.2 e §9.6), medida no Chromium
+ * sobre a Lexend variável servida pelo next/font, a 40px, com a classe
+ * aplicada e a fonte carregada:
+ *
+ *   0→24,28  1→20,00  2→21,92  3→21,17  4→24,81
+ *   5→22,73  6→22,28  7→21,69  8→23,17  9→22,05   (px)
+ *
+ * A LEXEND NÃO TRAZ `tnum`: as duas declarações são aceitas pelo navegador
+ * (`font-variant-numeric: tabular-nums`, `font-feature-settings: "tnum"`) e a
+ * largura dos dígitos NÃO muda. Forçar a feature no estilo inline dá o mesmo
+ * resultado — a fonte simplesmente não tem a tabela.
+ *
+ * O utilitário FICA: ele funciona no fallback de sistema (rede lenta, fonte
+ * bloqueada) e passa a valer sozinho se a Lexend publicar a feature. O que
+ * resolve o alinhamento de verdade é `.coluna-numerica` abaixo — e em nenhuma
+ * hipótese volta uma segunda família só para dígito (P7).
+ */
+@utility numeros {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings:
+    "tnum" 1,
+    "lnum" 1;
+}
+
+/**
+ * Coluna de número em tabela: alinhada à direita e com largura reservada em
+ * `ch`. É o remédio prescrito pelo §3.2 para a ausência de `tnum` — a vírgula
+ * decimal cai sempre no mesmo lugar porque a célula tem largura fixa, não
+ * porque o dígito tem.
+ */
+@utility coluna-numerica {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ===========================================================================
    REGRAS GLOBAIS MÍNIMAS
-   Só o que não cabe em token: os keyframes do cursor, o piso de foco visível
-   e a desativação global de movimento. Nada mais deve morar aqui.
    =========================================================================== */
 
-@keyframes pisca {
-  0%,
-  49% {
-    opacity: 1;
-  }
-  50%,
-  100% {
+/**
+ * Queda das bolinhas do enxame (elemento-assinatura).
+ * `--desloc-entrada` é lido do token: em prefers-reduced-motion ele vira 0 e o
+ * keyframe deixa de deslocar qualquer coisa mesmo se a animação escapar.
+ */
+@keyframes assenta {
+  from {
     opacity: 0;
+    transform: translateY(calc(var(--desloc-entrada) * -1));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Foco sempre visível (o :focus-visible do navegador some sobre papel bege). */
+/* Foco sempre visível e sempre o mesmo anel (ameixa) nas superfícies claras. */
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
   outline: 2px solid var(--color-foco);
   outline-offset: 2px;
 }
 
-/* Dentro da tela da urna o anel escuro desaparece: usa fósforo. */
-:where(.tela-urna) :where(a, button, [tabindex]):focus-visible {
-  outline-color: var(--color-foco-tela);
+/* Sobre campo ameixa/tinta o anel escuro sumiria: inverte. */
+:where(.campo-escuro) :where(a, button, input, select, summary, [tabindex]):focus-visible {
+  outline-color: var(--color-foco-inverso);
 }
 
-/* Respeita quem pediu menos movimento: o cursor para de piscar. */
+/**
+ * prefers-reduced-motion: o DECORATIVO vai a zero.
+ *  1. os tokens de movimento zeram — quem anima por token para de animar;
+ *  2. `[data-motion="decorativo"]` (o enxame, e só ele) perde a animação por
+ *     inteiro: as 100 bolinhas nascem assentadas;
+ *  3. rede de segurança global para qualquer transição não tokenizada.
+ * `transform` NÃO é resetado: ele também posiciona (centralização por
+ * translate), e zerá-lo quebraria layout em vez de acalmar movimento.
+ */
 @media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-rapida: 0ms;
+    --dur-base: 0ms;
+    --dur-entrada: 0ms;
+    --desloc-entrada: 0rem;
+    --stagger-passo: 0ms;
+    --stagger-teto: 0ms;
+    --default-transition-duration: 0ms;
+  }
+
+  [data-motion="decorativo"],
+  [data-motion="decorativo"] * {
+    animation: none !important;
+  }
+
   *,
   *::before,
   *::after {

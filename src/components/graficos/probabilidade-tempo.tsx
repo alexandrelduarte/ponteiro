@@ -1,9 +1,15 @@
 "use client";
 
 /**
- * Probabilidade de eleição ao longo do tempo (/historico) — um ponto por
- * snapshot gravado em `model_runs`. Sem banco, a página mostra o estado vazio
- * e este gráfico nem é montado.
+ * Chance de ser eleito ao longo do tempo (/historico) — um ponto por retrato
+ * gravado em `model_runs`. Sem banco, a página mostra o estado vazio e este
+ * gráfico nem é montado.
+ *
+ * NOTA DE HONESTIDADE: não há faixa de dúvida aqui porque o retrato exposto ao
+ * leitor público (`getSerieRuns`) guarda só as duas chances do dia, sem a
+ * dúvida daquele dia. Desenhar uma faixa a partir de um número que o modelo não
+ * publicou seria fabricar precisão (H11/H14) — então a referência que fica é a
+ * régua de "metade a metade", em tinta, como no resto do produto.
  */
 import {
   CartesianGrid,
@@ -18,11 +24,11 @@ import {
 import { COR, MolduraDica, TICK, ddmmDeMs, type PropsDica } from "./comum";
 
 export interface PontoProbabilidade {
-  /** instante do snapshot (ms) */
+  /** instante do retrato (ms) */
   x: number;
-  /** chance de Lula em % */
+  /** chance de Lula, em cada 100 */
   l: number | null;
-  /** chance de Flávio em % */
+  /** chance de Flávio, em cada 100 */
   f: number | null;
 }
 
@@ -36,8 +42,11 @@ function Dica({ active, payload }: PropsDica) {
   return (
     <MolduraDica>
       <div>{x === null ? "–" : ddmmDeMs(x)}</div>
-      <div className="text-lula-claro">Lula: {l === null ? "–" : `${Math.round(l)}%`}</div>
-      <div className="text-flavio-claro">Flávio: {f === null ? "–" : `${Math.round(f)}%`}</div>
+      <div className="mt-1 numeros">
+        <span className="text-lula">Lula: {l === null ? "–" : `${Math.round(l)} em 100`}</span>
+        {" · "}
+        <span className="text-flavio">Flávio: {f === null ? "–" : `${Math.round(f)} em 100`}</span>
+      </div>
     </MolduraDica>
   );
 }
@@ -45,29 +54,38 @@ function Dica({ active, payload }: PropsDica) {
 export default function GraficoProbabilidadeTempo({ dados }: { dados: PontoProbabilidade[] }) {
   return (
     <ResponsiveContainer width="100%" height="100%">
-      {/* `right: 26` pela mesma razão da evolução: o rótulo `dd/mm` do último
-          tick é centrado no limite do domínio e vazava do `<svg>`. */}
-      <LineChart data={dados} margin={{ top: 10, right: 26, bottom: 0, left: -18 }}>
-        <CartesianGrid stroke={COR.linha} strokeDasharray="2 4" />
+      <LineChart data={dados} margin={{ top: 10, right: 26, bottom: 0, left: -6 }}>
+        <CartesianGrid stroke={COR.grade} strokeDasharray="2 4" />
         <XAxis
           dataKey="x"
           type="number"
           domain={["dataMin", "dataMax"]}
           tickFormatter={(t: number) => ddmmDeMs(t)}
           tick={TICK}
-          stroke={COR.linha}
+          stroke={COR.contorno}
           interval="preserveStartEnd"
-          minTickGap={48}
+          minTickGap={52}
         />
         <YAxis
           domain={[0, 100]}
           ticks={[0, 25, 50, 75, 100]}
-          tickFormatter={(v: number) => `${v}%`}
           tick={TICK}
-          stroke={COR.linha}
+          stroke={COR.contorno}
+          width={44}
         />
         <Tooltip trigger="click" content={<Dica />} />
-        <ReferenceLine y={50} stroke={COR.cinza} strokeDasharray="4 3" />
+        <ReferenceLine
+          y={50}
+          stroke={COR.tinta}
+          strokeWidth={2}
+          label={{
+            value: "metade a metade",
+            position: "insideBottomLeft",
+            fontSize: 13,
+            fill: COR.tinta,
+            className: "rotulo-grafico",
+          }}
+        />
         <Line
           dataKey="l"
           stroke={COR.lula}

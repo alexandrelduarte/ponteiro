@@ -1,21 +1,36 @@
 "use client";
 
 /**
- * Cenário-base — o caminho MODAL da árvore de probabilidades do modelo, nos
- * parâmetros atuais do painel.
+ * "O que é mais provável acontecer em outubro?" — o cenário-base
+ * (COPY-DECK §M, INVENTÁRIO 3.9).
  *
- * A frase de frequência natural ("1 vez a cada N eleições parecidas") fica no
- * topo do bloco, nunca dentro de `<details>`: é ela que resolve a confusão
- * clássica do "75% de chance" lido como certeza (docs/DESIGN.md P3).
+ * É o caminho MODAL da árvore de probabilidades do próprio modelo, nos números
+ * que o leitor deixou nas réguas. "Mais provável" não é "certo", e o texto diz
+ * isso antes de qualquer número.
+ *
+ * A barra de bandas é monocromática no lilás da dúvida, com a banda modal em
+ * ameixa (ameixa é o produto falando, não um lado) e a régua do empate exatamente
+ * na fronteira entre "Flávio na frente" e "Lula por até 5": é a mesma gramática
+ * do enxame, deitada. Cada pedaço carrega o rótulo e o número ao lado — a cor
+ * nunca informa sozinha.
+ *
+ * Condição do despacho (AUDITORIA §9.3): o título "do jeito que as pesquisas
+ * medem" fica na MESMA dobra dos chips, nunca colapsado.
  */
 import { useMemo } from "react";
-import { Cartao } from "@/components/ui/cartao";
-import { pctComPiso } from "@/components/ui/textos";
-import { calcCenarioBase, fmt, fmtSinal, pct } from "@/lib/modelo";
+import { Bloco, Nicho, Pergunta, Resposta, Subtitulo, Traduzindo } from "@/components/ui/blocos";
+import { Termo } from "@/components/ui/glossario";
+import { emCem, inteiroEmCem } from "@/components/ui/textos";
+import { calcCenarioBase, fmt, fmtSinal } from "@/lib/modelo";
 import { usePainel } from "./estado";
 
-/** Bandas 0 e 1 são escuras (rótulo claro); 2 e 3 são claras (rótulo escuro) — §5.5. */
-const ROTULO_BANDA = ["text-papel", "text-papel", "text-tinta", "text-tinta"] as const;
+/** Rótulos das quatro bandas, na ordem em que o modelo as devolve. */
+const ROTULO_BANDA = [
+  "Flávio na frente",
+  "Lula por até 5 pontos",
+  "Lula por 5 a 10",
+  "Lula por mais de 10",
+];
 
 export function CenarioBase() {
   const { M, params } = usePainel();
@@ -23,140 +38,160 @@ export function CenarioBase() {
 
   if (!cen) return null;
 
-  const contra = 1 - cen.pElei;
-  const umaEmN = Math.max(2, Math.round(1 / Math.max(0.01, contra)));
+  const lider = cen.liderLula ? "Lula" : "Flávio";
+  const lider1T = cen.pLulaEm1 >= 0.5 ? "Lula" : "Flávio";
+  const apertada = Math.abs(M.margemAj) < 5 ? "apertada" : "média";
+  const pElei = emCem(cen.pElei);
+  const pContra = emCem(1 - cen.pElei);
+  const umaEm = Math.max(2, Math.round(1 / Math.max(0.01, 1 - cen.pElei)));
+  const p2t = emCem(M.p2Tacontece);
+  const pV2 = emCem(cen.pV2);
+  const pV2Abs = inteiroEmCem(M.p2Tacontece * cen.pV2);
+  const p1Direto = inteiroEmCem(cen.pDireto);
+  const larguraModal = cen.bandas.indexOf(cen.modal);
 
   return (
-    <Cartao
-      titulo="Cenário-base"
-      descricao="O desfecho mais provável segundo o modelo — recalcula com seus parâmetros."
-      destaque="tinta"
-    >
-      {/* §4.1: o «83%» do título e o «17%» da nota são a MESMA probabilidade,
-          vista dos dois lados, a 40px de distância — precisam sair na mesma
-          família. Os dois recalculam com os parâmetros do leitor, logo mono. */}
-      <h2 className="text-secao uppercase" data-testid="cenario-base-titulo">
-        {cen.liderLula ? "Reeleição de Lula" : "Vitória de Flávio Bolsonaro"} decidida no 2º turno,
-        por margem {Math.abs(M.margemAj) < 5 ? "apertada" : "moderada"} — probabilidade combinada:{" "}
-        <span
-          className={`font-mono ${cen.liderLula ? "text-lula-escuro" : "text-flavio-escuro"}`}
-          data-testid="cenario-base-probabilidade"
-        >
-          {pct(cen.pElei)}
+    <Bloco rotuladoPor="titulo-cenario-base">
+      <Pergunta id="titulo-cenario-base">O que é mais provável acontecer em outubro?</Pergunta>
+      <Resposta>
+        <span data-testid="cenario-base-titulo">
+          {lider} eleito, com a definição saindo em 25 de outubro e por diferença {apertada}: é o
+          caminho que aparece em <span className="numeros">{pV2Abs}</span> de cada 100 cenários.
+          Somando com o caminho de vitória já em 4 de outubro, {lider} termina eleito em{" "}
+          <span data-testid="cenario-base-probabilidade" className="numeros">
+            {pElei}
+          </span>{" "}
+          de cada 100.
         </span>
-      </h2>
+      </Resposta>
+      <Traduzindo>
+        De todos os caminhos que o painel calcula, este é o que aparece em mais cenários. “Mais
+        provável” não é “certo”: os outros caminhos continuam existindo, com as chances mostradas ao
+        lado.
+      </Traduzindo>
 
-      <p className="mt-2 rounded-controle bg-mini p-2 text-xs text-cinza">
-        Leitura estatística do agregado — não é previsão determinística nem endosso. Um cenário com{" "}
-        <span className="font-mono">{pctComPiso(contra)}</span> de probabilidade contrária acontece,
-        no longo prazo,{" "}
-        <b className="text-tinta">
-          <span className="font-mono">1</span> vez a cada{" "}
-          <span className="font-mono">{umaEmN}</span> eleições parecidas
-        </b>
-        .
-      </p>
-
-      <div className="mt-4 grid gap-2 font-mono text-sm md:grid-cols-3">
-        <div className="rounded-controle border border-linha bg-mini p-3">
-          <p className="text-xs text-cinza uppercase">04/10 · 1º turno</p>
-          <p className="mt-1 font-semibold">Sem definição → 2º turno</p>
-          <p className="mt-1 text-xs text-cinza">
-            P(ir a 2ºT): <b className="text-tinta">{pct(M.p2Tacontece)}</b> · Lula em 1º:{" "}
-            <b className="text-tinta">{pct(cen.pLulaEm1)}</b>
+      <div className="mt-5 grid gap-3 md:grid-cols-3 md:items-start">
+        <Nicho>
+          <Subtitulo>4 de outubro · 1º turno</Subtitulo>
+          <p className="mt-1 text-corpo text-tinta-media numeros">
+            Na maioria dos cenários ninguém passa da metade: vai para o 2º turno em {p2t} de cada
+            100. Lula chega em 1º lugar em {emCem(cen.pLulaEm1)} de cada 100.
           </p>
-        </div>
-        <div className="rounded-controle border border-linha bg-mini p-3">
-          <p className="text-xs text-cinza uppercase">25/10 · 2º turno</p>
-          <p className="mt-1 font-semibold">{cen.liderLula ? "Lula" : "Flávio"} vence a decisão</p>
-          <p className="mt-1 text-xs text-cinza">
-            P(vitória na decisão): <b className="text-tinta">{pct(cen.pV2)}</b> · combinada ={" "}
-            {fmt(cen.pDireto * 100, 0)}% + {pct(M.p2Tacontece)}×{pct(cen.pV2)}
+        </Nicho>
+        <Nicho>
+          <Subtitulo>25 de outubro · 2º turno</Subtitulo>
+          <p className="mt-1 text-corpo text-tinta-media numeros">
+            Havendo 2º turno, {lider} ganha a decisão em {pV2} de cada 100 desses cenários — como o
+            2º turno acontece em {p2t} de cada 100, esse caminho vale {pV2Abs} em 100. Some os{" "}
+            {p1Direto} em 100 em que {lider} já ganha em 4 de outubro: {pElei} em 100.
           </p>
-        </div>
-        <div className="rounded-controle border border-linha bg-mini p-3">
-          <p className="text-xs text-cinza uppercase">Placar central projetado</p>
-          <p className="mt-1 font-semibold">
-            <span className="text-lula-escuro">{fmt(cen.placarL)}%</span> ×{" "}
-            <span className="text-flavio-escuro">{fmt(100 - cen.placarL)}%</span>
+        </Nicho>
+        <Nicho>
+          <Subtitulo>Divisão de votos mais provável</Subtitulo>
+          <p className="mt-1 text-corpo text-tinta numeros">
+            <span className="text-lula">Lula {fmt(cen.placarL)}%</span>
+            <span className="text-tinta-media"> × </span>
+            <span className="text-flavio">Flávio {fmt(100 - cen.placarL)}%</span> dos{" "}
+            <Termo chave="votosValidos">votos válidos</Termo>.
           </p>
-          <p className="mt-1 text-xs text-cinza">
-            dos válidos · faixa 80% da margem: {fmt(M.int80[0])} a {fmtSinal(M.int80[1])} p.p.
+          <p className="mt-1 text-micro text-tinta-media numeros">
+            Em 8 de cada 10 cenários, a diferença{" "}
+            <b className="font-semibold text-tinta">medida nas pesquisas</b> fica entre{" "}
+            {fmtSinal(M.int80[0])} e {fmtSinal(M.int80[1])} pontos.
           </p>
-        </div>
+        </Nicho>
       </div>
 
-      <div className="mt-4">
-        <p className="mb-1 font-mono text-xs tracking-dado text-cinza uppercase">
-          Como a distribuição do 2º turno se reparte (banda modal em destaque):
-        </p>
+      {/* ---------- bandas: título e chips na MESMA dobra ---------- */}
+      <div className="mt-6">
+        <Subtitulo>
+          De quanto pode ser a diferença no fim, do jeito que as pesquisas medem
+        </Subtitulo>
+
         <div
-          className="flex h-6 overflow-hidden rounded-controle border border-linha"
+          className="relative mt-2 flex h-7 w-full gap-[3px]"
           role="img"
-          aria-label={cen.bandas.map((b) => `${b.rot}: ${Math.round(b.p * 100)}%`).join("; ")}
+          aria-label={cen.bandas
+            .map((b, i) => `${ROTULO_BANDA[i]}: ${emCem(b.p)} em 100`)
+            .join("; ")}
         >
           {cen.bandas.map((b, i) => (
             <div
-              key={b.rot}
-              className={`flex items-center justify-center font-mono text-xs font-bold ${ROTULO_BANDA[i]}`}
-              style={{ width: `${Math.max(b.p * 100, 0)}%`, background: b.cor }}
-            >
-              {b.p >= 0.12 ? `${Math.round(b.p * 100)}%` : ""}
-            </div>
+              key={ROTULO_BANDA[i]}
+              className={[
+                "h-full rounded-plena",
+                i === larguraModal ? "bg-ameixa-clara" : "bg-faixa",
+              ].join(" ")}
+              style={{ width: `${Math.max(b.p * 100, 0)}%` }}
+            />
           ))}
+          {/* A régua do empate mora na fronteira entre a primeira banda
+              (Flávio na frente) e a segunda: é o mesmo zero do enxame, e por
+              isso é desenhada POR CIMA, em tinta, e não como borda de um
+              pedaço (borda em raio pleno some). */}
+          <span
+            aria-hidden="true"
+            className="absolute inset-y-[-4px] w-[3px] -translate-x-1/2 rounded-plena bg-tinta"
+            style={{ left: `${Math.max(cen.bandas[0].p * 100, 0)}%` }}
+          />
         </div>
-        <ul className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-cinza">
-          {cen.bandas.map((b) => (
-            <li key={b.rot} className="inline-flex items-center gap-1">
-              <span
-                aria-hidden="true"
-                className="inline-block h-3 w-3 rounded-[2px] border border-linha-forte"
-                style={{ background: b.cor }}
-              />
-              {b.rot}: <span className="font-mono">{Math.round(b.p * 100)}%</span>
-              {b === cen.modal ? <b className="text-tinta"> ● mais provável</b> : null}
+
+        <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-micro text-tinta-media">
+          {cen.bandas.map((b, i) => (
+            <li key={ROTULO_BANDA[i]} className="numeros">
+              {ROTULO_BANDA[i]}: <b className="font-semibold text-tinta">{emCem(b.p)} em 100</b>
+              {i === larguraModal ? (
+                <span className="font-semibold text-ameixa"> ● o mais provável</span>
+              ) : null}
             </li>
           ))}
         </ul>
+
+        <p className="mt-2 max-w-texto text-micro text-tinta-media">
+          Cada pedaço é uma faixa de diferença, e o tamanho dele é a chance daquela faixa acontecer.
+        </p>
       </div>
 
-      <div className="mt-4 text-sm leading-leitura">
-        <b>Por que este é o cenário-base:</b>{" "}
-        <span className="text-cinza">
-          (1) a vantagem é consistente — <span className="font-mono">6</span> dos{" "}
-          <span className="font-mono">7</span> institutos de julho mostram Lula à frente ou
-          empatado, margem agregada de <span className="font-mono">{fmtSinal(M.margem)} p.p.</span>,
-          tendência pareada estável com leve inclinação pró-Lula; (2) o contexto medido favorece o
-          incumbente competitivo — aprovação ~empatada (1º saldo positivo na Quaest desde dez/24),
-          rejeição de Flávio igual ou maior que a de Lula em todos os institutos, potencial de voto
-          47%×38%; (3) a estrutura polarizada, com ~2/3 de voto fechado de cada lado, faz a série
-          andar em décimos — virar exige movimento fora do padrão de 2026; (4) mas a margem fica
-          «apertada» no placar central porque a direção histórica do erro (2018, 2022 e
-          Datafolha/Quaest em SP-2024) é subestimar a direita, e a réplica fiel de 2022 entrega
-          exatamente ~51×49. O que derrubaria o cenário: novas rodadas levando a margem bruta para
-          baixo de ~+2 (viraria «leve favoritismo»), três institutos seguidos com Flávio à frente
-          fora da margem, ou um erro de pesquisa acima do já observado no estado calibrado.
-        </span>
+      <div className="mt-6 max-w-texto">
+        <Subtitulo>Por que este é o caminho mais provável</Subtitulo>
+        <p className="mt-1 text-corpo text-tinta-media numeros">
+          Quatro motivos. <b className="font-semibold text-tinta">Um:</b> a vantagem é constante — 6
+          dos 7 institutos de julho mostram Lula à frente, e no sétimo os dois estão em empate
+          técnico; a comparação de cada instituto com ele mesmo está estável.{" "}
+          <b className="font-semibold text-tinta">Dois:</b> o contexto medido não desfavorece quem
+          está no governo: aprovação e desaprovação próximas, rejeição alta dos dois lados e mais
+          gente aberta a votar em Lula (47% contra 38%).{" "}
+          <b className="font-semibold text-tinta">Três:</b> com dois terços de cada lado já
+          decididos, a diferença anda devagar. Virar exige movimento fora do padrão de 2026.{" "}
+          <b className="font-semibold text-tinta">Quatro:</b> mesmo assim a diferença fica apertada.
+          Quando as pesquisas erraram em 2018 e em 2022, o erro foi na mesma direção — subestimando
+          a direita — e a repetição fiel de 2022 dá algo perto de 51 × 49.
+        </p>
+        <p className="mt-3 text-corpo text-tinta-media">
+          Três coisas derrubariam este caminho. Pesquisas novas levando a diferença para baixo de 2
+          pontos. Três institutos seguidos com Flávio na frente, fora da folga. Ou um erro de
+          pesquisa maior que o já visto quando os institutos tinham o gabarito na mão.
+        </p>
       </div>
 
-      <details className="mt-3 text-sm">
-        <summary className="font-semibold">Metodologia desta seção</summary>
-        <p className="mt-1 text-sm leading-compacto text-cinza">
-          O cenário-base é o <b>caminho modal</b> da árvore de probabilidades do próprio modelo, nos
-          parâmetros atuais do painel: em cada bifurcação, o ramo mais provável — definição no 1º
-          turno? (não, <span className="font-mono">{pct(M.p2Tacontece)}</span>); quem lidera a
-          largada? ({cen.pLulaEm1 >= 0.5 ? "Lula" : "Flávio"},{" "}
-          <span className="font-mono">{pct(Math.max(cen.pLulaEm1, 1 - cen.pLulaEm1))}</span>); quem
-          vence a decisão? ({cen.liderLula ? "Lula" : "Flávio"},{" "}
-          <span className="font-mono">{pct(cen.pV2)}</span>); em qual faixa de margem? (banda modal
-          acima). As bandas vêm da distribuição normal projetada N(margem ajustada;{" "}
-          <span className="font-mono">±{fmt(M.sigmaDia2)}</span>), a mesma do gráfico de
-          distribuição; a probabilidade combinada soma o caminho direto no 1º turno com o caminho
-          via 2º turno. Nada aqui é opinião fixa: mude o viés para +6,3 no painel de parâmetros e
-          esta seção passará, sozinha, a descrever a vitória de Flávio — o «cenário mais provável» é
-          uma função dos dados e das premissas, não um palpite.
+      <details className="mt-4 max-w-texto">
+        <summary className="inline-flex min-h-toque items-center text-corpo font-semibold text-ameixa">
+          Como este caminho foi escolhido
+        </summary>
+        <p className="mt-1 text-corpo text-tinta-media numeros">
+          O painel vai perguntando, uma coisa de cada vez, e fica sempre com a resposta mais
+          provável. Cada resposta é a mais provável da sua pergunta — juntas elas descrevem o
+          caminho mais comum, não o único. Acaba no 1º turno? Não, em {p2t} de cada 100 cenários vai
+          para o 2º. Quem chega na frente? {lider1T}. Quem ganha a decisão? {lider}. Por quanto? A
+          faixa em destaque acima. Nada disso é opinião fixa: mude a régua da puxada para 6,3 e esta
+          seção passa a descrever, sozinha, a vitória de Flávio.
         </p>
       </details>
-    </Cartao>
+
+      <p className="mt-4 max-w-texto text-micro text-tinta-media numeros">
+        Leitura das pesquisas, não previsão nem torcida. Um resultado que aparece em {pContra} de
+        cada 100 cenários acontece, no longo prazo, 1 vez a cada {umaEm} eleições parecidas.
+      </p>
+    </Bloco>
   );
 }

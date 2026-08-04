@@ -231,3 +231,109 @@ var(--color-linha-forte) 55%, transparent)` → mantém "zero hex em componente"
   perder um pixel (identidade dos dados crus conferida).
 - PNG bruto de procedência (1,1 MB) movido pelo orquestrador de public/ para
   docs/marca-origem/ → não é referenciado por nenhuma superfície; em public/ iria ao CDN.
+
+## Fase 6 — reescrita da camada de apresentação (frontend-dev)
+
+### Fundação
+
+- `tokens-v2.css` virou `tokens.css` e o arquivo v1 foi APAGADO (não adaptado); `globals.css`
+  reescrito: body = bruma-ameixa + Lexend, grão de papel e CSS da tela da urna removidos,
+  `public/grao-papel.svg` deletado. Deslizador e rolagem-x foram RETOKENIZADOS (ameixa/grade/
+  placa/contorno), não reaproveitados.
+- Fontes: `Instrument_Serif` (400) + `Lexend` (variável, sem `weight`: um arquivo cobre
+  400/500/600/700). Archivo e IBM Plex Mono saíram do layout; os `.ttf` do OG foram trocados
+  por InstrumentSerif-400/Lexend-400/Lexend-600.
+- Token NOVO `--text-wordmark` (30→36px, MARCA §8.2): é o único corpo display abaixo de 32px
+  que o sistema autoriza, porque é a marca, não texto.
+- `pctComPiso` virou `emCem`/`parEmCem` em `ui/textos.ts`: a v2 publica FREQUÊNCIA ("83"),
+  não percentual ("83%"), e o par sempre fecha 100 por complemento (COPY-DECK §A.3).
+
+### Verificações de aceitação da Fase 6 (DESIGN-V2 §9.6)
+
+- **`tnum` da Lexend: REPROVOU.** Medido no Chromium a 40px, com `.numeros` aplicada e a fonte
+  carregada, os dez dígitos têm larguras diferentes (20,00 a 24,81px); forçar
+  `font-feature-settings:"tnum"` inline dá o mesmo resultado — a Lexend não tem a tabela.
+  Remédio prescrito pelo §3.2 aplicado: utilitário `coluna-numerica` (alinhamento à direita +
+  largura reservada em `ch`) nas colunas numéricas das duas tabelas. `numeros` FICA (funciona no
+  fallback de sistema e passa a valer sozinha se a Lexend publicar a feature); mono NÃO volta.
+- **Bolinha a 390: APROVOU.** Medido no artefato de produção: 28 colunas de 1 ponto, 100
+  bolinhas, diâmetro 9,36px, folga 2,0px (horizontal e vertical), pilha de 96,8px.
+- **Teto de colunas é 31, não 33.** Com bolinha = `min(0,84 × passo, passo − 2)`, 33 colunas em
+  318px dão 7,9px — abaixo do piso duro. 31 é o maior número que satisfaz os DOIS pisos
+  (≥8px de bolinha E ≥2px de folga) ao mesmo tempo; acima disso a coluna dobra para 2 pontos.
+- `probit` (inversa da normal, algoritmo de Acklam) vive na APRESENTAÇÃO
+  (`enxame-nucleo.ts`), não no modelo: ela não altera número publicado nenhum, só decide onde
+  cada bolinha cai. `src/lib/modelo/**` continua intocado.
+- O enxame CONTA as próprias bolinhas e publica essa contagem; o escrito e o desenhado são o
+  mesmo inteiro por construção (H3), em vez de dois arredondamentos independentes.
+
+### Movimento — onde o despacho e o DESIGN-V2 §7.2 se cruzam
+
+- **Count-up:** §7.2 proíbe ("número que sobe sugere tendência que o modelo não afirmou"), o
+  despacho pede. Meio-termo implementado: `Contagem` NUNCA anima na primeira pintura — o número
+  que aparece é o do servidor — e só conta quando MUDA por ação do leitor (régua, cenário).
+  É feedback de interação, não espetáculo de carregamento, e some em reduced-motion (a duração
+  vem do token, que zera).
+- **Entrada orquestrada:** §7.2 proíbe reveal-on-scroll e a manchete é o LCP. Então a entrada é
+  (1) a queda do enxame, por COLUNA, uma vez por visita à seção, e (2) `.entra` em CSS puro nos
+  elementos de apoio do hero. A manchete e as bolinhas nascem visíveis: com JavaScript desligado
+  nada fica escondido.
+- **Micro-celebração:** classe `celebra` (só `scale`, 200ms) aplicada por estado DEPOIS do toque;
+  nunca existe no HTML do servidor.
+- Motion (12.43) é usado onde o gesto é do leitor: folha do glossário/registro (AnimatePresence),
+  faixa de simulação, troca 1º⇄2º turno (`initial={false}`) e a contagem.
+
+### Forma dos gráficos
+
+- **Distribuição (AreaChart da v1) → ENXAME.** A seção "Isso ainda pode virar?" passa a mostrar
+  a MESMA distribuição contada em 100 bolinhas (DESIGN-V2 §4, segunda escala). Mesma informação
+  (forma da incerteza, onde está o zero, o espaço de virada), zero Recharts, e o deck já
+  descrevia a seção com "cada bolinha". `calcDadosDist` continua no modelo (golden tests).
+- **Evolução passa a plotar a DIFERENÇA**, não os dois níveis: só assim "empate" é uma ALTURA
+  ("nesta altura os dois teriam o mesmo tanto de voto", COPY-DECK §G) e "Lula na frente ↑" é
+  verdade geométrica. Os dados são os mesmos do inventário (média ponderada ponto a ponto,
+  scatter por pesquisa, toggle 1º/2º, tooltip com instituto/campo/valores, nota da série curta).
+  A faixa da dúvida é ±`sigmaHoje` no observado e cresce até o dia da votação pela MESMA fórmula
+  do modelo (`hypot(sigmaHoje, coefDeriva·√dias)`), com borda tracejada depois de hoje — nenhum
+  número novo é inventado.
+- **/historico continua sem faixa lilás.** `getSerieRuns` (em `src/lib/dados.ts`, arquivo
+  congelado nesta fase) expõe só as duas chances do dia, sem a dúvida daquele dia; desenhar uma
+  faixa a partir de um número que o modelo não publicou seria fabricar precisão (H11/H14). A
+  frase do deck que promete a faixa fica pendente para quem puder mexer na camada de dados.
+- **Bandas do cenário-base monocromáticas**: lilás da dúvida + banda modal em ameixa + régua de
+  tinta na fronteira "Flávio na frente"/"Lula por até 5". As quatro cores do protótipo
+  (`CORES.lula`, `#D96A7A`…) não entram na superfície; cada pedaço leva rótulo e número ao lado.
+- **Ranking de candidatos**: Lula e Flávio nos tokens v2 (é a cor própria deles no sistema); os
+  demais mantêm a cor de `src/data/constantes.ts`, que é dado do protótipo. A "cor própria por
+  candidato" do INVENTÁRIO 3.3 sobrevive sem reintroduzir a paleta v1 nos dois protagonistas.
+
+### Interface
+
+- Chip de glossário SEM margem negativa: a margem negativa devolve o alvo de toque sem gastar
+  altura de linha, e um `inline-flex` só empurra a linha pela caixa de margem — o chip passava a
+  ser pintado por cima das linhas vizinhas. Sem ela, a linha cresce e nada é coberto.
+- Cabeçalho da marca e rodapé subiram para o layout raiz (uma instância, todas as páginas);
+  as páginas deixaram de renderizar o rodapé por conta própria.
+- A navegação vive SÓ no rodapé; o cabeçalho é a marca e leva ao painel. Dois conjuntos de links
+  com o mesmo rótulo seriam ambiguidade para leitor de tela e para o teste.
+- Ilustrações de `public/ilustracoes/` aplicadas onde ELAS ensinam (MARCA §6.8 define o "para
+  quê" de cada uma): `explicando-incerteza` em "Como ler esta página", `explicando-empate` na
+  série, `vazio-sem-dados` nos estados vazios, `vazio-sem-conexao` no /historico. O bloco de
+  contexto social ficou sem ilustração — nenhuma das quatro fala de contexto social, e ornamento
+  ali seria enfeite.
+- `/admin`: sem verde de sucesso e sem vermelho de perigo. Ação primária ameixa, ação destrutiva
+  em botão-fantasma âmbar, chips "pendente" (âmbar) e "publicada" (ameixa).
+
+### Renomeação (MARCA §5)
+
+- Executados: `_lib/site.ts` (NOME_SITE, TITULO_PADRAO, DESCRICAO_PADRAO, NOME_DESCRITIVO,
+  TAGLINE), metadata e JSON-LD do layout (`alternateName` = "Agregador de pesquisas
+  presidenciais 2026"), JSON-LD da home, `keywords`, OG (arte e `alt`), cabeçalho/`<h1>`,
+  compartilhamento, `package.json` → `ponteiro`, README, CLAUDE.md, `.env.example`, e o teste
+  e2e do `<h1>`.
+- **NÃO executados, por decisão explícita**: os headers `x-application-name` de
+  `src/lib/supabase/{publico,admin}.ts` (itens 14–15) — os arquivos estão na lista de "não
+  tocar" do despacho desta fase, e a string não aparece para o usuário. Ficam como pendência.
+- `docs/DESIGN.md` e `RELATORIO.md` preservados com o título antigo: são registro histórico da
+  v1 (o primeiro é o contraexemplo citado pelo próprio DESIGN-V2); renomeá-los seria churn sem
+  efeito perceptível (R7).

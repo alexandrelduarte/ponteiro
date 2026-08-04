@@ -1,4 +1,6 @@
-# Agregador Presidencial 2026
+# PONTEIRO
+
+> Para onde apontam as pesquisas.
 
 Agregador de pesquisas eleitorais para a disputa presidencial brasileira de 2026
 (Lula × Flávio Bolsonaro). Não é um blog de pesquisas: é um **modelo estatístico**

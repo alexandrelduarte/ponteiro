@@ -25,14 +25,16 @@ const PAGINAS = [
   { nome: "metodologia", caminho: "/metodologia" },
 ];
 
-/** Âncoras da home: rola até o texto e captura a janela (o que o usuário vê). */
+/** Âncoras da home (títulos-pergunta da v2): rola até o texto e captura a janela. */
 const ANCORAS = [
-  { nome: "urna", texto: "CHANCE DE SER ELEITO" },
-  { nome: "graficos", texto: "Evolução" },
-  { nome: "sensibilidade", texto: "sensibilidade" },
-  { nome: "replay", texto: "Replay 2022" },
-  { nome: "tabela", texto: "Série de pesquisas" },
-  { nome: "parametros", texto: "Parâmetros do modelo" },
+  { nome: "hero", texto: "Em 100 eleições parecidas" },
+  { nome: "frente", texto: "Quem está na frente?" },
+  { nome: "virar", texto: "Isso ainda pode virar?" },
+  { nome: "evolucao", texto: "Como a diferença mudou com o tempo?" },
+  { nome: "pesquisas", texto: "pesquisas?" },
+  { nome: "erro2022", texto: "errarem como em 2022?" },
+  { nome: "simulacao", texto: "Quer mexer nos números você mesmo?" },
+  { nome: "cenario-base", texto: "mais provável acontecer em outubro?" },
 ];
 
 // sobe o servidor de produção
@@ -103,7 +105,7 @@ try {
         // aba "Todos os candidatos" (contrastes das 9 cores; §5.5 do DESIGN)
         try {
           await page.evaluate(() => window.scrollTo(0, 0));
-          await page.getByRole("tab", { name: /Todos os candidatos/ }).click();
+          await page.getByRole("tab", { name: /Candidatos testados/ }).click();
           await page.waitForTimeout(600);
           await page.screenshot({
             path: join(DIR, `home-${vp.nome}-candidatos.png`),

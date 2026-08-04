@@ -1,21 +1,37 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, IBM_Plex_Mono } from "next/font/google";
+import { Instrument_Serif, Lexend } from "next/font/google";
 import "./globals.css";
 import { JsonLd } from "@/components/site/json-ld";
-import { DESCRICAO_PADRAO, NOME_SITE, TITULO_PADRAO, URL_SITE } from "./_lib/site";
+import { CabecalhoSite } from "@/components/site/marca";
+import { Rodape } from "@/components/site/rodape";
+import {
+  DESCRICAO_PADRAO,
+  NOME_DESCRITIVO,
+  NOME_SITE,
+  TAGLINE,
+  TITULO_PADRAO,
+  URL_SITE,
+} from "./_lib/site";
 
-/* Self-host automático: nenhum request a terceiros em runtime (docs/DESIGN.md §4.1). */
-const archivo = Archivo({
+/**
+ * Self-host automático: nenhum request a terceiros em runtime.
+ *
+ * `Instrument_Serif` é estática (só 400) e exige `weight`; a Lexend é variável,
+ * então entra SEM `weight` — um único arquivo cobre 400/500/600/700, que é
+ * exatamente o intervalo que o sistema usa (docs/DESIGN-V2.md §3.2).
+ * Archivo e IBM Plex Mono saíram: mono não volta como identidade (P7).
+ */
+const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
+  weight: "400",
   display: "swap",
-  variable: "--font-archivo",
+  variable: "--font-instrument-serif",
 });
 
-const plexMono = IBM_Plex_Mono({
+const lexend = Lexend({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
   display: "swap",
-  variable: "--font-plex-mono",
+  variable: "--font-lexend",
 });
 
 export const metadata: Metadata = {
@@ -25,6 +41,7 @@ export const metadata: Metadata = {
   applicationName: NOME_SITE,
   generator: "Next.js",
   keywords: [
+    "PONTEIRO",
     "pesquisas eleitorais",
     "eleições 2026",
     "presidente 2026",
@@ -54,7 +71,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // Não existe dark mode: a página tem um modo só (docs/DESIGN.md §3.2).
+  // Não existe dark mode: a página tem um modo só (docs/DESIGN-V2.md §3.1).
   colorScheme: "light",
   width: "device-width",
   initialScale: 1,
@@ -62,15 +79,21 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR" className={`${archivo.variable} ${plexMono.variable} h-full antialiased`}>
+    <html
+      lang="pt-BR"
+      className={`${instrumentSerif.variable} ${lexend.variable} h-full antialiased`}
+    >
       <body className="flex min-h-full flex-col">
+        <CabecalhoSite />
         {children}
+        <Rodape />
         <JsonLd
           dados={{
             "@context": "https://schema.org",
             "@type": "WebSite",
             name: NOME_SITE,
-            alternateName: "Agregador de pesquisas — Presidente 2026",
+            alternateName: NOME_DESCRITIVO,
+            slogan: TAGLINE,
             url: `${URL_SITE}/`,
             inLanguage: "pt-BR",
             description: DESCRICAO_PADRAO,

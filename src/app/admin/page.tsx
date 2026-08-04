@@ -7,12 +7,25 @@
  * A checagem aqui é para ESCOLHER A TELA. A autorização de verdade é
  * revalidada dentro de cada Server Action e de cada leitura privilegiada —
  * uma Server Action é um endpoint POST público.
+ *
+ * Superfície interna, MESMA paleta e mesmo piso de acessibilidade do painel,
+ * com densidade maior. E a regra que vale aqui como em qualquer lugar: não
+ * existe verde de sucesso nem vermelho de perigo (docs/DESIGN-V2.md §5.8) —
+ * vermelho e azul são dos candidatos, em toda superfície, e um print do /admin
+ * não pode ser lido como tomando partido (R4).
  */
 import type { Metadata } from "next";
-import Link from "next/link";
 import { formatInTimeZone } from "date-fns-tz";
-import { Cartao } from "@/components/ui/cartao";
-import { AvisoErro, Secao, Vazio } from "@/components/ui/basicos";
+import {
+  Aviso,
+  Bloco,
+  Chip,
+  LinkInterno,
+  Nicho,
+  Secao,
+  Subtitulo,
+  Vazio,
+} from "@/components/ui/blocos";
 import { AcoesPendente } from "@/components/admin/acoes-pendente";
 import { BotaoAtualizar } from "@/components/admin/botao-atualizar";
 import { BotaoRemover } from "@/components/admin/botao-remover";
@@ -23,7 +36,8 @@ import { PARAMS_PADRAO } from "@/data/constantes";
 import type { Pesquisa } from "@/data/tipos";
 import { getAdmin } from "@/lib/admin/auth";
 import { getPendentes, getPesquisasPublicadas, type PesquisaPendente } from "@/lib/dados";
-import { fmt, fmtData, fmtSinal, pct, rodarModelo } from "@/lib/modelo";
+import { fmt, fmtData, fmtSinal, rodarModelo } from "@/lib/modelo";
+import { inteiroEmCem } from "@/components/ui/textos";
 import { supabaseConfigurado } from "@/lib/supabase/publico";
 import { getUsuario } from "@/lib/supabase/sessao";
 import { instanteDoRender } from "../_lib/relogio";
@@ -33,7 +47,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Administração",
-  description: "Fila de aprovação da série de pesquisas.",
+  description: "Fila de aprovação da lista de pesquisas.",
   robots: { index: false, follow: false },
 };
 
@@ -42,25 +56,24 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function Moldura({ children }: { children: React.ReactNode }) {
   return (
-    <main className="mx-auto w-full max-w-leitura px-goteira pt-8 pb-16 lg:px-goteira-lg">
-      <p className="font-mono text-xs tracking-sobretitulo text-confirma-texto uppercase">
-        Área restrita · aprovação humana da série
-      </p>
-      <h1 className="mt-1 text-titulo">ADMINISTRAÇÃO</h1>
+    <main>
+      <Secao>
+        <Bloco>
+          <p className="text-etiqueta text-ameixa">Área restrita · aprovação humana da lista</p>
+          <h1 className="mt-1 text-pergunta text-tinta">Administração</h1>
+        </Bloco>
+      </Secao>
       {children}
-      <p className="mt-secao">
-        <Link
-          href="/"
-          className="inline-flex min-h-toque items-center text-sm font-semibold text-confirma-texto underline decoration-dotted underline-offset-2"
-        >
+      <Secao>
+        <LinkInterno href="/" className="text-corpo font-semibold">
           ← voltar ao painel
-        </Link>
-      </p>
+        </LinkInterno>
+      </Secao>
     </main>
   );
 }
 
-/** Pendente → `Pesquisa` para simular o agregado com ela dentro. */
+/** Pendente → `Pesquisa` para simular a média com ela dentro. */
 function paraPesquisa(p: PesquisaPendente): Pesquisa | null {
   const l2 = p.t2.lula;
   const f2 = p.t2.flavio;
@@ -92,13 +105,15 @@ export default async function Admin({
   if (!supabaseConfigurado()) {
     return (
       <Moldura>
-        <div className="mt-4 max-w-texto">
-          <AvisoErro>
-            admin indisponível sem configuração — este ambiente roda apenas com a base editorial
-            local. O painel público continua completo; a fila de aprovação, o login e a auditoria só
-            existem quando as variáveis do Supabase estão definidas.
-          </AvisoErro>
-        </div>
+        <Secao>
+          <Bloco className="max-w-texto">
+            <Aviso>
+              admin indisponível sem configuração — este ambiente roda apenas com a lista guardada
+              no próprio site. O painel público continua completo; a fila de aprovação, o login e a
+              auditoria só existem quando as variáveis do Supabase estão definidas.
+            </Aviso>
+          </Bloco>
+        </Secao>
       </Moldura>
     );
   }
@@ -109,21 +124,25 @@ export default async function Admin({
   if (!usuario) {
     return (
       <Moldura>
-        <p className="mt-2 max-w-texto text-sm leading-leitura text-cinza">
-          Publicar uma pesquisa na série é um ato registrado: entra na auditoria e aparece na linha
-          do tempo pública. Por isso o acesso é por link de uso único enviado por e-mail, e só para
-          endereços previamente autorizados no servidor.
-        </p>
-        {erroLogin ? (
-          <div className="mt-4 max-w-texto">
-            <AvisoErro>
-              {erroLogin === "sem-configuracao"
-                ? "login indisponível neste ambiente."
-                : "não foi possível concluir o login com esse link — ele pode ter expirado ou já ter sido usado. Peça um novo abaixo."}
-            </AvisoErro>
-          </div>
-        ) : null}
-        <FormLogin />
+        <Secao>
+          <Bloco className="max-w-texto">
+            <p className="text-corpo text-tinta-media">
+              Publicar uma pesquisa na lista é um ato registrado: entra na auditoria e aparece na
+              página pública do que já mudou. Por isso o acesso é por link de uso único enviado por
+              e-mail, e só para endereços previamente autorizados no servidor.
+            </p>
+            {erroLogin ? (
+              <div className="mt-4">
+                <Aviso>
+                  {erroLogin === "sem-configuracao"
+                    ? "login indisponível neste ambiente."
+                    : "não foi possível concluir o login com esse link — ele pode ter expirado ou já ter sido usado. Peça um novo abaixo."}
+                </Aviso>
+              </div>
+            ) : null}
+            <FormLogin />
+          </Bloco>
+        </Secao>
       </Moldura>
     );
   }
@@ -134,13 +153,17 @@ export default async function Admin({
   if (!admin) {
     return (
       <Moldura>
-        <div className="mt-4 max-w-texto space-y-3">
-          <AvisoErro>
-            a conta <b>{usuario.email}</b> não está autorizada a administrar a série. Nada foi
-            alterado e o acesso ficou registrado.
-          </AvisoErro>
-          <BotaoSair />
-        </div>
+        <Secao>
+          <Bloco className="max-w-texto">
+            <Aviso>
+              a conta <b>{usuario.email}</b> não está autorizada a administrar a lista. Nada foi
+              alterado e o acesso ficou registrado.
+            </Aviso>
+            <div className="mt-3">
+              <BotaoSair />
+            </div>
+          </Bloco>
+        </Secao>
       </Moldura>
     );
   }
@@ -165,130 +188,155 @@ export default async function Admin({
 
   return (
     <Moldura>
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-        <p className="font-mono text-sm text-cinza">
-          conectado como <b className="text-tinta">{admin.email}</b>
-        </p>
-        <BotaoSair />
-      </div>
-
       <Secao>
-        <Cartao titulo="Coletor automático" destaque="confirma">
-          <p className="mb-3 text-sm text-cinza">
-            Busca rodadas novas dos institutos e as coloca na fila como <b>pendentes</b> — nada é
-            publicado sem aprovação (R3). O cron já faz isso uma vez por dia; este botão serve para
-            antecipar.
-          </p>
-          <BotaoAtualizar />
-        </Cartao>
+        <Bloco>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-corpo text-tinta-media">
+              conectado como <b className="font-semibold text-tinta">{admin.email}</b>
+            </p>
+            <BotaoSair />
+          </div>
+        </Bloco>
       </Secao>
 
       <Secao>
-        <Cartao
-          titulo={`Fila de aprovação (${fila.length}) · o que cada pesquisa faz com o agregado`}
-          destaque="alerta"
-        >
+        <Bloco>
+          <Subtitulo>Coletor automático</Subtitulo>
+          <p className="mt-1 mb-3 max-w-texto text-corpo text-tinta-media">
+            Busca pesquisas novas dos institutos e as coloca na fila como{" "}
+            <b className="font-semibold text-tinta">pendentes</b> — nada é publicado sem aprovação
+            (R3). O cron já faz isso uma vez por dia; este botão serve para antecipar.
+          </p>
+          <BotaoAtualizar />
+        </Bloco>
+      </Secao>
+
+      <Secao>
+        <Bloco>
+          <Subtitulo>
+            Fila de aprovação ({fila.length}) · o que cada pesquisa faz com a média
+          </Subtitulo>
           {fila.length === 0 ? (
-            <Vazio titulo="Nada aguardando aprovação.">
-              Quando o coletor encontrar uma rodada nova, ela aparece aqui com o efeito que teria
-              sobre a margem e sobre a probabilidade — antes de você decidir.
-            </Vazio>
+            <div className="mt-3">
+              <Vazio titulo="Nada aguardando aprovação.">
+                Quando o coletor encontrar uma pesquisa nova, ela aparece aqui com o efeito que
+                teria sobre a diferença e sobre a chance — antes de você decidir.
+              </Vazio>
+            </div>
           ) : (
-            <ul className="space-y-4">
+            <ul className="mt-3 space-y-4">
               {fila.map(({ p, depois }) => {
                 const descricao = `${p.instituto} · campo ${fmtData(p.inicio)}–${fmtData(p.fim)}`;
                 return (
-                  <li key={p.id} className="rounded-cartao border border-linha bg-mini p-cartao">
-                    <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <h3 className="text-sm font-bold text-tinta">{descricao}</h3>
-                      <span className="font-mono text-xs text-cinza">
-                        origem {p.origem} · recebida em{" "}
-                        {formatInTimeZone(Date.parse(p.criadoEm), TZ, "dd/MM/yyyy HH:mm")}
-                      </span>
-                    </div>
+                  <li key={p.id}>
+                    <Nicho>
+                      <div className="flex flex-wrap items-baseline justify-between gap-2">
+                        <h3 className="text-secao text-tinta">{descricao}</h3>
+                        <span className="text-micro text-tinta-media numeros">
+                          <Chip tom="atencao" className="mr-2">
+                            pendente
+                          </Chip>
+                          origem {p.origem} · recebida em{" "}
+                          {formatInTimeZone(Date.parse(p.criadoEm), TZ, "dd/MM/yyyy HH:mm")}
+                        </span>
+                      </div>
 
-                    <p className="mt-1 font-mono text-xs text-cinza">
-                      2ºT {fmt(p.t2.lula)}%×{fmt(p.t2.flavio)}% · 1ºT{" "}
-                      {p.t1 && p.t1.lula !== null
-                        ? `${fmt(p.t1.lula)}%×${fmt(p.t1.flavio)}%`
-                        : "n/d"}{" "}
-                      · n {p.n ?? "n/d"} · ±{fmt(p.moe)} · TSE {p.tse ?? "n/d"}
-                    </p>
-                    <p className="mt-1 font-mono text-xs break-all text-cinza">
-                      fonte: {p.fonte ?? "não informada"}
-                    </p>
-
-                    {base && depois ? (
-                      <dl className="mt-3 grid grid-cols-2 gap-2 font-mono text-xs">
-                        <div className="rounded-controle border border-linha bg-cartao p-2">
-                          <dt className="text-cinza uppercase">margem 2ºT</dt>
-                          <dd className="text-dado">
-                            {fmtSinal(base.margem)} → {fmtSinal(depois.margem)}
-                          </dd>
-                          <dd className="text-cinza">
-                            variação {fmtSinal(depois.margem - base.margem)} p.p.
-                          </dd>
-                        </div>
-                        <div className="rounded-controle border border-linha bg-cartao p-2">
-                          <dt className="text-cinza uppercase">chance de Lula (dia)</dt>
-                          <dd className="text-dado">
-                            {pct(base.eleito.dia.l)} → {pct(depois.eleito.dia.l)}
-                          </dd>
-                          <dd className="text-cinza">
-                            variação{" "}
-                            {fmtSinal(
-                              Math.round(depois.eleito.dia.l * 100) -
-                                Math.round(base.eleito.dia.l * 100),
-                              0,
-                            )}{" "}
-                            p.p.
-                          </dd>
-                        </div>
-                      </dl>
-                    ) : (
-                      <p className="mt-3">
-                        <AvisoErro>
-                          não foi possível simular o efeito desta linha no agregado — confira os
-                          números do 2º turno antes de aprovar.
-                        </AvisoErro>
+                      <p className="mt-1 text-micro text-tinta-media numeros">
+                        2º turno {fmt(p.t2.lula)}% × {fmt(p.t2.flavio)}% · 1º turno{" "}
+                        {p.t1 && p.t1.lula !== null
+                          ? `${fmt(p.t1.lula)}% × ${fmt(p.t1.flavio)}%`
+                          : "n/d"}{" "}
+                        · {p.n ?? "n/d"} pessoas · folga {fmt(p.moe)} · TSE {p.tse ?? "n/d"}
                       </p>
-                    )}
+                      <p className="mt-1 text-micro break-all text-tinta-media">
+                        fonte: {p.fonte ?? "não informada"}
+                      </p>
 
-                    {p.bruto ? (
-                      <details className="mt-3 text-xs">
-                        <summary className="font-semibold text-cinza">
-                          Resposta crua da IA (texto não verificado)
-                        </summary>
-                        <pre className="mt-1 max-h-64 overflow-auto rounded-controle bg-cartao p-2 font-mono text-xs whitespace-pre-wrap text-tinta">
-                          <code>{JSON.stringify(p.bruto, null, 2)}</code>
-                        </pre>
-                      </details>
-                    ) : null}
+                      {base && depois ? (
+                        <dl className="mt-3 grid grid-cols-2 gap-2 text-micro numeros">
+                          <div className="rounded-campo bg-placa p-3">
+                            <dt className="text-etiqueta text-tinta-media">
+                              diferença no 2º turno
+                            </dt>
+                            <dd className="text-dado text-tinta">
+                              {fmtSinal(base.margem)} → {fmtSinal(depois.margem)}
+                            </dd>
+                            <dd className="text-tinta-media">
+                              variação {fmtSinal(depois.margem - base.margem)} pontos
+                            </dd>
+                          </div>
+                          <div className="rounded-campo bg-placa p-3">
+                            <dt className="text-etiqueta text-tinta-media">
+                              chance de Lula (dia da votação)
+                            </dt>
+                            <dd className="text-dado text-tinta">
+                              {inteiroEmCem(base.eleito.dia.l)} →{" "}
+                              {inteiroEmCem(depois.eleito.dia.l)} em 100
+                            </dd>
+                            <dd className="text-tinta-media">
+                              variação{" "}
+                              {fmtSinal(
+                                inteiroEmCem(depois.eleito.dia.l) - inteiroEmCem(base.eleito.dia.l),
+                                0,
+                              )}
+                            </dd>
+                          </div>
+                        </dl>
+                      ) : (
+                        <div className="mt-3">
+                          <Aviso>
+                            não foi possível simular o efeito desta linha na média — confira os
+                            números do 2º turno antes de aprovar.
+                          </Aviso>
+                        </div>
+                      )}
 
-                    <AcoesPendente id={p.id} descricao={descricao} />
+                      {p.bruto ? (
+                        <details className="mt-3">
+                          <summary className="inline-flex min-h-toque items-center text-micro font-semibold text-ameixa">
+                            Resposta crua da IA (texto não verificado)
+                          </summary>
+                          <pre className="mt-1 max-h-64 overflow-auto rounded-campo bg-placa p-3 text-micro whitespace-pre-wrap text-tinta">
+                            <code>{JSON.stringify(p.bruto, null, 2)}</code>
+                          </pre>
+                        </details>
+                      ) : null}
+
+                      <AcoesPendente id={p.id} descricao={descricao} />
+                    </Nicho>
                   </li>
                 );
               })}
             </ul>
           )}
-        </Cartao>
+        </Bloco>
       </Secao>
 
       <Secao>
-        <Cartao titulo="Inclusão manual (entra publicada, com auditoria)" destaque="tinta">
-          <FormInclusao />
-        </Cartao>
+        <Bloco>
+          <Subtitulo>Inclusão manual (entra publicada, com auditoria)</Subtitulo>
+          <div className="mt-3">
+            <FormInclusao />
+          </div>
+        </Bloco>
       </Secao>
 
       <Secao>
-        <Cartao titulo={`Série publicada (${publicadas.length})`}>
-          <ul className="divide-y divide-linha">
+        <Bloco>
+          <Subtitulo>Lista publicada ({publicadas.length})</Subtitulo>
+          <ul className="mt-3">
             {publicadas.map((p) => (
-              <li key={p.id} className="flex items-center justify-between gap-3 py-2">
-                <span className="font-mono text-xs text-cinza">
-                  <b className="font-sans text-sm text-tinta">{p.instituto}</b> ·{" "}
-                  {fmtData(p.inicio)}–{fmtData(p.fim)} · 2ºT {fmt(p.t2.lula)}%×{fmt(p.t2.flavio)}% ·{" "}
-                  {p.tse}
+              <li
+                key={p.id}
+                className="flex flex-wrap items-center justify-between gap-3 border-t border-filete py-2"
+              >
+                <span className="text-micro text-tinta-media numeros">
+                  <Chip tom="ameixa" className="mr-2">
+                    publicada
+                  </Chip>
+                  <b className="text-corpo font-semibold text-tinta">{p.instituto}</b> ·{" "}
+                  {fmtData(p.inicio)}–{fmtData(p.fim)} · 2º turno {fmt(p.t2.lula)}% ×{" "}
+                  {fmt(p.t2.flavio)}% · {p.tse}
                 </span>
                 {UUID.test(p.id) ? (
                   <BotaoRemover
@@ -296,34 +344,39 @@ export default async function Admin({
                     descricao={`${p.instituto} (campo até ${fmtData(p.fim)})`}
                   />
                 ) : (
-                  <span className="font-mono text-xs text-cinza">base editorial</span>
+                  <span className="text-micro text-tinta-media">lista guardada no site</span>
                 )}
               </li>
             ))}
           </ul>
-        </Cartao>
+        </Bloco>
       </Secao>
 
       <Secao>
-        <Cartao titulo={`Auditoria completa (${auditoria.length} registros mais recentes)`}>
+        <Bloco>
+          <Subtitulo>Auditoria completa ({auditoria.length} registros mais recentes)</Subtitulo>
           {auditoria.length === 0 ? (
-            <Vazio titulo="Nenhum registro de auditoria ainda.">
-              Toda aprovação, rejeição, inclusão e remoção grava uma linha aqui, com o e-mail de
-              quem executou. O feed público de /historico mostra os mesmos eventos sem o ator.
-            </Vazio>
+            <div className="mt-3">
+              <Vazio titulo="Nenhum registro de auditoria ainda.">
+                Toda aprovação, rejeição, inclusão e remoção grava uma linha aqui, com o e-mail de
+                quem executou. A página pública mostra os mesmos eventos sem o ator.
+              </Vazio>
+            </div>
           ) : (
-            <ul className="space-y-2">
+            <ul className="mt-3 space-y-2">
               {auditoria.map((l) => (
-                <li key={l.id} className="border-t border-linha pt-2">
-                  <p className="font-mono text-xs text-cinza">
+                <li key={l.id} className="border-t border-filete pt-2">
+                  <p className="text-micro text-tinta-media numeros">
                     {formatInTimeZone(Date.parse(l.em), TZ, "dd/MM/yyyy HH:mm")} ·{" "}
-                    <b className="text-tinta">{l.acao}</b> · {l.entidade}
+                    <b className="font-semibold text-tinta">{l.acao}</b> · {l.entidade}
                     {l.entidadeId ? ` ${l.entidadeId}` : ""} · por {l.ator}
                   </p>
                   {l.detalhes ? (
-                    <details className="mt-1 text-xs">
-                      <summary className="text-cinza">detalhes</summary>
-                      <pre className="mt-1 max-h-64 overflow-auto rounded-controle bg-mini p-2 font-mono text-xs whitespace-pre-wrap text-tinta">
+                    <details className="mt-1">
+                      <summary className="inline-flex min-h-toque items-center text-micro text-ameixa">
+                        detalhes
+                      </summary>
+                      <pre className="mt-1 max-h-64 overflow-auto rounded-campo bg-nicho p-3 text-micro whitespace-pre-wrap text-tinta">
                         <code>{JSON.stringify(l.detalhes, null, 2)}</code>
                       </pre>
                     </details>
@@ -332,7 +385,7 @@ export default async function Admin({
               ))}
             </ul>
           )}
-        </Cartao>
+        </Bloco>
       </Secao>
     </Moldura>
   );

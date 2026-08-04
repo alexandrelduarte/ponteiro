@@ -216,3 +216,18 @@ var(--color-linha-forte) 55%, transparent)` → mantém "zero hex em componente"
   S2 descartado por ser um velocímetro literal) → remove_background → upscale 2K → novo
   remove_background (o upscaler achata alfa) → PNG 2160² RGBA. 7 operações no total,
   abaixo do teto de ~10.
+
+## Fase 4 — composição da marca (design-lead; detalhes em docs/MARCA.md §6)
+
+- O mestre da marca virou VETOR: geometria ajustada por mínimos quadrados sobre o raster do
+  Higgsfield (RMS 0,34px, IoU 0,970) → nítido em qualquer tamanho, 457 B vs 1,1 MB, família
+  inteira sai de uma verdade só; fidelidade medida, não opinada.
+- Ícone do app é variante ÓTICA (anel mais grosso, vão maior, sem vazado) — reduzir o mestre a
+  16px fecharia o vazado; wordmark em paths extraídos do TTF (opentype.js só no scratchpad;
+  serializador reescrito à mão por bug do toPathData) → SVG autossuficiente, zero dependência
+  de fonte instalada.
+- PNGs recomprimidos por otimizador próprio sobre node:zlib (sips PIORAVA; zopfli/pngquant não
+  existem na máquina e dependência nova violaria R7): símbolo 2K 118→42 KB, OG 50→36,5 KB, sem
+  perder um pixel (identidade dos dados crus conferida).
+- PNG bruto de procedência (1,1 MB) movido pelo orquestrador de public/ para
+  docs/marca-origem/ → não é referenciado por nenhuma superfície; em public/ iria ao CDN.

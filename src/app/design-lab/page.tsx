@@ -65,15 +65,16 @@ export default async function IndiceDesignLab() {
               {r.flavioEm100} em 100
             </li>
             <li>
-              à frente no 2º turno: Lula {r.lulaMargemEm100} em 100 · Flávio {r.flavioMargemEm100} em
-              100
+              à frente no 2º turno: Lula {r.lulaMargemEm100} em 100 · Flávio {r.flavioMargemEm100}{" "}
+              em 100
             </li>
             <li>
               2º turno: Lula {fmt(r.mediaLula)}% × Flávio {fmt(r.mediaFlavio)}% · diferença{" "}
               {fmtSinal(r.margem)} p.p. · incerteza ±{fmt(r.incerteza)} p.p.
             </li>
             <li>
-              intervalo de 80% no dia da votação: {fmtSinal(r.int80[0])} a {fmtSinal(r.int80[1])} p.p.
+              intervalo de 80% no dia da votação: {fmtSinal(r.int80[0])} a {fmtSinal(r.int80[1])}{" "}
+              p.p.
             </li>
             <li>
               {r.totalPesquisas} pesquisas na série · {r.qtdEmpate} de {r.qtdRecentes} recentes em
@@ -99,7 +100,10 @@ export default async function IndiceDesignLab() {
                   <Par etiqueta="identidade" valor={c.identidade} />
                   <Par etiqueta="tipografia" valor={c.tipografia} />
                 </dl>
-                <p className="mt-3 text-[15px] underline underline-offset-4" style={{ fontWeight: 600 }}>
+                <p
+                  className="mt-3 text-[15px] underline underline-offset-4"
+                  style={{ fontWeight: 600 }}
+                >
                   abrir o style tile →
                 </p>
               </Link>

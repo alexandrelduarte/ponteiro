@@ -260,8 +260,18 @@ export default async function ConceitoB() {
               Lula está na frente por {fmt(Math.abs(r.margem))} pontos — menos do que a dúvida.
             </h2>
             <div className="mt-5 grid grid-cols-2 gap-3">
-              <ValorCandidato nome="Lula" valor={`${fmt(r.mediaLula)}%`} cor="var(--lula)" tenue="var(--lula-tenue)" />
-              <ValorCandidato nome="Flávio" valor={`${fmt(r.mediaFlavio)}%`} cor="var(--flavio)" tenue="var(--flavio-tenue)" />
+              <ValorCandidato
+                nome="Lula"
+                valor={`${fmt(r.mediaLula)}%`}
+                cor="var(--lula)"
+                tenue="var(--lula-tenue)"
+              />
+              <ValorCandidato
+                nome="Flávio"
+                valor={`${fmt(r.mediaFlavio)}%`}
+                cor="var(--flavio)"
+                tenue="var(--flavio-tenue)"
+              />
             </div>
             <p className="mt-5 text-[16px] leading-[1.6]">
               A diferença hoje é de{" "}
@@ -275,8 +285,8 @@ export default async function ConceitoB() {
               — por isso a virada continua no mapa.
             </p>
             <p className="mt-4 text-[16px] leading-[1.7]">
-              <ChipGlossario termo="empate técnico" /> {r.qtdEmpate} das {r.qtdRecentes} pesquisas do
-              último mês estão nessa situação.
+              <ChipGlossario termo="empate técnico" /> {r.qtdEmpate} das {r.qtdRecentes} pesquisas
+              do último mês estão nessa situação.
             </p>
           </div>
 
@@ -346,7 +356,13 @@ export default async function ConceitoB() {
 /** Marca ESTÁTICA (DECISOES.md): agulha dentro de um disco. Nunca é medidor. */
 function AgulhaAmeixa() {
   return (
-    <svg viewBox="0 0 44 44" width="44" height="44" aria-hidden="true" style={{ display: "block", flex: "none" }}>
+    <svg
+      viewBox="0 0 44 44"
+      width="44"
+      height="44"
+      aria-hidden="true"
+      style={{ display: "block", flex: "none" }}
+    >
       <circle cx="22" cy="22" r="21" fill="var(--vazio)" />
       <path d="M22 31 L31 14" stroke="var(--ident)" strokeWidth={4} strokeLinecap="round" />
       <circle cx="22" cy="31" r="4.5" fill="var(--tinta)" />
@@ -354,7 +370,17 @@ function AgulhaAmeixa() {
   );
 }
 
-function ValorCandidato({ nome, valor, cor, tenue }: { nome: string; valor: string; cor: string; tenue: string }) {
+function ValorCandidato({
+  nome,
+  valor,
+  cor,
+  tenue,
+}: {
+  nome: string;
+  valor: string;
+  cor: string;
+  tenue: string;
+}) {
   return (
     <div className="rounded-[16px] px-4 py-3" style={{ background: tenue }}>
       <p className="text-[15px]" style={{ color: cor, fontWeight: 600 }}>

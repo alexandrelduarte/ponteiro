@@ -95,7 +95,13 @@ function Regua({ inicio, fim, corte }: { inicio: number; fim: number; corte: num
     );
     if (i % 10 === 0) {
       rotulos.push(
-        <Rotulo key={i} x={fx(posicaoX(i, inicio) + TICK / 2)} y={fy(80)} ancora="meio" cor="var(--tinta2)">
+        <Rotulo
+          key={i}
+          x={fx(posicaoX(i, inicio) + TICK / 2)}
+          y={fy(80)}
+          ancora="meio"
+          cor="var(--tinta2)"
+        >
           {i}
         </Rotulo>,
       );
@@ -115,7 +121,9 @@ function Regua({ inicio, fim, corte }: { inicio: number; fim: number; corte: num
       >
         <rect x={-6} y={BASE} width={caixa} height={2} fill="var(--vazio)" />
         {traços}
-        {temPortao ? <rect x={xg - 2} y={-4} width={4} height={BASE + 8} fill="var(--tinta)" /> : null}
+        {temPortao ? (
+          <rect x={xg - 2} y={-4} width={4} height={BASE + 8} fill="var(--tinta)" />
+        ) : null}
       </svg>
       {rotulos}
       {temPortao ? (
@@ -209,7 +217,13 @@ function FaixaProjetada({ r }: { r: Retrato }) {
       <Rotulo x={fx(16)} y={fy(18)} cor="var(--lula)" peso={600}>
         Lula na frente ↑
       </Rotulo>
-      <Rotulo x={fx(G.W - 16)} y={fy(py(r.int80[1]) - 22)} ancora="fim" cor="var(--tinta)" peso={600}>
+      <Rotulo
+        x={fx(G.W - 16)}
+        y={fy(py(r.int80[1]) - 22)}
+        ancora="fim"
+        cor="var(--tinta)"
+        peso={600}
+      >
         de {fmtSinal(r.int80[0])} a {fmtSinal(r.int80[1])}
       </Rotulo>
       <Rotulo x={fx(px(0) + 16)} y={fy(py(r.margem) - 20)} cor="var(--tinta)" peso={700}>
@@ -290,7 +304,12 @@ export default async function ConceitoA() {
             <ReguaDeCem corte={r.lulaEm100} />
             <div className="mt-5 flex items-start justify-between gap-3">
               <Legenda cor="var(--lula)" nome="Lula" valor={`${r.lulaEm100} em 100`} />
-              <Legenda cor="var(--flavio)" nome="Flávio" valor={`${r.flavioEm100} em 100`} alinhar />
+              <Legenda
+                cor="var(--flavio)"
+                nome="Flávio"
+                valor={`${r.flavioEm100} em 100`}
+                alinhar
+              />
             </div>
           </div>
         </section>
@@ -298,29 +317,45 @@ export default async function ConceitoA() {
         {/* ---------------- CARTÃO DE DADO + GRÁFICO ---------------- */}
         <section className="mt-4 grid gap-4 md:mt-6 md:grid-cols-2">
           <div className="rounded-[6px] p-4 md:p-6" style={moldura}>
-            <h2 className="text-[13px] md:text-[14px]" style={{ color: "var(--ident)", fontWeight: 600 }}>
+            <h2
+              className="text-[13px] md:text-[14px]"
+              style={{ color: "var(--ident)", fontWeight: 600 }}
+            >
               2º turno · média das {r.totalPesquisas} pesquisas
             </h2>
             <div className="mt-4 grid grid-cols-2 gap-3">
-              <ValorCandidato nome="Lula" valor={`${fmt(r.mediaLula)}%`} cor="var(--lula)" tenue="var(--lula-tenue)" />
-              <ValorCandidato nome="Flávio" valor={`${fmt(r.mediaFlavio)}%`} cor="var(--flavio)" tenue="var(--flavio-tenue)" />
+              <ValorCandidato
+                nome="Lula"
+                valor={`${fmt(r.mediaLula)}%`}
+                cor="var(--lula)"
+                tenue="var(--lula-tenue)"
+              />
+              <ValorCandidato
+                nome="Flávio"
+                valor={`${fmt(r.mediaFlavio)}%`}
+                cor="var(--flavio)"
+                tenue="var(--flavio-tenue)"
+              />
             </div>
             <dl className="mt-5 grid grid-cols-2 gap-4">
               <ParDado etiqueta="diferença hoje" valor={`${fmtSinal(r.margem)} p.p.`} />
               <ParDado etiqueta="incerteza até 25/10" valor={`±${fmt(r.incerteza)} p.p.`} />
             </dl>
             <p className="mt-4 text-[15px] leading-[1.55]" style={{ color: "var(--tinta2)" }}>
-              No dia da votação a diferença cabe entre {fmtSinal(r.int80[0])} e {fmtSinal(r.int80[1])}{" "}
-              p.p. Número negativo quer dizer Flávio na frente.
+              No dia da votação a diferença cabe entre {fmtSinal(r.int80[0])} e{" "}
+              {fmtSinal(r.int80[1])} p.p. Número negativo quer dizer Flávio na frente.
             </p>
             <p className="mt-3 text-[15px] leading-[1.6]">
-              <ChipGlossario termo="empate técnico" /> {r.qtdEmpate} das {r.qtdRecentes} pesquisas do
-              último mês estão nessa situação.
+              <ChipGlossario termo="empate técnico" /> {r.qtdEmpate} das {r.qtdRecentes} pesquisas
+              do último mês estão nessa situação.
             </p>
           </div>
 
           <div className="rounded-[6px] p-4 md:p-6" style={moldura}>
-            <h2 className="text-[13px] md:text-[14px]" style={{ color: "var(--ident)", fontWeight: 600 }}>
+            <h2
+              className="text-[13px] md:text-[14px]"
+              style={{ color: "var(--ident)", fontWeight: 600 }}
+            >
               a dúvida cresce com o tempo
             </h2>
             <p className="mt-1 mb-4 max-w-[46ch] text-[15px] leading-[1.5]">
@@ -328,7 +363,10 @@ export default async function ConceitoA() {
               larga a faixa do que ainda pode acontecer.
             </p>
             <FaixaProjetada r={r} />
-            <div className="mt-2 flex justify-between text-[12px] md:text-[13px]" style={{ color: "var(--tinta2)" }}>
+            <div
+              className="mt-2 flex justify-between text-[12px] md:text-[13px]"
+              style={{ color: "var(--tinta2)" }}
+            >
               <span>hoje</span>
               <span>25 de outubro</span>
             </div>
@@ -377,15 +415,37 @@ export default async function ConceitoA() {
 /** Marca ESTÁTICA (DECISOES.md): agulha dentro de um arco. Nunca é medidor. */
 function AgulhaLatao() {
   return (
-    <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true" style={{ display: "block", flex: "none" }}>
-      <path d="M4 23a12 12 0 0 1 24 0" fill="none" stroke="var(--ident)" strokeWidth={3} strokeLinecap="round" />
+    <svg
+      viewBox="0 0 32 32"
+      width="26"
+      height="26"
+      aria-hidden="true"
+      style={{ display: "block", flex: "none" }}
+    >
+      <path
+        d="M4 23a12 12 0 0 1 24 0"
+        fill="none"
+        stroke="var(--ident)"
+        strokeWidth={3}
+        strokeLinecap="round"
+      />
       <path d="M16 23 L24 11" stroke="var(--tinta)" strokeWidth={3} strokeLinecap="round" />
       <circle cx="16" cy="23" r="3" fill="var(--ident)" />
     </svg>
   );
 }
 
-function Legenda({ cor, nome, valor, alinhar }: { cor: string; nome: string; valor: string; alinhar?: boolean }) {
+function Legenda({
+  cor,
+  nome,
+  valor,
+  alinhar,
+}: {
+  cor: string;
+  nome: string;
+  valor: string;
+  alinhar?: boolean;
+}) {
   return (
     <div className={alinhar ? "text-right" : undefined}>
       <p className="text-[15px] md:text-[16px]" style={{ color: cor, fontWeight: 600 }}>
@@ -425,7 +485,17 @@ function ParDado({ etiqueta, valor }: { etiqueta: string; valor: string }) {
   );
 }
 
-function ValorCandidato({ nome, valor, cor, tenue }: { nome: string; valor: string; cor: string; tenue: string }) {
+function ValorCandidato({
+  nome,
+  valor,
+  cor,
+  tenue,
+}: {
+  nome: string;
+  valor: string;
+  cor: string;
+  tenue: string;
+}) {
   return (
     <div className="rounded-[4px] px-3 py-2" style={{ background: tenue }}>
       <p className="text-[14px]" style={{ color: cor, fontWeight: 600 }}>

@@ -107,7 +107,13 @@ function CampoDeCem({ corte }: { corte: number }) {
       style={{ display: "block", width: "100%", height: "auto" }}
     >
       {casas}
-      <path d={contorno} fill="none" stroke="var(--ident)" strokeWidth={14} strokeLinejoin="miter" />
+      <path
+        d={contorno}
+        fill="none"
+        stroke="var(--ident)"
+        strokeWidth={14}
+        strokeLinejoin="miter"
+      />
     </svg>
   );
 }
@@ -267,7 +273,10 @@ export default async function ConceitoC() {
               cada 100 eleições parecidas com esta. Flávio, em{" "}
               <strong style={{ color: "var(--flavio)" }}>{r.flavioEm100}</strong>.
             </h1>
-            <p className="mt-3 max-w-[46ch] text-[16px] leading-[1.6]" style={{ color: "var(--tinta2)" }}>
+            <p
+              className="mt-3 max-w-[46ch] text-[16px] leading-[1.6]"
+              style={{ color: "var(--tinta2)" }}
+            >
               Não é previsão. É a conta do que as {r.totalPesquisas} pesquisas registradas no TSE
               dizem hoje, esticada até o dia da votação.
             </p>
@@ -292,7 +301,11 @@ export default async function ConceitoC() {
               className="flex items-center gap-2 text-[14px] tracking-[0.01em] md:text-[15px]"
               style={{ color: "var(--ident)", fontWeight: 700 }}
             >
-              <span aria-hidden="true" className="inline-block h-3 w-3 flex-none" style={{ background: "var(--ident)" }} />
+              <span
+                aria-hidden="true"
+                className="inline-block h-3 w-3 flex-none"
+                style={{ background: "var(--ident)" }}
+              />
               2º turno · média das {r.totalPesquisas} pesquisas
             </h2>
             <div className="mt-4 grid grid-cols-2 gap-3">
@@ -304,12 +317,12 @@ export default async function ConceitoC() {
               <ParDado etiqueta="incerteza até 25/10" valor={`±${fmt(r.incerteza)} p.p.`} />
             </dl>
             <p className="mt-4 max-w-[48ch] text-[16px] leading-[1.6]">
-              No dia da votação a diferença cabe entre {fmtSinal(r.int80[0])} e {fmtSinal(r.int80[1])}{" "}
-              p.p. Número negativo quer dizer Flávio na frente.
+              No dia da votação a diferença cabe entre {fmtSinal(r.int80[0])} e{" "}
+              {fmtSinal(r.int80[1])} p.p. Número negativo quer dizer Flávio na frente.
             </p>
             <p className="mt-4 max-w-[48ch] text-[16px] leading-[1.8]">
-              <ChipGlossario termo="empate técnico" /> {r.qtdEmpate} das {r.qtdRecentes} pesquisas do
-              último mês estão nessa situação.
+              <ChipGlossario termo="empate técnico" /> {r.qtdEmpate} das {r.qtdRecentes} pesquisas
+              do último mês estão nessa situação.
             </p>
 
             {/* -------- BOTÕES -------- */}
@@ -342,12 +355,16 @@ export default async function ConceitoC() {
               className="flex items-center gap-2 text-[14px] tracking-[0.01em] md:text-[15px]"
               style={{ color: "var(--ident)", fontWeight: 700 }}
             >
-              <span aria-hidden="true" className="inline-block h-3 w-3 flex-none" style={{ background: "var(--ident)" }} />
+              <span
+                aria-hidden="true"
+                className="inline-block h-3 w-3 flex-none"
+                style={{ background: "var(--ident)" }}
+              />
               cada pesquisa contra a linha do empate
             </h2>
             <p className="mt-1 mb-5 max-w-[44ch] text-[15px] leading-[1.5]">
-              A barra é a margem de erro dobrada. Quando ela atravessa a régua do empate, o resultado
-              daquela pesquisa é indistinguível de um empate.
+              A barra é a margem de erro dobrada. Quando ela atravessa a régua do empate, o
+              resultado daquela pesquisa é indistinguível de um empate.
             </p>
             <GraficoPesquisas r={r} />
           </div>
@@ -372,13 +389,25 @@ export default async function ConceitoC() {
  * ------------------------------------------------------------------ */
 
 function Regua() {
-  return <div aria-hidden="true" className="my-7 h-[4px] w-full md:my-10" style={{ background: "var(--ident)" }} />;
+  return (
+    <div
+      aria-hidden="true"
+      className="my-7 h-[4px] w-full md:my-10"
+      style={{ background: "var(--ident)" }}
+    />
+  );
 }
 
 /** Marca ESTÁTICA (DECISOES.md): agulha dentro de um quadrado. Nunca é medidor. */
 function AgulhaChumbo() {
   return (
-    <svg viewBox="0 0 40 40" width="40" height="40" aria-hidden="true" style={{ display: "block", flex: "none" }}>
+    <svg
+      viewBox="0 0 40 40"
+      width="40"
+      height="40"
+      aria-hidden="true"
+      style={{ display: "block", flex: "none" }}
+    >
       <rect x="0" y="0" width="40" height="40" fill="var(--ident)" />
       <path d="M20 30 L30 12" stroke="var(--placa)" strokeWidth={5} strokeLinecap="butt" />
       <rect x="16" y="26" width="8" height="8" fill="var(--placa)" />
@@ -386,14 +415,20 @@ function AgulhaChumbo() {
   );
 }
 
-function Quadro({ cor, nome, valor, alinhar }: { cor: string; nome: string; valor: string; alinhar?: boolean }) {
+function Quadro({
+  cor,
+  nome,
+  valor,
+  alinhar,
+}: {
+  cor: string;
+  nome: string;
+  valor: string;
+  alinhar?: boolean;
+}) {
   return (
     <div className={alinhar ? "text-right" : undefined}>
-      <span
-        aria-hidden="true"
-        className="mb-1 inline-block h-3 w-6"
-        style={{ background: cor }}
-      />
+      <span aria-hidden="true" className="mb-1 inline-block h-3 w-6" style={{ background: cor }} />
       <p className="text-[15px] md:text-[16px]" style={{ color: cor, fontWeight: 700 }}>
         {nome}
       </p>

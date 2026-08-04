@@ -14,6 +14,7 @@ Raciocine em profundidade máxima: examine cada print com atenção real, nos tr
 (390×844, 768×1024, 1440×900), e só então escreva.
 
 RUBRICA v2 (14 itens):
+
 1. ANTI-REGRESSÃO: lado a lado com .qa/antes/, nada da paleta, tipografia ou motivo visual da
    v1 sobrevive. Parecer "o mesmo produto" é BLOCKER automático.
 2. TESTE DO LEIGO: com a persona, tente responder só com o que está na tela: "Quem está na

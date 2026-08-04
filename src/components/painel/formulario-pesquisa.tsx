@@ -171,7 +171,9 @@ export function FormularioPesquisa({
         conferência de uma pessoa.
       </p>
 
-      <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+      {/* items-end: rótulos de 1 e 2 linhas convivem na mesma fileira — as
+          caixas de entrada alinham pela base, não pelo topo do rótulo. */}
+      <div className="mt-4 grid grid-cols-2 items-end gap-3 md:grid-cols-4">
         {CAMPOS.map((c) => {
           const id = `${idBase}-${c.chave}`;
           const erro = erros[c.chave];

@@ -141,19 +141,45 @@ try {
           path: join(DIR, `home-${vp.nome}-full-aberto.png`),
           fullPage: true,
         });
+        // UM popover aberto por gesto real (o estado que um humano alcança):
+        // o primeiro chip de glossário da página, clicado de verdade.
+        try {
+          await page.goto(BASE + "/", { waitUntil: "networkidle" });
+          const chip = page.locator('[aria-expanded="false"]').first();
+          await chip.scrollIntoViewIfNeeded();
+          await chip.click();
+          await page.waitForTimeout(500);
+          await page.screenshot({ path: join(DIR, `home-${vp.nome}-popover.png`) });
+        } catch {
+          console.warn(`popover não capturado em ${vp.nome}px`);
+        }
       }
-      if (pg.nome === "metodologia" && vp.nome === "390") {
-        // o estado "Explicação técnica" fotografado (pedido do qa-critic)
+      if (pg.nome === "metodologia") {
+        // o estado "Explicação técnica" fotografado nos três viewports
         try {
           await page.getByTestId("modo-tecnica").click();
           await page.waitForTimeout(500);
           await page.screenshot({
-            path: join(DIR, `metodologia-390-tecnica.png`),
+            path: join(DIR, `metodologia-${vp.nome}-tecnica.png`),
             fullPage: true,
           });
         } catch {
           console.warn("estado técnica não capturado");
         }
+        // /metodologia e /historico também com disclosures abertos
+        await page.goto(BASE + "/metodologia", { waitUntil: "networkidle" });
+        await abrirTudo(page);
+        await page.screenshot({
+          path: join(DIR, `metodologia-${vp.nome}-full-aberto.png`),
+          fullPage: true,
+        });
+      }
+      if (pg.nome === "historico") {
+        await abrirTudo(page);
+        await page.screenshot({
+          path: join(DIR, `historico-${vp.nome}-full-aberto.png`),
+          fullPage: true,
+        });
       }
     }
     await page.close();

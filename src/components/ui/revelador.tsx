@@ -17,7 +17,7 @@
  * pintura: o painel só nasce depois de um toque.
  */
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { duracaoDoToken, easeDoToken } from "./movimento";
 import { ACOES } from "./textos";
 
@@ -43,6 +43,25 @@ export function Revelador({
   const painelRef = useRef<HTMLDivElement>(null);
   const fecharRef = useRef<HTMLButtonElement>(null);
   const id = useId();
+
+  /* A 768–1440 o painel é absoluto com a esquerda no chip e 22rem de largura:
+     chip perto da borda direita fazia a página inteira rolar de lado (medido:
+     +101px no pior chip a 768). O deslocamento é medido ao abrir e escrito
+     DIRETO no DOM (CSS var no próprio painel) — sem setState: o efeito só
+     sincroniza o sistema externo, e o painel morre com a var ao fechar. */
+  useLayoutEffect(() => {
+    if (!aberto) return;
+    if (!window.matchMedia("(min-width: 48rem)").matches) return;
+    const gatilho = gatilhoRef.current?.getBoundingClientRect();
+    const painel = painelRef.current;
+    const larguraPainel = painel?.getBoundingClientRect().width;
+    if (!gatilho || !painel || !larguraPainel) return;
+    const estouro = gatilho.left + larguraPainel - (window.innerWidth - 16);
+    if (estouro > 0) {
+      const desloc = -Math.min(estouro, Math.max(gatilho.left - 16, 0));
+      painel.style.setProperty("--desloc-popover", `${desloc}px`);
+    }
+  }, [aberto]);
 
   const fechar = (devolverFoco: boolean) => {
     setAberto(false);
@@ -121,8 +140,9 @@ export function Revelador({
               className={[
                 "fixed inset-x-0 bottom-0 z-50 max-h-[85svh] overflow-y-auto",
                 "rounded-t-bloco bg-placa p-bloco text-left shadow-erguido",
-                "md:absolute md:inset-x-auto md:top-full md:bottom-auto md:left-0 md:mt-2",
-                "md:w-[22rem] md:max-w-[80vw] md:rounded-bloco",
+                "md:absolute md:inset-x-auto md:top-full md:bottom-auto md:mt-2",
+                "md:left-[var(--desloc-popover,0px)]",
+                "md:w-[22rem] md:max-w-[calc(100vw-2rem)] md:rounded-bloco",
               ].join(" ")}
             >
               <span

@@ -81,6 +81,9 @@ export function Revelador({
     const painel = painelRef.current;
     const larguraPainel = painel?.getBoundingClientRect().width;
     if (!gatilho || !painel || !larguraPainel) return;
+    // Retângulo degenerado (gatilho sem layout — só acontece em automação que
+    // dispara N aberturas no mesmo tique): não posicionar às cegas na origem.
+    if (!gatilho.width && !gatilho.height) return;
     const esquerda = Math.max(16, Math.min(gatilho.left, window.innerWidth - 16 - larguraPainel));
     painel.style.top = `${window.scrollY + gatilho.bottom + 8}px`;
     painel.style.left = `${window.scrollX + esquerda}px`;

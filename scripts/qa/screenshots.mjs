@@ -61,7 +61,11 @@ const falhou = (mensagem) => {
   console.warn(`FALHA DE CAPTURA: ${mensagem}`);
 };
 
-/** Abre todos os disclosures da página (details + aria-expanded). */
+/** Abre os disclosures de CONTEÚDO da página (details e reveladores de bloco).
+    Popovers/folhas de glossário ficam de fora (veredito da iter-8): 29 cliques
+    num tique é estado inalcançável por humano — escondeu um MAJOR real por seis
+    iterações e depois fabricou um defeito que não existe. O estado de popover é
+    auditado pelos prints DIRIGIDOS (chip-chance/chip-tse/chip-pior/popover). */
 const abrirTudo = async (page) => {
   await page.evaluate(async () => {
     const passo = window.innerHeight * 0.8;
@@ -72,7 +76,9 @@ const abrirTudo = async (page) => {
     document.querySelectorAll("details").forEach((d) => {
       d.open = true;
     });
-    document.querySelectorAll('[aria-expanded="false"]').forEach((el) => el.click());
+    document
+      .querySelectorAll('[aria-expanded="false"]:not([aria-label^="o que é"])')
+      .forEach((el) => el.click());
     window.scrollTo(0, 0);
   });
   await page.waitForTimeout(800);

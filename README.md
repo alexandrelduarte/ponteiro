@@ -55,7 +55,7 @@ que o leitor vê tem que ser o número que o protótipo produzia.
                             ▼                                              ▼
               ┌──────────────────────────┐                   ┌──────────────────────┐
               │ src/lib/updater.ts       │                   │ src/lib/snapshot.ts  │
-              │ Anthropic + web_search   │                   │ roda o modelo e      │
+              │ OpenAI + web_search      │                   │ roda o modelo e      │
               │ ↓ resposta = HOSTIL      │                   │ grava em model_runs  │
               │ Zod → sanidade → dedup   │                   │ (sempre, mesmo sem   │
               │ ↓                        │                   │  pesquisa nova)      │
@@ -90,7 +90,7 @@ Três invariantes valem em todo o desenho:
 
 ## Setup local
 
-Não é preciso Supabase nem chave da Anthropic para rodar o site: sem elas o
+Não é preciso Supabase nem chave da OpenAI para rodar o site: sem elas o
 projeto usa o seed local e o `/admin` mostra a tela de "ambiente sem banco".
 
 ```bash
@@ -171,8 +171,8 @@ guarda a série oficial, a fila de aprovação e a auditoria).
    | `NEXT_PUBLIC_SUPABASE_URL`      | pública         | sim (prod)    | endpoint do projeto; sem ela o site roda no seed                                            |
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | pública         | sim (prod)    | leitura sujeita a RLS; é pública por desenho                                                |
    | `SUPABASE_SERVICE_ROLE_KEY`     | **server-only** | sim (prod)    | única chave que escreve; ignora RLS                                                         |
-   | `ANTHROPIC_API_KEY`             | **server-only** | sim (coletor) | chamadas ao modelo, só em route handler/cron                                                |
-   | `ANTHROPIC_MODEL`               | servidor        | não           | padrão `claude-sonnet-4-6`                                                                  |
+   | `OPENAI_API_KEY`                | **server-only** | sim (coletor) | chamadas ao modelo, só em route handler/cron                                                |
+   | `OPENAI_MODEL`                  | servidor        | não           | padrão `gpt-5.6-luna`                                                                       |
    | `CRON_SECRET`                   | **server-only** | **sim**       | sem ela a rota do cron responde 503 e o coletor nunca roda. Gere com `openssl rand -hex 32` |
    | `ADMIN_EMAILS`                  | **server-only** | sim           | lista separada por vírgula; **default-deny**: vazia = ninguém é admin                       |
    | `SENTRY_DSN`                    | servidor        | não           | opcional                                                                                    |
@@ -231,7 +231,7 @@ higiene a cada ~90 dias:
 
 - _Supabase_: painel → _Settings → API → Rotate_ (service role e anon). Atualize
   na Vercel e faça um **redeploy** — variável nova só vale no próximo build.
-- _Anthropic_: Console → _API Keys_ → crie a nova, troque na Vercel, redeploy,
+- _OpenAI_: platform.openai.com → _API keys_ → crie a nova, troque na Vercel, redeploy,
   **e só então** revogue a antiga.
 - _`CRON_SECRET`_: `openssl rand -hex 32`, troque na Vercel, redeploy.
 - _Sessões do `/admin`_: retirar um e-mail de `ADMIN_EMAILS` derruba o acesso no
@@ -242,30 +242,28 @@ higiene a cada ~90 dias:
 
 ## Quanto custa o cron
 
-Uma execução por dia: uma chamada ao Sonnet com a ferramenta `web_search`
-(`max_uses: 8`, `max_tokens: 2000`). São três linhas na conta:
+Uma execução por dia: uma chamada à OpenAI Responses API com a ferramenta
+`web_search` (`max_output_tokens: 8000`; o modelo decide quantas buscas faz).
+São três linhas na conta:
 
-| Item                           | Preço                                          |
-| ------------------------------ | ---------------------------------------------- |
-| Busca                          | US$ 10 / 1.000 buscas (**US$ 0,01 por busca**) |
-| Tokens de entrada (Sonnet 4.6) | US$ 3 / milhão                                 |
-| Tokens de saída (Sonnet 4.6)   | US$ 15 / milhão                                |
+| Item                             | Preço                                          |
+| -------------------------------- | ---------------------------------------------- |
+| Busca                            | US$ 10 / 1.000 buscas (**US$ 0,01 por busca**) |
+| Tokens de entrada (gpt-5.6-luna) | US$ 0,20 / milhão                              |
+| Tokens de saída (gpt-5.6-luna)   | US$ 1,20 / milhão                              |
 
-O que domina **não é a taxa de busca** — é o texto das páginas. Cada resultado
-entra no contexto como token de entrada, e as iterações de busca dentro de uma
-mesma resposta recobram o contexto acumulado. Duas execuções plausíveis:
+Com o modelo barato, quem domina a conta é **a taxa de busca**, não os tokens:
+o teste real da migração fez 8 buscas (~US$ 0,08) sobre ~52 mil tokens de
+entrada (~US$ 0,01). Ordem de grandeza:
 
-| Cenário                      | Buscas | Entrada estimada | Custo/dia | Custo/mês   |
-| ---------------------------- | ------ | ---------------- | --------- | ----------- |
-| Dia calmo (nada novo)        | ~3     | ~35 mil tokens   | ~US$ 0,15 | **~US$ 5**  |
-| Dia cheio (teto de 8 buscas) | 8      | ~190 mil tokens  | ~US$ 0,65 | **~US$ 20** |
+| Cenário               | Buscas | Entrada estimada | Custo/dia | Custo/mês  |
+| --------------------- | ------ | ---------------- | --------- | ---------- |
+| Dia calmo (nada novo) | ~3     | ~30 mil tokens   | ~US$ 0,04 | **~US$ 1** |
+| Dia cheio             | ~8     | ~60 mil tokens   | ~US$ 0,10 | **~US$ 3** |
 
-Ou seja: **poucos dólares por mês, não centavos** — e o custo é de ordem de
-grandeza semelhante ao do domínio. Se precisar apertar, os dois botões são
-(a) baixar `max_uses` em `src/lib/updater.ts` e (b) trocar `web_search_20250305`
-por `web_search_20260209`, que o Sonnet 4.6 suporta e que filtra os resultados por
-código antes de eles entrarem no contexto. A versão atual foi mantida de
-propósito, por ser compatível com qualquer `ANTHROPIC_MODEL` (ver `DECISOES.md`).
+Ou seja: **poucos dólares por mês** — menos que o domínio. Os dois botões de
+ajuste são (a) `OPENAI_MODEL` (env, sem deploy) e (b) `max_output_tokens` em
+`src/lib/updater.ts` (ver `DECISOES.md`).
 
 O disparo manual do `/admin` custa o mesmo que uma execução do cron. O cooldown de
 60 s existe por isso.
@@ -284,7 +282,7 @@ o ativo (ameaça A10 no `SECURITY.md`).
 - **2FA obrigatório** para você e para qualquer colaborador
   (_Settings → Moderation options_, ou nas configurações da organização).
 - **Segredos só na Vercel.** O CI deste repositório roda **sem secret nenhum** —
-  o projeto builda e testa sem Supabase e sem Anthropic (R8), e um passo do
+  o projeto builda e testa sem Supabase e sem OpenAI (R8), e um passo do
   workflow prova que `.next/static` não contém nome nem valor de chave server-only.
   Se um dia um passo precisar de credencial, ele está no lugar errado.
 - **Dependabot** já está configurado (`.github/dependabot.yml`): npm e

@@ -14,7 +14,6 @@
  * camada de dados nunca o lê para pesquisas de origem `auto`.
  */
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { montarPromptBusca } from "@/data/constantes";
 import { criarClienteAdmin, registrarAuditoria } from "@/lib/supabase/admin";
@@ -420,23 +419,95 @@ export function processarRespostaIA(texto: unknown, ctx: ContextoBusca): Resulta
  * Chamada à IA                                                       *
  * ------------------------------------------------------------------ */
 
-/** Junta só os blocos de texto da resposta — nada mais é interpretado. */
-function textoDaResposta(blocos: Anthropic.ContentBlock[]): string {
-  return blocos
-    .filter((b): b is Anthropic.TextBlock => b.type === "text")
-    .map((b) => b.text)
-    .join("\n");
+/** Modelo padrão: o degrau barato da geração vigente na OpenAI (DECISOES.md). */
+const MODELO_PADRAO = "gpt-5.6-luna";
+
+/**
+ * Junta só os blocos `output_text` das mensagens da resposta — nada mais é
+ * interpretado. A resposta é tratada como `unknown` de ponta a ponta: a forma
+ * vem da rede, não do nosso código, então cada nível é conferido antes do uso.
+ */
+export function textoDaResposta(saida: unknown): string {
+  if (!Array.isArray(saida)) return "";
+  const partes: string[] = [];
+  for (const item of saida) {
+    if (!item || typeof item !== "object") continue;
+    const { type, content } = item as { type?: unknown; content?: unknown };
+    if (type !== "message" || !Array.isArray(content)) continue;
+    for (const bloco of content) {
+      if (!bloco || typeof bloco !== "object") continue;
+      const { type: t, text } = bloco as { type?: unknown; text?: unknown };
+      if (t === "output_text" && typeof text === "string") partes.push(text);
+    }
+  }
+  return partes.join("\n");
 }
 
+/**
+ * Orçamento por tentativa. A rota do cron declara `maxDuration = 300`; DUAS
+ * tentativas + contexto + snapshot precisam caber nela, senão a plataforma
+ * mata a função no meio e nem o snapshot diário é gravado (o contrato "nunca
+ * lança" de `rodarUpdater` não protege de kill externo). 2×130s deixa ~40s
+ * de folga para o resto da rota.
+ */
+const TIMEOUT_TENTATIVA_MS = 130_000;
+
+/**
+ * OpenAI Responses API com a ferramenta `web_search`, via fetch (sem SDK —
+ * é um POST único; a dependência inteira não se paga, R7).
+ * `max_output_tokens` folgado porque em modelo com raciocínio ele inclui os
+ * tokens de pensamento — apertado demais, a resposta chega sem o JSON final.
+ * Uma retentativa em falha transitória (rede/timeout/5xx/429).
+ */
 async function buscarNaWeb(desde: string): Promise<string> {
-  const cliente = new Anthropic({ timeout: 240_000, maxRetries: 1 });
-  const resposta = await cliente.messages.create({
-    model: process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-6",
-    max_tokens: 2000,
-    messages: [{ role: "user", content: montarPromptBusca(desde) }],
-    tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 8 }],
+  const corpo = JSON.stringify({
+    model: process.env.OPENAI_MODEL ?? MODELO_PADRAO,
+    max_output_tokens: 8_000,
+    tools: [{ type: "web_search" }],
+    input: montarPromptBusca(desde),
   });
-  return textoDaResposta(resposta.content);
+
+  for (let tentativa = 1; ; tentativa++) {
+    let resposta: Response;
+    try {
+      resposta = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: corpo,
+        signal: AbortSignal.timeout(TIMEOUT_TENTATIVA_MS),
+      });
+    } catch (erro) {
+      if (tentativa === 1) continue;
+      throw erro;
+    }
+    if ((resposta.status >= 500 || resposta.status === 429) && tentativa === 1) {
+      // Consome o corpo antes de descartar a Response (não deixa socket preso).
+      await resposta.text().catch(() => undefined);
+      continue;
+    }
+    if (!resposta.ok) {
+      throw new Error(`OpenAI ${resposta.status}: ${(await resposta.text()).slice(0, 300)}`);
+    }
+    const dados: unknown = await resposta.json();
+    const { status, incomplete_details, output } = dados as {
+      status?: unknown;
+      incomplete_details?: { reason?: unknown };
+      output?: unknown;
+    };
+    // HTTP 200 não basta: `incomplete` (ex.: estourou max_output_tokens) chega
+    // sem o JSON final e viraria um falso "não há pesquisa nova" no resumo.
+    if (status !== "completed") {
+      throw new Error(
+        `OpenAI resposta ${String(status)}${
+          incomplete_details?.reason ? ` (${String(incomplete_details.reason)})` : ""
+        }`,
+      );
+    }
+    return textoDaResposta(output);
+  }
 }
 
 /* ------------------------------------------------------------------ *
@@ -493,7 +564,7 @@ export async function rodarUpdater(ator = "cron"): Promise<ResumoUpdater> {
     institutosNovos: [],
   };
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.OPENAI_API_KEY) {
     return { ...base, erro: "coletor indisponível: falta configuração da IA" };
   }
   const supabase = criarClienteAdmin();

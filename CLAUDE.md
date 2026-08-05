@@ -27,8 +27,8 @@ Gates antes de qualquer commit: `pnpm typecheck && pnpm lint && pnpm test && pnp
 
 ## Regras inegociáveis (resumo de R1–R8)
 
-- **R1** Nenhum segredo no cliente: `ANTHROPIC_API_KEY` e `SUPABASE_SERVICE_ROLE_KEY` são
-  server-only; chamadas à Anthropic só em route handler/cron.
+- **R1** Nenhum segredo no cliente: `OPENAI_API_KEY` e `SUPABASE_SERVICE_ROLE_KEY` são
+  server-only; chamadas à IA (OpenAI) só em route handler/cron.
 - **R2** Público só lê: RLS em todas as tabelas, zero policies de escrita; escrita apenas via
   service role no servidor, após checagem de admin, com registro em `audit_log`.
 - **R3** Pesquisas achadas pela IA nascem `pendente`; só admin aprova (no `/admin`). Não existe
@@ -52,7 +52,7 @@ Gates antes de qualquer commit: `pnpm typecheck && pnpm lint && pnpm test && pnp
   verbatim do .jsx) com tolerância 1e-9. Nunca "melhorar" a matemática; bug real → DECISOES.md.
   `rodarModelo(pesquisas, params, hojeMs)` é determinístico (`hojeMs` explícito).
 - `src/lib/dados.ts` — camada de dados: Supabase quando envs existem, senão seed local (R8).
-- `src/lib/updater.ts` — coletor server-only (Anthropic + web_search). A resposta da IA é
+- `src/lib/updater.ts` — coletor server-only (OpenAI Responses + web_search). A resposta da IA é
   entrada HOSTIL: Zod estrito, sanidade (valores 20–70, datas coerentes, URL https:), dedup
   por (instituto, campo_fim), bruto guardado para forense, insere como `pendente`.
 - `supabase/migrations/` — schema versionado (RLS default-deny; ver SECURITY.md).

@@ -16,6 +16,7 @@ import {
   extrairArrayJSON,
   processarRespostaIA,
   slugInstituto,
+  textoDaResposta,
   type ContextoBusca,
 } from "@/lib/updater";
 
@@ -316,5 +317,35 @@ describe("resposta maliciosa", () => {
     expect(chaves).not.toContain("status");
     expect(chaves).not.toContain("origem");
     expect(chaves).not.toContain("publicado_por");
+  });
+});
+
+describe("textoDaResposta (parser do formato OpenAI Responses)", () => {
+  it("extrai e junta só os output_text das mensagens, na ordem", () => {
+    const saida = [
+      { type: "reasoning", summary: [] },
+      { type: "web_search_call", status: "completed" },
+      { type: "message", content: [{ type: "output_text", text: "[]" }] },
+      { type: "message", content: [{ type: "output_text", text: "fim" }] },
+    ];
+    expect(textoDaResposta(saida)).toBe("[]\nfim");
+  });
+
+  it("resposta sem message (só raciocínio/buscas) vira string vazia", () => {
+    expect(
+      textoDaResposta([{ type: "reasoning" }, { type: "web_search_call" }]),
+    ).toBe("");
+  });
+
+  it("formas hostis não derrubam: não-array, itens nulos, content errado", () => {
+    expect(textoDaResposta(undefined)).toBe("");
+    expect(textoDaResposta("texto solto")).toBe("");
+    expect(textoDaResposta([null, 42, { type: "message", content: "não-array" }])).toBe("");
+    expect(
+      textoDaResposta([{ type: "message", content: [{ type: "refusal", refusal: "não" }] }]),
+    ).toBe("");
+    expect(
+      textoDaResposta([{ type: "message", content: [{ type: "output_text", text: 99 }] }]),
+    ).toBe("");
   });
 });

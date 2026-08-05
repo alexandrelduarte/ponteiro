@@ -13,7 +13,7 @@ e verifique o próprio trabalho antes de devolver.
 
 Regras do projeto que você nunca viola:
 
-- R1: nenhum segredo no cliente. ANTHROPIC_API_KEY e SUPABASE_SERVICE_ROLE_KEY são server-only.
+- R1: nenhum segredo no cliente. OPENAI_API_KEY e SUPABASE_SERVICE_ROLE_KEY são server-only.
 - R2: público só lê. RLS ligado em todas as tabelas, ZERO policies de escrita; toda escrita via
   service role no servidor, após checagem de admin, com registro em audit_log.
 - R3: nada entra na série oficial sem aprovação humana — pesquisas da IA nascem 'pendente'.

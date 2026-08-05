@@ -76,7 +76,7 @@ depois da correção.
 ## A2 — Roubo de chaves
 
 **O ataque.** Extrair `SUPABASE_SERVICE_ROLE_KEY` (escreve ignorando RLS),
-`ANTHROPIC_API_KEY` (gasta dinheiro) ou `CRON_SECRET` do que o navegador baixa.
+`OPENAI_API_KEY` (gasta dinheiro) ou `CRON_SECRET` do que o navegador baixa.
 
 **Mitigações.**
 
@@ -89,7 +89,7 @@ depois da correção.
   quais são server-only.
 - **Prova no build, não confiança.** Um passo do CI (`.github/workflows/ci.yml`)
   varre `.next/static/` — literalmente o que o navegador baixa — atrás de
-  `sk-ant`, `SUPABASE_SERVICE_ROLE_KEY`, `service_role`, `ANTHROPIC_API_KEY`,
+  `sk-ant`, `sk-proj`, `SUPABASE_SERVICE_ROLE_KEY`, `service_role`, `OPENAI_API_KEY`,
   `CRON_SECRET` e `ADMIN_EMAILS`. Qualquer ocorrência reprova o build.
   Verificado localmente com um build adversarial (valores-sentinela plantados nas
   envs): **zero ocorrências**; o bundle do cliente não contém sequer a URL ou a
@@ -303,7 +303,7 @@ executar código no build ou no servidor.
 - **CI sem privilégio.** `permissions: contents: read`, `persist-credentials:
 false` no checkout, zero secrets.
 - **Superfície pequena por escolha.** 10 dependências de produção, todas de
-  primeira linha (Next, React, Supabase, Recharts, Zod, date-fns, SDK da Anthropic).
+  primeira linha (Next, React, Supabase, Recharts, Zod, date-fns).
 
 **Avisos abertos — avaliados, não ignorados.** `pnpm audit --prod` reporta hoje
 5 vulnerabilidades (3 altas, 2 moderadas), **todas transitivas via `next`**:

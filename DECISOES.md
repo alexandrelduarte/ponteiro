@@ -415,3 +415,32 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
   empilhada criava ~350px de buraco sob o título; em terços as alturas casam.
 - "folga de N pontos" 13× sob as barras REMOVIDA da tabela → o número vive no balão da própria
   barra (hover) e no registro da linha; linhas de andar único, ruído morto.
+
+## Go-live — troca de fornecedor do coletor (ordem do dono, 2026-08-05)
+
+- Coletor migrado de Anthropic (claude) para OpenAI Responses API com ferramenta
+  `web_search`, a pedido do dono (créditos disponíveis lá). Modelo padrão
+  `gpt-5.6-luna` — o degrau barato da geração vigente (US$ 0,20/M entrada),
+  validado ao vivo antes da troca: executou buscas reais e localizou pesquisa
+  recente com registro TSE correto.
+- A troca é SÓ na função `buscarNaWeb` + checagem de env (`OPENAI_API_KEY`,
+  `OPENAI_MODEL`): todo o funil hostil (Zod estrito, sanidade 20–70, dedup,
+  `pendente`, bruto forense) é agnóstico de fornecedor e ficou intacto — o
+  contrato continua "texto com um array JSON dentro".
+- Sem SDK da OpenAI: é um POST único; `fetch` nativo com timeout de 240s e uma
+  retentativa em falha transitória reproduz o comportamento do cliente antigo
+  sem a dependência (R7). `@anthropic-ai/sdk` removido.
+- `max_output_tokens: 8000` (era 2000): em modelo com raciocínio o teto inclui
+  os tokens de pensamento; apertado, a resposta chegaria truncada sem o JSON.
+- `textoDaResposta` exportada e tratando a resposta como `unknown` nível a
+  nível — a forma vem da rede, não do nosso tipo.
+- Pós-revisão adversarial da migração (3 lentes, 8 achados confirmados):
+  timeout por tentativa 240s→130s — a rota do cron tem `maxDuration=300` e
+  2×240s estourava o teto, matando a função ANTES do snapshot diário (o pior
+  modo de falha: buraco silencioso na série); agora 2×130s + folga cabem.
+  `status !== "completed"` da Responses API vira erro explícito (antes,
+  resposta truncada por max_output_tokens viraria um falso "não há pesquisa
+  nova"). Tripwire do CI atualizado para `sk-proj|OPENAI_API_KEY` (varria só
+  os padrões da Anthropic — SECURITY.md prometia o que o CI não fazia).
+  `textoDaResposta` ganhou testes (formas hostis inclusas). Custos e runbooks
+  do README reescritos para a OpenAI.

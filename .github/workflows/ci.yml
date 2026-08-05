@@ -2,7 +2,7 @@ name: CI
 
 # Portão único do repositório: os mesmos gates que rodam na máquina
 # (typecheck → lint → test → build) rodam aqui, na ordem que falha mais barato
-# primeiro. Sem secrets: o site builda e testa SEM Supabase e SEM Anthropic
+# primeiro. Sem secrets: o site builda e testa SEM Supabase e SEM OpenAI
 # (regra R8, degradação graciosa para o seed local). Se algum dia um passo
 # precisar de credencial, ele está no lugar errado.
 
@@ -76,7 +76,7 @@ jobs:
         # valor de uma chave server-only pode aparecer ali.
         run: |
           set -euo pipefail
-          padroes='sk-ant|SUPABASE_SERVICE_ROLE_KEY|service_role|ANTHROPIC_API_KEY|CRON_SECRET|ADMIN_EMAILS'
+          padroes='sk-ant|sk-proj|SUPABASE_SERVICE_ROLE_KEY|service_role|OPENAI_API_KEY|CRON_SECRET|ADMIN_EMAILS'
           if grep -REl "$padroes" .next/static/ ; then
             echo "::error::segredo (nome ou valor) encontrado no bundle do cliente"
             exit 1

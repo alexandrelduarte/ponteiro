@@ -116,7 +116,7 @@ CSP no cliente (`z.config({ jitless: true })` no único módulo cliente com Zod)
    de RLS rodam automaticamente quando as envs existirem.
 2. **GitHub**: criar o repositório, `git remote add` + push, ligar branch protection na `main`
    e 2FA.
-3. **Vercel**: importar o repo, preencher as envs do `.env.example` (service role e Anthropic
+3. **Vercel**: importar o repo, preencher as envs do `.env.example` (service role e OpenAI
    como server-only), conferir o cron diário em Settings → Crons, definir `CRON_SECRET`.
 4. Fluxo de login por magic link validado com envs falsas (3 estados do /admin renderizam);
    o `exchangeCodeForSession` só é testável com projeto Supabase real.

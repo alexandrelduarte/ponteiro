@@ -16,6 +16,7 @@
  */
 import { useMemo } from "react";
 import { Botao, Chip, Detalhe, Nicho, Subtitulo } from "@/components/ui/blocos";
+import { MaisSobre } from "@/components/ui/glossario";
 import { emCem, parEmCem } from "@/components/ui/textos";
 import { ERRO_2022 } from "@/data/constantes";
 import { calcReplay, fmt, fmtSinal } from "@/lib/modelo";
@@ -48,9 +49,14 @@ export function Replay2022() {
       {/* Três colunas só a partir de lg. A 768 a grade ficava severamente
           desequilibrada — as colunas 1 e 2 terminavam ~450px acima da 3, que
           carrega o dobro de texto — e a coluna de ~180px espremia o botão
-          primário em quatro linhas, virando uma pílula de 110px de altura. */}
-      <div className="mt-4 grid gap-3 lg:grid-cols-3 lg:items-start">
-        <Nicho>
+          primário em quatro linhas, virando uma pílula de 110px de altura.
+          Em lg os três cartões passam a ter a MESMA altura (`items-stretch` +
+          `h-full`): o desequilíbrio que sobrava era o do conteúdo, e o terceiro
+          cartão devolveu ao balão o parágrafo que o fazia ter o dobro dos
+          outros. Quatro peças contra duas e três viraram três contra duas e
+          três. */}
+      <div className="mt-4 grid gap-3 lg:grid-cols-3 lg:items-stretch">
+        <Nicho className="h-full">
           <p className="text-secao text-tinta">1º turno, com o erro de 2022 aplicado</p>
           <p className="mt-2">
             <Chip tom="ameixa" className="numeros">
@@ -66,7 +72,7 @@ export function Replay2022() {
           </p>
         </Nicho>
 
-        <Nicho>
+        <Nicho className="h-full">
           <p className="text-secao text-tinta">2º turno, com o erro de 2022 aplicado</p>
           <p className="mt-2">
             <Chip tom="ameixa" className="numeros">
@@ -83,26 +89,34 @@ export function Replay2022() {
         {/* Tom neutro de propósito: sobre o lilás da faixa, o carmim dos números
             fica em 4,47:1 — 0,03 abaixo do piso AA (axe reprova). O lilás segue
             reservado às formas de incerteza; a síntese destaca pelo título. */}
-        <Nicho>
+        <Nicho className="h-full">
           <p className="text-secao text-tinta">Somando os dois turnos nesta hipótese</p>
           <p className="mt-2 text-dado numeros">
             <span className="text-lula">Lula {elDia} em 100</span>
             <span className="text-tinta-media"> × </span>
             <span className="text-flavio">Flávio {elDiaF} em 100</span>
           </p>
+          {/* DIETA: o quarto parágrafo deste cartão — o que explica por que a
+              distância até outubro derruba o número — desceu para o balão. Ele
+              é a única peça de aprofundamento dos três cartões e era ele que
+              fazia esta coluna ter o dobro de altura das outras duas. Nenhuma
+              palavra mudou: ela está inteira a um toque. */}
           <p className="mt-2 text-micro text-tinta numeros">
             De cada 100 cenários desta hipótese: <b className="font-semibold">{p1Direto}</b>{" "}
             terminam com Lula eleito já no 1º turno. Os outros{" "}
             <b className="font-semibold">{p2t}</b> vão à decisão, e Lula ganha em {pv2} de cada 100
             deles — o que dá <b className="font-semibold">{v2Abs}</b> em 100. Somando os dois
-            caminhos: <b className="font-semibold">{elDia}</b> em 100.
-          </p>
-          <p className="mt-2 text-micro text-tinta-media numeros">
-            Nesta hipótese o erro vira suposição fixa, turno a turno, como aconteceu em 2022. A
-            única dúvida que sobra é o quanto a opinião ainda pode andar até outubro. Se a votação
-            fosse hoje sob essa hipótese, a dúvida quase desapareceria: a diferença ficaria perto de{" "}
-            {r2lInt} × {100 - r2lInt} e Lula seria eleito em {emCem(replay.elRepH)} de cada 100
-            cenários. É a distância até outubro que derruba esse número para {elDia}.
+            caminhos: <b className="font-semibold">{elDia}</b> em 100.{" "}
+            <MaisSobre
+              titulo="Somando os dois turnos nesta hipótese"
+              rotuloAcessivel="ver por que a distância até outubro derruba esse número"
+            >
+              Nesta hipótese o erro vira suposição fixa, turno a turno, como aconteceu em 2022. A
+              única dúvida que sobra é o quanto a opinião ainda pode andar até outubro. Se a votação
+              fosse hoje sob essa hipótese, a dúvida quase desapareceria: a diferença ficaria perto
+              de {r2lInt} × {100 - r2lInt} e Lula seria eleito em {emCem(replay.elRepH)} de cada 100
+              cenários. É a distância até outubro que derruba esse número para {elDia}.
+            </MaisSobre>
           </p>
         </Nicho>
       </div>

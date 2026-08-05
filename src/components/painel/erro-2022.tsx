@@ -12,7 +12,16 @@
  * do bloco e some por completo numa tabela espremida.
  */
 import { useMemo } from "react";
-import { Bloco, Cabecalho, Detalhe, LinkExterno, Nicho, Subtitulo } from "@/components/ui/blocos";
+import {
+  Bloco,
+  Cabecalho,
+  Colunas,
+  Detalhe,
+  LINHA_TABELA,
+  LinkExterno,
+  Nicho,
+  Subtitulo,
+} from "@/components/ui/blocos";
 import { parEmCem } from "@/components/ui/textos";
 import { calcReplay } from "@/lib/modelo";
 import { ERROS_TRADUZIDOS, FONTES_TRADUZIDAS } from "./copia-erros";
@@ -78,19 +87,24 @@ export function Erro2022() {
         ))}
       </ul>
 
-      {/* ---------- lg+: tabela ---------- */}
-      <div
-        className="rolagem-x relative mt-5 hidden overflow-x-auto lg:block"
-        role="group"
-        tabIndex={0}
-        aria-labelledby="titulo-erro-2022"
-      >
-        <table className="w-full text-micro">
+      {/* ---------- lg+: tabela ----------
+          Mesma cirurgia da tabela da série: `table-fixed` com `<colgroup>` em
+          porcentagem, e a região de rolagem (com os gradientes e o `tabIndex`)
+          desaparece porque não há mais o que rolar. A coluna do ERRO — a razão
+          de existir do bloco — é a mais larga depois da fala das pesquisas. */}
+      <div className="relative mt-5 hidden lg:block">
+        <table className="w-full table-fixed text-micro">
           <caption className="sr-only">
             O que as pesquisas de véspera diziam e qual foi o resultado real, em cinco eleições.
           </caption>
+          <colgroup>
+            <col className="w-[14%]" />
+            <col className="w-[22%]" />
+            <col className="w-[34%]" />
+            <col className="w-[30%]" />
+          </colgroup>
           <thead>
-            <tr className="text-left text-tinta-media">
+            <tr className="text-left align-bottom text-tinta-media">
               <th scope="col" className="py-2 pr-3 font-medium">
                 Eleição
               </th>
@@ -107,11 +121,8 @@ export function Erro2022() {
           </thead>
           <tbody>
             {ERROS_TRADUZIDOS.map((h) => (
-              <tr key={h.pleito} className="border-t border-filete align-top">
-                <th
-                  scope="row"
-                  className="py-3 pr-3 text-left font-semibold whitespace-nowrap text-tinta"
-                >
+              <tr key={h.pleito} className={`border-t border-filete align-top ${LINHA_TABELA}`}>
+                <th scope="row" className="py-3 pr-3 text-left font-semibold text-tinta">
                   {h.pleito}
                 </th>
                 <td className="py-3 pr-3 text-tinta-media numeros">{h.urna}</td>
@@ -150,10 +161,13 @@ export function Erro2022() {
           página, e quem quer a íntegra alcança num toque. */}
       <Detalhe
         titulo="Por que o erro do 1º turno importa agora, se o do 2º é menor"
-        className="mt-5 max-w-texto"
+        className="mt-5"
       >
-        <div className="mt-2 space-y-3 text-corpo text-tinta-media numeros">
-          <p>
+        <Colunas
+          arranjo="iguais"
+          className="mt-2 space-y-3 text-corpo text-tinta-media numeros lg:gap-y-3 lg:space-y-0"
+        >
+          <p className="max-w-texto">
             O erro pequeno da decisão de 2022 (3,1 pontos) só foi possível porque, entre um turno e
             outro, os institutos ganharam um gabarito perfeito: o resultado real do 1º turno. Com
             ele na mão, eles corrigiram o método.{" "}
@@ -162,14 +176,14 @@ export function Erro2022() {
             </b>{" "}
             — são o mesmo tipo de instrumento que produziu o erro de 6,3.
           </p>
-          <p>
+          <p className="max-w-texto">
             Por isso o erro do 1º turno entra três vezes na conta. Ele dá o tamanho da dúvida de
             hoje (o padrão de 4,0 fica entre os dois números). Ele muda a cara do 1º turno
             projetado: uma folga de cerca de 9 pontos vira uma chegada de cerca de 2,5. E ele define
             o teto do erro já visto no setor, usado no cartão de teste-limite. O 3,1 só vira a
             referência certa depois de 4 de outubro, quando o gabarito voltar a existir.
           </p>
-          <p>
+          <p className="max-w-texto">
             <b className="font-semibold text-tinta">
               E as correções duram de uma eleição para a outra?
             </b>{" "}
@@ -181,14 +195,14 @@ export function Erro2022() {
             Quaest ficaram 4,7 e 8,7 pontos abaixo da diferença real de Nunes — a Futura acertou.
             Correção parcial e desigual: nem cura, nem volta à estaca zero.
           </p>
-          <p>
+          <p className="max-w-texto">
             Traduzindo em número, sempre falando da chance de Lula no dia da votação: se a correção
             se manteve (régua em 3,0), cerca de 86 em 100. Se veio só em parte — o padrão do painel,
             4,0 — cerca de 83 em 100. Se o erro voltar para perto do tamanho do 1º turno (6,0, o
             topo da régua), cerca de 79 em 100. Escolha a sua suposição na régua de erro, logo
             acima.
           </p>
-        </div>
+        </Colunas>
       </Detalhe>
 
       <CurvaSensibilidade />

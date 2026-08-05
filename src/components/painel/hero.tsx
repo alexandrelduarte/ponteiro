@@ -16,7 +16,7 @@
  *
  * Tudo aqui sai pronto do HTML do servidor. Nenhum número espera JavaScript.
  */
-import { Nicho, Bloco, Aviso } from "@/components/ui/blocos";
+import { Nicho, Bloco, Aviso, Colunas } from "@/components/ui/blocos";
 import { Termo } from "@/components/ui/glossario";
 import { Contagem } from "@/components/ui/movimento";
 import { abs1, direcaoVies, faixaVeredito, parEmCem } from "@/components/ui/textos";
@@ -98,31 +98,39 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
           rotuloAcessivel={`Cem bolinhas, uma por cenário da decisão de 25 de outubro: ${nLula} caem do lado de Lula e ${nFlavio} do lado de Flávio.`}
         />
 
-        {/* 5. A micro-legenda, na redação assinada pelo data-scientist
-               (AUDITORIA-COPY §10.2): 55 palavras, com DUAS marcas de dúvida
-               dentro — "nenhuma é o resultado" e a cláusula literal de H2,
-               "até outubro isso ainda pode mudar". É ela que garante que a
-               primeira dobra de 390px carregue dúvida mesmo quando o
-               veredito desce para baixo da linha do horizonte.
-               Os fechos condicionais por líder ficaram APOSENTADOS: duas
-               fontes para o mesmo fato foi como o 83 ↔ 82 nasceu. */}
-        <p data-testid="legenda-enxame" className="mt-3 max-w-texto text-corpo text-tinta-media">
-          Cada bolinha é um resultado possível: nenhuma é o resultado —{" "}
-          <b className="font-semibold text-tinta">até outubro isso ainda pode mudar</b>. Aqui, só a
-          decisão de 25 de outubro: {nLula} do lado de Lula, {nFlavio} do lado de Flávio. Em{" "}
-          {p1tDef} de cada 100 cenários não há 2º turno; esses entram na frase de cima, que dá{" "}
-          {eleitoL} e {eleitoF}.
-        </p>
+        {/* 5 e 6, lado a lado a partir de lg — e NA MESMA ORDEM DO DOM.
+               A micro-legenda e o "isto não é previsão" são as duas frases que
+               fecham o hero, e empilhadas deixavam 44,8% da placa em branco à
+               direita. Como `Colunas` só vira grade em `lg`, a 390 a ordem de
+               leitura continua exatamente a de §5.1 (legenda → não é previsão)
+               e a dobra de 844px não muda um pixel. */}
+        <Colunas arranjo="principal" className="mt-3">
+          {/* 5. A micro-legenda, na redação assinada pelo data-scientist
+                 (AUDITORIA-COPY §10.2): 55 palavras, com DUAS marcas de dúvida
+                 dentro — "nenhuma é o resultado" e a cláusula literal de H2,
+                 "até outubro isso ainda pode mudar". É ela que garante que a
+                 primeira dobra de 390px carregue dúvida mesmo quando o
+                 veredito desce para baixo da linha do horizonte.
+                 Os fechos condicionais por líder ficaram APOSENTADOS: duas
+                 fontes para o mesmo fato foi como o 83 ↔ 82 nasceu. */}
+          <p data-testid="legenda-enxame" className="max-w-texto text-corpo text-tinta-media">
+            Cada bolinha é um resultado possível: nenhuma é o resultado —{" "}
+            <b className="font-semibold text-tinta">até outubro isso ainda pode mudar</b>. Aqui, só
+            a decisão de 25 de outubro: {nLula} do lado de Lula, {nFlavio} do lado de Flávio. Em{" "}
+            {p1tDef} de cada 100 cenários não há 2º turno; esses entram na frase de cima, que dá{" "}
+            {eleitoL} e {eleitoF}.
+          </p>
 
-        {/* 6. "Não é previsão" — nunca some a 390px (H4), e §5.1 pede os seis
-               elementos no primeiro scroll "sem exceção". Ele ficava FORA da
-               placa e começava em y=839 dos 844: sobravam 5px de ascendentes.
-               Dentro da placa ele sobe o vão de 16px mais o respiro de 20px do
-               fim do cartão — e passa a caber inteiro. */}
-        <p data-testid="disclaimer" className="mt-3 max-w-texto text-intro text-tinta">
-          Isto não é previsão. É o que as {pesquisas.length} pesquisas registradas no TSE dizem
-          hoje, mais o tanto que a corrida ainda pode andar até outubro.
-        </p>
+          {/* 6. "Não é previsão" — nunca some a 390px (H4), e §5.1 pede os seis
+                 elementos no primeiro scroll "sem exceção". Ele ficava FORA da
+                 placa e começava em y=839 dos 844: sobravam 5px de ascendentes.
+                 Dentro da placa ele sobe o vão de 16px mais o respiro de 20px do
+                 fim do cartão — e passa a caber inteiro. */}
+          <p data-testid="disclaimer" className="mt-3 max-w-texto text-intro text-tinta lg:mt-0">
+            Isto não é previsão. É o que as {pesquisas.length} pesquisas registradas no TSE dizem
+            hoje, mais o tanto que a corrida ainda pode andar até outubro.
+          </p>
+        </Colunas>
       </Bloco>
 
       <Bloco className="mt-4">
@@ -136,54 +144,81 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
           </Aviso>
         ) : null}
 
-        <h2 data-testid="veredito-titulo" className="text-pergunta text-tinta">
-          {faixa === "empate" ? "Está em aberto — dá para os dois lados" : null}
-          {faixa === "leve" ? `${lider} está na frente por pouco — e isso ainda pode mudar` : null}
-          {faixa === "favorito" ? (
-            <>
-              {lider} está na frente — provável, mas <b>ainda pode mudar</b>
-            </>
-          ) : null}
-          {faixa === "amplo" ? `${lider} está bem na frente — mas não é garantia` : null}
-        </h2>
+        {/* O VEREDITO e o que "chance" quer dizer, pareados a partir de lg.
+            O título mais o parágrafo da faixa ficam na medida de leitura à
+            esquerda; as duas frases que ensinam a ler o número — antes soltas
+            depois dos nichos, num grid de 2 colunas próprio — sobem para a
+            coluna da direita. Um pareamento no lugar de duas faixas mortas. */}
+        <Colunas arranjo="principal">
+          <div>
+            <h2 data-testid="veredito-titulo" className="text-pergunta text-tinta">
+              {faixa === "empate" ? "Está em aberto — dá para os dois lados" : null}
+              {faixa === "leve"
+                ? `${lider} está na frente por pouco — e isso ainda pode mudar`
+                : null}
+              {faixa === "favorito" ? (
+                <>
+                  {lider} está na frente — provável, mas <b>ainda pode mudar</b>
+                </>
+              ) : null}
+              {faixa === "amplo" ? `${lider} está bem na frente — mas não é garantia` : null}
+            </h2>
 
-        <p className="mt-2 max-w-texto text-corpo text-tinta-media">
-          {faixa === "empate" ? (
-            <>
-              A diferença de {abs1(M.margemAj)} pontos na decisão é pequena diante da dúvida, que é
-              de cerca de {fmt(M.sigmaDia2)} pontos para cada lado. Pelos números de hoje, qualquer
-              um dos dois pode ser eleito.
-            </>
-          ) : null}
-          {faixa === "leve" ? (
-            <>
-              A vantagem existe, mas cabe dentro do erro que as pesquisas já cometeram antes, somado
-              aos {M.dias2T} dias que ainda faltam. Virada segue possível.
-            </>
-          ) : null}
-          {faixa === "favorito" ? (
-            <>
-              A vantagem de {abs1(M.margemAj)} pontos na decisão é grande diante da dúvida de hoje,
-              que é de cerca de {fmt(M.sigmaHoje)} pontos para cada lado. Mesmo assim, um erro das
-              pesquisas do tamanho do de 2022, ou a campanha na TV, ainda permitiriam a virada.
-            </>
-          ) : null}
-          {faixa === "amplo" ? (
-            <>
-              A vantagem aparece na maioria das pesquisas e resiste ao erro que elas já cometeram
-              antes. Para virar, seria preciso um erro de pesquisa maior que os já vistos e uma
-              mudança de opinião fora do padrão. Improvável não é impossível.
-            </>
-          ) : null}
-          {params.vies !== 0 ? (
-            <>
-              {" "}
-              Nesta conta você supôs uma puxada de {abs1(params.vies)} pontos{" "}
-              {direcaoVies(params.vies)}: a diferença medida ({fmtSinal(M.margem)}) virou{" "}
-              {fmtSinal(M.margemAj)}.
-            </>
-          ) : null}
-        </p>
+            <p className="mt-2 max-w-texto text-corpo text-tinta-media">
+              {faixa === "empate" ? (
+                <>
+                  A diferença de {abs1(M.margemAj)} pontos na decisão é pequena diante da dúvida,
+                  que é de cerca de {fmt(M.sigmaDia2)} pontos para cada lado. Pelos números de hoje,
+                  qualquer um dos dois pode ser eleito.
+                </>
+              ) : null}
+              {faixa === "leve" ? (
+                <>
+                  A vantagem existe, mas cabe dentro do erro que as pesquisas já cometeram antes,
+                  somado aos {M.dias2T} dias que ainda faltam. Virada segue possível.
+                </>
+              ) : null}
+              {faixa === "favorito" ? (
+                <>
+                  A vantagem de {abs1(M.margemAj)} pontos na decisão é grande diante da dúvida de
+                  hoje, que é de cerca de {fmt(M.sigmaHoje)} pontos para cada lado. Mesmo assim, um
+                  erro das pesquisas do tamanho do de 2022, ou a campanha na TV, ainda permitiriam a
+                  virada.
+                </>
+              ) : null}
+              {faixa === "amplo" ? (
+                <>
+                  A vantagem aparece na maioria das pesquisas e resiste ao erro que elas já
+                  cometeram antes. Para virar, seria preciso um erro de pesquisa maior que os já
+                  vistos e uma mudança de opinião fora do padrão. Improvável não é impossível.
+                </>
+              ) : null}
+              {params.vies !== 0 ? (
+                <>
+                  {" "}
+                  Nesta conta você supôs uma puxada de {abs1(params.vies)} pontos{" "}
+                  {direcaoVies(params.vies)}: a diferença medida ({fmtSinal(M.margem)}) virou{" "}
+                  {fmtSinal(M.margemAj)}.
+                </>
+              ) : null}
+            </p>
+          </div>
+
+          <div className="mt-4 lg:mt-0">
+            <p className="max-w-texto text-corpo text-tinta-media">
+              Chance não é resultado. O painel monta 100 cenários compatíveis com as pesquisas de
+              hoje{" "}
+              <b className="font-semibold text-tinta">
+                e com o quanto a corrida ainda pode andar até outubro
+              </b>
+              , e conta em quantos deles cada um termina eleito.
+            </p>
+            <p className="mt-3 max-w-texto text-corpo text-tinta-media">
+              Um resultado que aparece em {M.eleito.dia.l >= 0.5 ? eleitoF : eleitoL} de 100
+              cenários é pouco provável — não é impossível.
+            </p>
+          </div>
+        </Colunas>
 
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <Nicho>
@@ -209,42 +244,28 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
             </p>
           </Nicho>
         </div>
-
-        {/* Duas colunas a partir de lg. Não é enfeite: em uma coluna só, este
-            parágrafo deixava 47% da placa de 936px em branco — a mesma faixa
-            morta que o resto da página já tinha corrigido. Duas colunas de
-            ~440px mantêm cada uma dentro da medida de leitura. */}
-        <div className="mt-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-10">
-          <p className="max-w-texto text-corpo text-tinta-media">
-            Chance não é resultado. O painel monta 100 cenários compatíveis com as pesquisas de hoje{" "}
-            <b className="font-semibold text-tinta">
-              e com o quanto a corrida ainda pode andar até outubro
-            </b>
-            , e conta em quantos deles cada um termina eleito.
-          </p>
-          <p className="mt-3 max-w-texto text-corpo text-tinta-media lg:mt-0">
-            Um resultado que aparece em {M.eleito.dia.l >= 0.5 ? eleitoF : eleitoL} de 100 cenários
-            é pouco provável — não é impossível.
-          </p>
-        </div>
       </Bloco>
 
-      {/* 7. Procedência + selo de frescor. */}
-      <div className="entra mt-4 max-w-texto">
-        <p className="text-corpo text-tinta-media">
+      {/* 7. Procedência | selo de frescor — o terceiro pareamento do hero.
+             De onde vêm os números fica à esquerda, na medida de leitura; o
+             quão frescos eles são (selo + explicação) à direita. */}
+      <Colunas arranjo="principal" className="entra mt-4">
+        <p className="max-w-texto text-corpo text-tinta-media">
           {pesquisas.length} pesquisas de {institutos} institutos, todas com{" "}
           <Termo chave="registroTse">registro no TSE</Termo>. Cada uma tem link para a publicação
           original.
         </p>
-        <p
-          data-testid="selo-frescor"
-          className={`mt-2 text-micro ${selo.alerta ? "text-atencao" : "text-tinta-media"}`}
-        >
-          <span aria-hidden="true">{selo.alerta ? "⚠ " : "✓ "}</span>
-          {selo.texto}
-        </p>
-        <p className="mt-1 text-micro text-tinta-media">{EXPLICA_FRESCOR}</p>
-      </div>
+        <div className="mt-2 max-w-texto lg:mt-0">
+          <p
+            data-testid="selo-frescor"
+            className={`text-micro ${selo.alerta ? "text-atencao" : "text-tinta-media"}`}
+          >
+            <span aria-hidden="true">{selo.alerta ? "⚠ " : "✓ "}</span>
+            {selo.texto}
+          </p>
+          <p className="mt-1 text-micro text-tinta-media">{EXPLICA_FRESCOR}</p>
+        </div>
+      </Colunas>
     </div>
   );
 }

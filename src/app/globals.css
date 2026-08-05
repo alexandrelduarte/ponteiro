@@ -150,11 +150,36 @@ details > summary {
   border-radius: var(--radius-plena);
   background: var(--color-ameixa);
   box-shadow: 0 0 0 2px var(--color-placa);
-  transition: background-color var(--dur-rapida) var(--ease-padrao);
+  transition:
+    background-color var(--dur-rapida) var(--ease-padrao),
+    box-shadow var(--dur-rapida) var(--ease-padrao);
 }
 
 .deslizador:active::-webkit-slider-thumb {
   background: var(--color-ameixa-pressa);
+}
+
+/**
+ * SEGUNDO ANEL no hover — só onde existe ponteiro que paira.
+ *
+ * O thumb já tinha o anel de 2px cor-da-placa que garante os 24px visíveis; o
+ * halo ameixa-tênue por fora é o único jeito de o controle responder ao mouse
+ * sem crescer (crescer moveria a posição percebida do valor, e a régua é
+ * referência). Em toque a regra nem existe — `:hover` grudado num dedo é o
+ * defeito clássico. A cor de campo do thumb não muda: o pressed continua sendo
+ * o único estado que troca de tom.
+ */
+@media (hover: hover) {
+  .deslizador:hover::-webkit-slider-thumb {
+    box-shadow:
+      0 0 0 2px var(--color-placa),
+      0 0 0 6px var(--color-ameixa-tenue);
+  }
+  .deslizador:hover::-moz-range-thumb {
+    box-shadow:
+      0 0 0 2px var(--color-placa),
+      0 0 0 6px var(--color-ameixa-tenue);
+  }
 }
 
 .deslizador::-moz-range-track {
@@ -177,6 +202,9 @@ details > summary {
   border-radius: var(--radius-plena);
   background: var(--color-ameixa);
   box-shadow: 0 0 0 2px var(--color-placa);
+  transition:
+    background-color var(--dur-rapida) var(--ease-padrao),
+    box-shadow var(--dur-rapida) var(--ease-padrao);
 }
 
 /* ===========================================================================

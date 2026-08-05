@@ -90,6 +90,28 @@ export function Enxame({
   const { ref, assentou } = useAssentaUmaVez<HTMLDivElement>();
   const { passo, diametro, passoVertical, larguraSvg, alturaSvg, yEixo, xEmpate } = layout;
   const raio = diametro / 2;
+
+  /**
+   * A LEITURA ACUMULADA — o momento-assinatura do ponteiro (§7.1b).
+   *
+   * Passar o mouse por uma coluna acende a faixa dela e diz, em palavras,
+   * quantos cenários existem dali para a esquerda. É a acumulada do desenho
+   * dita em contagem, que é a única leitura que um quantile dotplot autoriza
+   * sem virar promessa.
+   *
+   * Três decisões que não são detalhe:
+   *  1. o alvo é a FAIXA inteira da coluna, não o grupo de bolinhas — senão as
+   *     colunas vazias (hoje 3 das 28) viram zona morta e o número parece
+   *     pular de 40 para 55 ao atravessar o desenho;
+   *  2. só ponteiro do tipo `mouse` acende. Toque não paira: no celular isto
+   *     simplesmente não existe, e nada na tela muda de lugar por causa disso;
+   *  3. nenhuma coluna é APAGADA para destacar a outra (1.4.11): o que entra é
+   *     um campo ameixa-tênue ATRÁS das bolinhas — as 100 continuam com o
+   *     mesmo tom e o mesmo limite de sempre.
+   */
+  const interativo = escala !== "mini";
+  const [destacada, setDestacada] = useState<number | null>(null);
+  const coluna = destacada === null ? null : layout.colunas[destacada];
   /**
    * Rótulos de ponta curtos no mini: no cartão de 286px de 390, "← Flávio na
    * frente · 18" quebrava e deixava o "18" órfão numa linha sozinha, sem o
@@ -100,7 +122,12 @@ export function Enxame({
 
   return (
     <div ref={ref} className={LARGURA_ESCALA[escala]}>
-      {/* Rótulo do empate, ancorado em porcentagem e fora do SVG. */}
+      {/* Rótulo do empate, ancorado em porcentagem e fora do SVG.
+          A leitura acumulada divide ESTA fileira, que já existia e já tinha
+          20px reservados: o desenho não é empurrado um pixel quando ela
+          aparece, e o CLS continua zero sem precisar de espaço novo. Ela se
+          ancora no lado OPOSTO ao do rótulo "empate" — que é referência e não
+          pode ser encoberta nem deslocada (§7.2). */}
       <div className="relative h-5 text-micro text-tinta">
         <span
           className="absolute -translate-x-1/2 whitespace-nowrap"
@@ -108,6 +135,17 @@ export function Enxame({
         >
           empate
         </span>
+        {interativo ? (
+          <span
+            aria-hidden="true"
+            className={[
+              "absolute top-0 whitespace-nowrap text-ameixa numeros",
+              layout.posEmpatePct > 50 ? "left-0" : "right-0",
+            ].join(" ")}
+          >
+            {coluna ? `da esquerda até aqui: ${coluna.acumulado} de 100 cenários` : ""}
+          </span>
+        ) : null}
       </div>
 
       <div
@@ -121,6 +159,17 @@ export function Enxame({
           aria-label={rotuloAcessivel}
           className="block h-auto w-full"
         >
+          {/* O campo do destaque, ATRÁS de tudo. */}
+          {interativo && destacada !== null ? (
+            <rect
+              x={destacada * passo}
+              y={0}
+              width={passo}
+              height={alturaSvg}
+              fill="var(--color-ameixa-tenue)"
+            />
+          ) : null}
+
           {layout.colunas.map((coluna, i) => {
             const cx = (coluna.indice - layout.colunas[0].indice + 0.5) * passo;
             return (
@@ -171,6 +220,34 @@ export function Enxame({
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
           />
+
+          {/* As faixas de captura, por último e por cima: uma por COLUNA,
+              inclusive as vazias, cada uma cobrindo o passo inteiro de ponta a
+              ponta. É isto que faz a leitura existir em toda a largura do
+              desenho em vez de só onde há tinta.
+              `pointerEvents="all"` é obrigatório, não zelo: o padrão do SVG é
+              `visiblePainted`, e um retângulo de preenchimento transparente NÃO
+              é pintado — sem esta linha as faixas existem, ficam por cima e não
+              recebem um único evento. */}
+          {interativo
+            ? layout.colunas.map((c, i) => (
+                <rect
+                  key={c.indice}
+                  x={i * passo}
+                  y={0}
+                  width={passo}
+                  height={alturaSvg}
+                  fill="transparent"
+                  pointerEvents="all"
+                  onPointerEnter={(e) => {
+                    if (e.pointerType === "mouse") setDestacada(i);
+                  }}
+                  onPointerLeave={(e) => {
+                    if (e.pointerType === "mouse") setDestacada(null);
+                  }}
+                />
+              ))
+            : null}
         </svg>
       </div>
 

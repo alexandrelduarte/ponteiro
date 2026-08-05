@@ -94,8 +94,41 @@ const CARTOES: Record<string, { dado: string; leitura: string }> = {
   },
 };
 
+/**
+ * A 1ª camada da leitura, DERIVADA — nunca redigida à parte.
+ *
+ * A dieta da missão "ENCAIXE" deixa visível só a abertura de cada leitura e
+ * põe o resto atrás do "?". A tentação é escrever o resumo à mão; o preço
+ * seria a mesma frase existindo em dois lugares, livre para divergir — o
+ * defeito que este arquivo inteiro existe para evitar. Aqui o resumo é um
+ * PREFIXO calculado do texto auditado: corta no primeiro ponto final e nunca
+ * reescreve uma palavra. `tests/copia-apresentacao.test.ts` trava a invariante.
+ *
+ * O piso de 40 caracteres existe porque uma das cinco leituras abre com uma
+ * frase de duas palavras ("País dividido."): sozinha na tela ela não é
+ * resumo de nada, então o corte anda até o próximo ponto final.
+ */
+const PISO_RESUMO = 40;
+
+export function primeiraFrase(texto: string): string {
+  let corte = 0;
+  while (corte < texto.length) {
+    const ponto = texto.indexOf(". ", corte);
+    if (ponto < 0) return texto;
+    corte = ponto + 1;
+    if (corte >= PISO_RESUMO) break;
+  }
+  return texto.slice(0, corte);
+}
+
+export interface ItemContextoTraduzido extends ItemContexto {
+  /** abertura da `leitura`, palavra por palavra — o resto abre no "?" */
+  leituraCurta: string;
+}
+
 /** Os cinco cartões, na ordem do dado, com `dado` e `leitura` já traduzidos. */
-export const CONTEXTO_TRADUZIDO: ItemContexto[] = CONTEXTO.map((c) => {
+export const CONTEXTO_TRADUZIDO: ItemContextoTraduzido[] = CONTEXTO.map((c) => {
   const traducao = CARTOES[c.titulo];
-  return traducao ? { ...c, dado: traducao.dado, leitura: traducao.leitura } : c;
+  const item = traducao ? { ...c, dado: traducao.dado, leitura: traducao.leitura } : c;
+  return { ...item, leituraCurta: primeiraFrase(item.leitura) };
 });

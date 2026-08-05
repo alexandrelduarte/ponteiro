@@ -17,7 +17,7 @@
  * nomes aparecem juntos, uma vez, na primeira ocorrência da superfície.
  */
 import { Bloco, Cabecalho, Nicho, Subtitulo } from "@/components/ui/blocos";
-import { Termo } from "@/components/ui/glossario";
+import { MaisSobre, Termo } from "@/components/ui/glossario";
 import { abs1, emCem, parEmCem, pessoasEmCem } from "@/components/ui/textos";
 import { fmt, fmtSinal } from "@/lib/modelo";
 import { usePainel } from "./estado";
@@ -85,14 +85,23 @@ export function Frente() {
           </p>
           <p className="mt-1 text-corpo text-tinta numeros">diferença de {abs1(M.margem)} pontos</p>
 
+          {/* DIETA: a frase inteira de votos válidos ocupava três linhas para
+              entregar dois números. Fica o RÓTULO com os números — que é o
+              dado — e a frase auditada abre no "?", palavra por palavra, com o
+              aposto ("o bolo depois de tirar os N% de branco, nulo e quem não
+              sabe") que é o que ela tem de explicativo. */}
           <p className="mt-3 text-micro text-tinta-media">
-            Em <Termo chave="votosValidos">votos válidos</Termo> — o bolo depois de tirar os{" "}
-            <span className="numeros">{bnT2}%</span> de branco, nulo e quem não sabe, que é o que
-            falta para 100 nos números acima — fica{" "}
+            Em <Termo chave="votosValidos">votos válidos</Termo>:{" "}
             <span className="numeros">
               {validoL}% × {validoF}%
-            </span>
-            .
+            </span>{" "}
+            <MaisSobre
+              titulo="Votos válidos no 2º turno"
+              rotuloAcessivel="ver a conta dos votos válidos do 2º turno"
+            >
+              Em votos válidos — o bolo depois de tirar os {bnT2}% de branco, nulo e quem não sabe,
+              que é o que falta para 100 nos números acima — fica {validoL}% × {validoF}%.
+            </MaisSobre>
           </p>
 
           <p className="mt-3 text-micro text-tinta-media">
@@ -180,10 +189,13 @@ export function Frente() {
         </Nicho>
       </div>
 
-      {/* ---------------- Tendência ---------------- */}
+      {/* ---------------- Tendência ----------------
+          A nota do método era uma faixa de texto sozinha embaixo de duas
+          colunas curtas — a assinatura visual da faixa morta. Em `lg` ela vira
+          a TERCEIRA coluna, ao lado das duas listas que ela explica. */}
       <div className="mt-5">
         <Subtitulo>Subiu ou desceu desde a pesquisa anterior?</Subtitulo>
-        <div className="mt-2 grid gap-4 md:grid-cols-2">
+        <div className="mt-2 grid gap-4 md:grid-cols-2 lg:grid-cols-3 lg:items-start">
           <div className="flex flex-col gap-1">
             <p className="text-etiqueta text-tinta-media">2º turno</p>
             <Tendencia t={M.tend2.l} rotulo="Lula" />
@@ -196,12 +208,12 @@ export function Frente() {
             <Tendencia t={M.tend1.f} rotulo="Flávio" />
             <Tendencia t={M.tend1.m} rotulo="Diferença" />
           </div>
+          <p className="max-w-texto text-micro text-tinta-media md:col-span-2 lg:col-span-1">
+            Para não confundir método com movimento, o painel compara cada instituto com ele mesmo:
+            a pesquisa nova contra a anterior da mesma casa. Subir agora não quer dizer que vai
+            continuar subindo.
+          </p>
         </div>
-        <p className="mt-3 max-w-texto text-micro text-tinta-media">
-          Para não confundir método com movimento, o painel compara cada instituto com ele mesmo: a
-          pesquisa nova contra a anterior da mesma casa. Subir agora não quer dizer que vai
-          continuar subindo.
-        </p>
       </div>
     </Bloco>
   );

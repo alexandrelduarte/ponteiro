@@ -13,8 +13,10 @@
  *  2. COMPLEMENTO, NUNCA ARREDONDAMENTO DUPLO — em todo par que deve somar
  *     100, `parEmCem` arredonda UM número e devolve `100 − ele` no outro.
  *     Arredondar os dois em separado publica 101 (H3/VOZ §2.3).
- *  3. ORDEM FIXA — Lula à esquerda, Flávio à direita, sempre, porque essa é a
- *     posição deles na régua da diferença (VOZ §2.4).
+ *  3. ORDEM FIXA — Lula primeiro, Flávio depois, SEMPRE (VOZ §2.4): ordem que
+ *     muda com a liderança vira juízo editorial (R4). Atenção (AUDITORIA
+ *     §12.6): na régua da DIFERENÇA é o contrário — Flávio à esquerda, Lula à
+ *     direita; a ordem da prosa é convenção fixa, não espelho do desenho.
  */
 import { fmt } from "@/lib/modelo";
 

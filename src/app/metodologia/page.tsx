@@ -257,11 +257,17 @@ export default async function Metodologia() {
             <p>As mesmas definições publicadas nos chips do painel, reunidas para consulta.</p>
           </BlocoMetodo>
 
-          <section aria-labelledby="glossario-lista" className="mt-6">
+          {/* As duas LISTAS longas — treze verbetes e treze fontes — saem da
+              coluna de leitura em `lg` e viram duas colunas de ~490px cada.
+              A prosa não sai: §5.7 continua valendo palavra por palavra, e é
+              por isso que o recuo negativo mora só aqui e só a partir de `lg`,
+              onde a coluna de 1200 tem folga de sobra dos dois lados. Cada
+              coluna do par continua abaixo da medida de leitura. */}
+          <section aria-labelledby="glossario-lista" className="mt-6 lg:-mx-64">
             <Subtitulo id="glossario-lista" className="sr-only">
               Lista das palavras explicadas
             </Subtitulo>
-            <dl className="space-y-4">
+            <dl className="space-y-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-10 lg:gap-y-4 lg:space-y-0">
               {ORDEM_GLOSSARIO.map((chave) => (
                 <div key={chave}>
                   <dt className="text-secao text-tinta">{GLOSSARIO[chave].termo}</dt>
@@ -286,9 +292,9 @@ export default async function Metodologia() {
             <p>Fontes da série ({pesquisas.length}), com período de campo e registro no TSE.</p>
           </BlocoMetodo>
 
-          <section className="mt-6">
+          <section className="mt-6 lg:-mx-64">
             <Subtitulo>Lista completa</Subtitulo>
-            <ul className="mt-2 text-micro numeros">
+            <ul className="mt-2 text-micro numeros lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-10">
               {fontes.map((p) => (
                 <li
                   key={p.id}

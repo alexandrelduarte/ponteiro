@@ -242,9 +242,21 @@
      ====================================================================== */
   --breakpoint-sm: 40rem; /* 640 */
   --breakpoint-md: 48rem; /* 768 — a série vira tabela aqui */
-  --breakpoint-lg: 71.25rem; /* 1140 — coluna de 1080 + goteiras confortáveis */
+  --breakpoint-lg: 71.25rem; /* 1140 — entrada da composição de duas colunas
+                                (coluna de 1140 − 2×40 de goteira = 1060 de
+                                conteúdo; placa interna de 996 = 2×478px de
+                                medida de leitura + gap de 40) */
+  /* NÃO existe passo acima de `lg`. Os `xl`/`2xl` vinham do tema padrão do
+     Tailwind por VAZAMENTO — nenhuma regra do produto os usava, e um
+     breakpoint que ninguém desenhou é dívida esperando para ser paga por
+     engano. Acima de 1200 a coluna satura e a composição não muda. */
+  --breakpoint-xl: initial;
+  --breakpoint-2xl: initial;
 
-  --container-pagina: 67.5rem; /* 1080 — coluna máxima da página */
+  /* 1200 — a menor coluna que hospeda DUAS medidas de leitura dentro da placa:
+     a 1440 o interior do bloco fica em 1056 = 2×508px (≈57ch) + gap de 40.
+     Invisível abaixo de 1080 de viewport: 390 e 768 não mudam um pixel. */
+  --container-pagina: 75rem; /* 1200 — coluna máxima da página */
   --container-texto: 32rem; /* 512 (~58ch em Lexend 17px) — medida de leitura */
   --container-base: 24.375rem; /* 390 — o viewport onde o conceito nasce (P12) */
 

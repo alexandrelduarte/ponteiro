@@ -334,13 +334,18 @@ test.describe("painel", () => {
     );
   });
 
+  /**
+   * `:visible` porque a barra passou a existir em duas árvores desde a v2.1 —
+   * no ranking (abaixo de lg) e na matriz (lg+), sempre com só uma visível. O
+   * viewport padrão da suíte é 1280, então quem responde aqui é a da matriz.
+   */
   test("as barras dos candidatos usam régua fixa, não o líder", async ({ page }) => {
     await page.goto("/");
     await painelPronto(page);
     await page.getByTestId("aba-todos").scrollIntoViewIfNeeded();
     await page.getByTestId("aba-todos").click();
 
-    const primeira = page.getByTestId("barra-candidato-0");
+    const primeira = page.locator('[data-testid="barra-candidato-0"]:visible');
     await primeira.scrollIntoViewIfNeeded();
     const trilho = primeira.locator("..");
     const larguraBarra = (await primeira.boundingBox())!.width;

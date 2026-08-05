@@ -34,7 +34,7 @@ import {
   YAxis,
 } from "recharts";
 import type { PontoGrafico, PontoSerie } from "@/lib/modelo";
-import { COR, DicaEvolucao, TICK, ddmmDeMs } from "./comum";
+import { COR, CURSOR_DICA, DicaEvolucao, PONTO_ATIVO, TICK, ddmmDeMs, gatilhoDica } from "./comum";
 
 export interface PropsEvolucao {
   serie: PontoSerie[];
@@ -151,7 +151,7 @@ export default function GraficoEvolucao({
           stroke={COR.contorno}
           width={40}
         />
-        <Tooltip trigger="click" content={<DicaEvolucao />} />
+        <Tooltip trigger={gatilhoDica()} cursor={CURSOR_DICA} content={<DicaEvolucao />} />
 
         {/* A dúvida, observada: campo lilás com borda. */}
         <Area
@@ -215,6 +215,7 @@ export default function GraficoEvolucao({
           stroke={COR.ameixa}
           strokeWidth={2.5}
           dot={false}
+          activeDot={{ ...PONTO_ATIVO, fill: COR.ameixa }}
           type="monotone"
           connectNulls={false}
           isAnimationActive={false}

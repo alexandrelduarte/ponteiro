@@ -80,10 +80,19 @@ export function BarraPesquisa({
   linha,
   escala,
   className,
+  balaoNaLinha = false,
 }: {
   linha: LinhaModelo;
   escala: EscalaBarra;
   className?: string;
+  /**
+   * Na tabela (lg+), a frase que o leitor de tela já ouvia vira BALÃO visível
+   * quando o ponteiro passa pela linha. É o segundo momento-assinatura: a
+   * barra que só era geometria passa a dizer, com todas as letras, por que
+   * aquela pesquisa é ou não empate técnico. Só foi possível porque a rolagem
+   * lateral do wrapper morreu — com `overflow-x: auto` o balão era recortado.
+   */
+  balaoNaLinha?: boolean;
 }) {
   const folga = 2 * (linha.moe || 2);
   const inicio = posicao(linha.margem2 - folga, escala);
@@ -97,11 +106,31 @@ export function BarraPesquisa({
     : `Diferença de ${abs1(linha.margem2)} pontos a favor de ${lado}, fora da folga de ${abs1(folga)} pontos.`;
 
   return (
+    /* Sem `min-w`: na tabela de larguras fixas um piso em `rem` dentro da
+       célula era conteúdo estourando a coluna, e era ele que empurrava a
+       tabela para os 943px que não cabiam nos 936 da placa. Onde a barra
+       precisa de largura (o cartão), ela já tem a do cartão inteiro. */
     <div
       role="img"
       aria-label={rotulo}
-      className={["relative h-6 w-full min-w-[7rem]", className].filter(Boolean).join(" ")}
+      className={["relative h-6 w-full", className].filter(Boolean).join(" ")}
     >
+      {/* `aria-hidden` + `pointer-events-none`: é a MESMA frase do `aria-label`
+          acima, agora também para quem enxerga. Nada de novo é dito, nada
+          recebe foco, e o balão nunca intercepta o ponteiro. */}
+      {balaoNaLinha ? (
+        <span
+          aria-hidden="true"
+          className={[
+            "pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 hidden w-max max-w-[18rem]",
+            "-translate-x-1/2 rounded-nicho bg-placa px-3 py-2 text-micro text-tinta shadow-erguido",
+            "opacity-0 transition-opacity duration-(--dur-rapida) ease-(--ease-padrao)",
+            "lg:block group-hover:opacity-100",
+          ].join(" ")}
+        >
+          {rotulo}
+        </span>
+      ) : null}
       {/* A dúvida: comprimento = 2× a folga da medida, raio pleno, sem contorno. */}
       <span
         aria-hidden="true"

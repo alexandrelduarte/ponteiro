@@ -118,6 +118,20 @@ export interface ColunaEnxame {
   qtd: number;
   /** de que lado do empate ela está */
   lado: "lula" | "flavio";
+  /**
+   * Quantos cenários caem DESTA COLUNA PARA A ESQUERDA, ela inclusive.
+   *
+   * É a acumulada do próprio desenho — a SOMA CORRIDA de `qtd`, nunca uma
+   * normal avaliada de novo: se o número lido no hover viesse de fórmula, ele
+   * poderia discordar das bolinhas que o leitor está contando na tela, e o
+   * produto inteiro se apoia em "o escrito é o desenhado" (H3).
+   *
+   * Duas âncoras que caem fora por construção: na última coluna do lado de
+   * Flávio o acumulado é exatamente `nFlavio` (o inteiro impresso sob o
+   * desenho), e na última coluna é exatamente 100. Nunca é 0: a primeira
+   * coluna é, por definição, a do menor quantil, então tem ao menos um.
+   */
+  acumulado: number;
 }
 
 export interface LayoutEnxame {
@@ -158,10 +172,12 @@ function montarComLargura(
 
   const colunas: ColunaEnxame[] = [];
   let maiorPilha = 0;
+  let corrente = 0;
   for (let i = min; i <= max; i++) {
     const qtd = contagem.get(i) ?? 0;
     if (qtd > maiorPilha) maiorPilha = qtd;
-    colunas.push({ indice: i, qtd, lado: i >= 0 ? "lula" : "flavio" });
+    corrente += qtd;
+    colunas.push({ indice: i, qtd, lado: i >= 0 ? "lula" : "flavio", acumulado: corrente });
   }
 
   const passo = LARGURA_BASE / nCols;

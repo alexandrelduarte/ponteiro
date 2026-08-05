@@ -24,7 +24,7 @@
  *     alcançável, a um toque, em qualquer largura.
  */
 import { useRef } from "react";
-import { Bloco, Cabecalho, Chip, Vazio } from "@/components/ui/blocos";
+import { Bloco, Cabecalho, Chip, LINHA_TABELA, Vazio } from "@/components/ui/blocos";
 import { corDeExibicao } from "@/components/ui/cores-candidatos";
 import { fmt, fmtData, valCand } from "@/lib/modelo";
 import { usePainel, type Aba } from "./estado";
@@ -70,7 +70,8 @@ export function OutrosCandidatos() {
   const classeAba = (alvo: Aba) =>
     [
       "min-h-toque flex-1 basis-0 rounded-plena px-4 text-center text-corpo font-semibold",
-      "transition-colors duration-(--dur-rapida) ease-(--ease-padrao)",
+      "transition-[background-color,color,scale] duration-(--dur-rapida) ease-(--ease-padrao)",
+      "motion-safe:active:scale-[0.985]",
       aba === alvo ? "bg-ameixa text-tinta-inversa" : "text-tinta hover:bg-ameixa-tenue",
     ].join(" ");
 
@@ -116,7 +117,10 @@ export function OutrosCandidatos() {
         role="tablist"
         aria-label="Escopo da lista de candidatos"
         onKeyDown={aoTeclar}
-        className="mt-4 flex w-full gap-1 rounded-plena bg-nicho p-1 md:w-auto md:max-w-[32rem]"
+        /* O teto do controle acompanha a coluna: 32rem era 55% da placa de 936
+           e virava 48% na de 1056 — a barra encolhia sozinha quando a página
+           crescia. 40rem devolve a proporção. */
+        className="mt-4 flex w-full gap-1 rounded-plena bg-nicho p-1 md:w-auto md:max-w-[32rem] lg:max-w-[40rem]"
       >
         <button
           type="button"
@@ -182,13 +186,16 @@ export function OutrosCandidatos() {
                 é 720, ou seja, o rótulo "25%" caía sobre 22,4% da escala. É a
                 mesma âncora da marca no trilho (`left-1/2 -translate-x-1/2`),
                 então os dois não têm como divergir. */}
-            <div aria-hidden="true" className="relative mt-1 h-5 text-micro text-tinta-media">
+            <div
+              aria-hidden="true"
+              className="relative mt-1 h-5 text-micro text-tinta-media lg:hidden"
+            >
               <span className="absolute left-0">0</span>
               <span className="absolute left-1/2 -translate-x-1/2">25%</span>
               <span className="absolute right-0">50% dos votos</span>
             </div>
 
-            <ul className="mt-1 space-y-3" data-testid="lista-candidatos">
+            <ul className="mt-1 space-y-3 lg:hidden" data-testid="lista-candidatos">
               {campoCompleto.linhas.map((c, i) => {
                 const largura = Math.min(100, (100 * c.media) / REGUA_MAX);
                 return (
@@ -235,7 +242,7 @@ export function OutrosCandidatos() {
               })}
             </ul>
 
-            <p className="mt-2 max-w-texto text-micro text-tinta-media">
+            <p className="mt-2 max-w-texto text-micro text-tinta-media lg:hidden">
               Todas as barras estão na mesma régua: de 0 a 50% dos votos no 1º turno. O risco na
               marca do meio é a metade dessa régua, 25%.
             </p>
@@ -284,23 +291,63 @@ export function OutrosCandidatos() {
               ))}
             </ul>
 
-            {/* ---------- lg+: a matriz completa ---------- */}
-            <div className="mt-4 hidden lg:block">
-              <table className="w-full text-micro numeros">
+            {/* ---------- lg+: UMA tabela só ----------
+                A seção tinha duas leituras do mesmo dado empilhadas: o ranking
+                com as barras (numa coluna de 512px, com 49,7% da placa vazia à
+                direita) e, logo abaixo, a matriz candidato × instituto. Ler
+                "Lula 41,4%" duas vezes na mesma tela é o que VOZ §4 proíbe.
+                A partir de `lg` a MATRIZ absorve a régua como segunda coluna e
+                o ranking se recolhe: uma tabela, uma leitura, zero vazio. O
+                ranking continua sendo a forma de 390 e 768, onde a matriz não
+                caberia.
+
+                `table-fixed` + `<colgroup>`: os sete institutos dividem o que
+                sobra em partes iguais e a tabela não pode exceder a placa. O
+                `overflow-x-auto` é rede defensiva — com larguras fixas ele
+                nunca chega a rolar. */}
+            <div className="mt-4 hidden overflow-x-auto lg:block">
+              <table className="w-full table-fixed text-micro numeros">
                 <caption className="sr-only">
-                  Intenção de voto de cada candidato no 1º turno, pesquisa a pesquisa (as 7 mais
-                  recentes que divulgaram o 1º turno) e a média do painel.
+                  Cada candidato no 1º turno: onde a média dele cai na régua de 0 a 50% dos votos, a
+                  média do painel e o número pesquisa a pesquisa (as 7 mais recentes que divulgaram
+                  o 1º turno).
                 </caption>
+                <colgroup>
+                  <col className="w-[16%]" />
+                  <col className="w-[27%]" />
+                  <col className="w-[8%]" />
+                  {campoCompleto.pollsCampo.map((p) => (
+                    <col key={p.id} />
+                  ))}
+                </colgroup>
                 <thead>
-                  <tr className="text-left text-tinta-media">
+                  <tr className="text-left align-bottom text-tinta-media">
                     <th scope="col" className="py-2 pr-3 font-medium">
                       Candidato
+                    </th>
+                    {/* A régua dos 0 a 50% vive no CABEÇALHO da coluna que ela
+                        nomeia — mesma largura e mesmo recuo das barras de
+                        baixo, que é o que faz o "25%" cair exatamente sobre o
+                        risco da metade de cada trilho. */}
+                    <th scope="col" className="py-2 pr-3 font-medium">
+                      Onde a média cai
+                      <span
+                        aria-hidden="true"
+                        className="relative mt-1 block h-4 font-normal text-tinta-media"
+                      >
+                        <span className="absolute left-0">0</span>
+                        <span className="absolute left-1/2 -translate-x-1/2">25%</span>
+                        <span className="absolute right-0">50% dos votos</span>
+                      </span>
+                    </th>
+                    <th scope="col" className="coluna-numerica py-2 pr-3 font-medium">
+                      Média
                     </th>
                     {campoCompleto.pollsCampo.map((p) => (
                       <th
                         key={p.id}
                         scope="col"
-                        className="coluna-numerica min-w-[5ch] py-2 pr-3 font-medium whitespace-nowrap"
+                        className="coluna-numerica py-2 pr-3 font-medium whitespace-nowrap"
                       >
                         {ABREV_INSTITUTO[p.instituto] ? (
                           <>
@@ -314,42 +361,69 @@ export function OutrosCandidatos() {
                         {fmtData(p.fim)}
                       </th>
                     ))}
-                    <th scope="col" className="coluna-numerica min-w-[5ch] py-2 font-medium">
-                      Média
-                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {campoCompleto.linhas.map((c) => (
-                    <tr key={c.nome} className="border-t border-filete">
-                      <th
-                        scope="row"
-                        className="py-2 pr-3 text-left font-semibold whitespace-nowrap text-tinta"
+                  {campoCompleto.linhas.map((c, i) => {
+                    const largura = Math.min(100, (100 * c.media) / REGUA_MAX);
+                    return (
+                      <tr
+                        key={c.nome}
+                        className={`border-t border-filete align-top ${LINHA_TABELA}`}
                       >
-                        {c.nome}
-                      </th>
-                      {campoCompleto.pollsCampo.map((p) => {
-                        const v = valCand(p, c.nome);
-                        return (
-                          <td
-                            key={p.id}
-                            className="coluna-numerica min-w-[5ch] py-2 pr-3 text-tinta-media"
-                          >
-                            {v != null ? fmt(v, v % 1 ? 1 : 0) : "–"}
-                          </td>
-                        );
-                      })}
-                      <td className="coluna-numerica min-w-[5ch] py-2 font-semibold text-tinta">
-                        {fmt(c.media)}
-                      </td>
-                    </tr>
-                  ))}
+                        <th scope="row" className="py-2 pr-3 text-left font-semibold text-tinta">
+                          {i + 1}º · {c.nome}
+                          <span className="block font-normal text-tinta-media">
+                            {c.partido} · média de {c.k} {c.k === 1 ? "pesquisa" : "pesquisas"}
+                          </span>
+                          {i < 2 ? (
+                            <Chip tom="ameixa" className="mt-1">
+                              disputa principal
+                            </Chip>
+                          ) : null}
+                        </th>
+                        <td className="py-2 pr-3">
+                          <div className="relative mt-1 h-3 overflow-hidden rounded-plena bg-nicho">
+                            <div
+                              data-testid={`barra-candidato-${i}`}
+                              className="h-full rounded-plena"
+                              style={{
+                                width: `${largura}%`,
+                                background: corDeExibicao(c.nome, i),
+                              }}
+                            />
+                            <span
+                              aria-hidden="true"
+                              className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-contorno"
+                            />
+                          </div>
+                        </td>
+                        <td className="coluna-numerica py-2 pr-3 font-semibold text-tinta">
+                          {fmt(c.media)}
+                        </td>
+                        {campoCompleto.pollsCampo.map((p) => {
+                          const v = valCand(p, c.nome);
+                          return (
+                            <td key={p.id} className="coluna-numerica py-2 pr-3 text-tinta-media">
+                              {v != null ? fmt(v, v % 1 ? 1 : 0) : "–"}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
-              <p className="mt-3 max-w-texto text-micro text-tinta-media">
-                “–” quer dizer que o instituto não testou esse nome naquela pesquisa, ou não
-                divulgou o número.
-              </p>
+              <div className="mt-3 lg:grid lg:grid-cols-2 lg:items-start lg:gap-10">
+                <p className="max-w-texto text-micro text-tinta-media">
+                  Todas as barras estão na mesma régua: de 0 a 50% dos votos no 1º turno. O risco na
+                  marca do meio é a metade dessa régua, 25%.
+                </p>
+                <p className="mt-2 max-w-texto text-micro text-tinta-media lg:mt-0">
+                  “–” quer dizer que o instituto não testou esse nome naquela pesquisa, ou não
+                  divulgou o número.
+                </p>
+              </div>
             </div>
           </>
         )}

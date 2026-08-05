@@ -13,6 +13,7 @@
  * unidade: `aria-valuenow` sozinho lê "4" e não significa nada.
  */
 import { useId, type CSSProperties, type ReactNode } from "react";
+import { MaisSobre } from "@/components/ui/glossario";
 import type { FaixaSlider } from "./parametros-url";
 
 export function Deslizador({
@@ -22,6 +23,7 @@ export function Deslizador({
   valor,
   faixa,
   dica,
+  dicaResumo,
   idTeste,
   onChange,
 }: {
@@ -32,7 +34,10 @@ export function Deslizador({
   leituraAcessivel: string;
   valor: number;
   faixa: FaixaSlider;
+  /** a dica INTEIRA — mora na 2ª camada, a um toque do "?" */
   dica: ReactNode;
+  /** a 1ª frase da dica, VERBATIM: é o que fica visível ao lado da régua */
+  dicaResumo: ReactNode;
   idTeste?: string;
   onChange: (v: number) => void;
 }) {
@@ -62,8 +67,20 @@ export function Deslizador({
         onChange={(e) => onChange(parseFloat(e.target.value))}
         style={{ "--preenchido": `${preenchido}%` } as CSSProperties}
       />
+      {/* DIETA (missão "ENCAIXE"): as quatro dicas somavam ~19 frases sempre
+          visíveis dentro do grid das réguas — mais texto do que os controles
+          que elas explicam. Fica visível a 1ª FRASE, palavra por palavra, e o
+          resto abre no "?", na mesma folha/popover do glossário. Nenhuma
+          palavra foi reescrita e nada saiu da página.
+          O `aria-describedby` da régua aponta para a frase VISÍVEL: o texto
+          inteiro está a um toque, para todo mundo do mesmo jeito — em vez de
+          uma cópia `sr-only` que duplicaria os chips de glossário de dentro da
+          dica e criaria paradas de tabulação invisíveis. */}
       <p id={idDica} className="mt-1 max-w-texto text-micro text-tinta-media">
-        {dica}
+        {dicaResumo}{" "}
+        <MaisSobre titulo={rotulo} rotuloAcessivel={`ver a explicação completa: ${rotulo}`}>
+          {dica}
+        </MaisSobre>
       </p>
     </div>
   );

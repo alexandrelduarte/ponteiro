@@ -90,7 +90,8 @@ export function Evolucao() {
             onClick={() => definirTurnoGrafico(t)}
             className={[
               "min-h-toque rounded-plena px-5 text-corpo font-semibold",
-              "transition-colors duration-(--dur-rapida) ease-(--ease-padrao)",
+              "transition-[background-color,color,scale] duration-(--dur-rapida) ease-(--ease-padrao)",
+              "motion-safe:active:scale-[0.985]",
               turnoGrafico === t
                 ? "bg-ameixa text-tinta-inversa"
                 : "text-tinta hover:bg-ameixa-tenue",
@@ -140,18 +141,21 @@ export function Evolucao() {
         <p className="text-micro text-tinta-media">Flávio na frente ↓</p>
       </div>
 
-      <div className="mt-3 max-w-texto space-y-2 text-micro text-tinta-media">
-        <p>
+      {/* As sete frases de legenda do gráfico em 2×2 a partir de lg: em coluna
+          única elas eram 746px de altura contra uma faixa branca do mesmo
+          tamanho à direita. Cada uma continua na medida de leitura. */}
+      <div className="mt-3 space-y-2 text-micro text-tinta-media lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-10 lg:gap-y-2 lg:space-y-0">
+        <p className="max-w-texto">
           <b className="font-semibold text-tinta">empate</b> — nesta altura os dois teriam o mesmo
           tanto de voto.
         </p>
-        <p>
+        <p className="max-w-texto">
           A linha vertical marcada <b className="font-semibold text-tinta">hoje</b> é onde as
           pesquisas acabam. Dali para a frente a faixa fica tracejada: é{" "}
           <Termo chave="projecao">projeção</Termo>, não pesquisa.
         </p>
         {turnoGrafico === 1 ? (
-          <p>
+          <p className="max-w-texto">
             No 1º turno a linha é mais curta: nem todo instituto divulgou esse cenário nas pesquisas
             mais antigas.
           </p>
@@ -160,7 +164,7 @@ export function Evolucao() {
             "vermelho: Lula, azul: Flávio" mandava o leitor procurar duas
             linhas que não existem. O que a cor faz aqui é dizer, em cada
             pesquisa, de que lado da régua ela caiu. */}
-        <p className="numeros">
+        <p className="max-w-texto numeros">
           Cada bolinha é uma pesquisa, na cor de quem aparece à frente nela: acima da régua,{" "}
           <b className="font-semibold text-lula">Lula</b>; abaixo,{" "}
           <b className="font-semibold text-flavio">Flávio</b>. A linha ameixa é a média do painel, e

@@ -22,7 +22,7 @@ const junta = (...classes: (string | false | null | undefined)[]) =>
  * Coluna e ritmo                                                     *
  * ------------------------------------------------------------------ */
 
-/** Faixa de conteúdo: coluna de 1080px, goteiras 16/24/40 e respiro entre blocos. */
+/** Faixa de conteúdo: coluna de 1200px, goteiras 16/24/40 e respiro entre blocos. */
 export function Secao({
   children,
   className,
@@ -48,6 +48,94 @@ export function Secao({
     </section>
   );
 }
+
+/* ------------------------------------------------------------------ *
+ * Colunas — a composição de lg                                       *
+ * ------------------------------------------------------------------ */
+
+export type ArranjoColunas = "iguais" | "principal" | "tres" | "leitura-dado";
+
+/**
+ * Os quatro arranjos de duas/três colunas que a página inteira usa a partir de
+ * `lg`, e nenhum a mais.
+ *
+ * Por que um primitivo e não `grid-cols-2` solto em cada seção: a medida de
+ * leitura (≤58ch, §6.1) só sobrevive se as colunas tiverem SEMPRE a mesma
+ * largura útil. Com o container em 1200, a placa interna vale 1056 a 1440 e
+ * 996 na entrada de `lg` — nos dois casos `iguais` dá colunas de 478 a 508px,
+ * que é a medida de leitura, não um parágrafo esticado. A largura se preenche
+ * com LAYOUT; nenhum `max-w-texto` cresce um pixel por causa disto.
+ *
+ * `Record` de strings literais porque o scanner do Tailwind lê o código-fonte:
+ * classe montada por concatenação não seria compilada.
+ *
+ * Abaixo de `lg` isto é um `div` comum e os filhos empilham na ORDEM DO DOM —
+ * é o que mantém 390 e 768 byte-comparáveis ao que já estava aprovado.
+ */
+const ARRANJO: Record<ArranjoColunas, string> = {
+  /** duas colunas de igual peso — dois textos, ou texto + texto */
+  iguais: "lg:grid lg:grid-cols-2 lg:items-start lg:gap-10",
+  /** a medida de leitura à esquerda, o que sobra à direita (o mesmo do Cabecalho) */
+  principal: "lg:grid lg:grid-cols-[minmax(0,34rem)_minmax(0,1fr)] lg:items-start lg:gap-10",
+  /** três colunas — listas curtas que deixavam órfão em duas */
+  tres: "lg:grid lg:grid-cols-3 lg:items-start lg:gap-8",
+  /** texto à esquerda, desenho de 32rem à direita (o teto do mini-enxame) */
+  "leitura-dado": "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,32rem)] lg:items-start lg:gap-10",
+};
+
+export function Colunas({
+  arranjo = "iguais",
+  children,
+  className,
+}: {
+  arranjo?: ArranjoColunas;
+  children: ReactNode;
+  className?: string;
+}) {
+  return <div className={junta(ARRANJO[arranjo], className)}>{children}</div>;
+}
+
+/* ------------------------------------------------------------------ *
+ * Estados de ponteiro reutilizados (DESIGN-V2 §7.1b)                  *
+ * ------------------------------------------------------------------ */
+
+/**
+ * Cartão que É um controle (botão de cenário, gatilho de folha).
+ *
+ * A sombra só existe em INTERATIVO + HOVER: §3.5 continua valendo para bloco
+ * parado, e é justamente por isso que a sombra aqui informa — ela aparece
+ * apenas no que responde ao ponteiro. O deslocamento de 1px e o `scale` de
+ * pressed são `motion-safe`: em `prefers-reduced-motion` sobra só a troca de
+ * campo, seca.
+ */
+export const CARTAO_INTERATIVO = [
+  "transition-[background-color,box-shadow,translate,scale]",
+  "duration-(--dur-rapida) ease-(--ease-padrao)",
+  "motion-safe:hover:-translate-y-px hover:shadow-flutua",
+  "motion-safe:active:scale-[0.995]",
+].join(" ");
+
+/**
+ * Linha de tabela que responde ao ponteiro. `group` porque o gatilho de dentro
+ * da linha (o balão da folga, o registro no TSE) reage ao hover da LINHA
+ * inteira — a linha é a unidade de leitura, não a célula.
+ */
+export const LINHA_TABELA =
+  "group transition-colors duration-(--dur-rapida) ease-(--ease-padrao) hover:bg-nicho";
+
+/**
+ * Link e gatilho de texto: cor mais funda, sublinhado que engrossa e afasta.
+ *
+ * EXCEÇÃO NOMEADA ao orçamento de "só transform e opacity" (§7.1): a espessura
+ * e o deslocamento do sublinhado repintam UMA linha de 1–2px, não uma caixa —
+ * o custo é de outra ordem de grandeza, e sem isso o único sinal de hover num
+ * link seria a cor, que §7 já proíbe usar como canal único.
+ */
+export const TEXTO_INTERATIVO = [
+  "transition-[color,text-decoration-color,text-decoration-thickness,text-underline-offset]",
+  "duration-(--dur-rapida) ease-(--ease-padrao)",
+  "hover:text-ameixa-forte hover:decoration-2 hover:underline-offset-4",
+].join(" ");
 
 /* ------------------------------------------------------------------ *
  * Bloco-conversa                                                     *
@@ -137,20 +225,28 @@ export function Cabecalho({
   pergunta,
   resposta,
   traduzindo,
+  ilustracao,
 }: {
   id?: string;
   pergunta: ReactNode;
   resposta?: ReactNode;
   traduzindo?: ReactNode;
+  /** desenho de apoio — irmão do TRADUZINDO, na coluna da direita */
+  ilustracao?: ReactNode;
 }) {
   return (
-    <div className="lg:grid lg:grid-cols-[minmax(0,34rem)_minmax(0,1fr)] lg:items-start lg:gap-10">
+    <Colunas arranjo="principal">
       <div>
         <Pergunta id={id}>{pergunta}</Pergunta>
         {resposta ? <Resposta>{resposta}</Resposta> : null}
       </div>
-      {traduzindo ? <Traduzindo className="lg:mt-0">{traduzindo}</Traduzindo> : null}
-    </div>
+      {traduzindo || ilustracao ? (
+        <div>
+          {traduzindo ? <Traduzindo className="lg:mt-0">{traduzindo}</Traduzindo> : null}
+          {ilustracao ? <div className="mt-3">{ilustracao}</div> : null}
+        </div>
+      ) : null}
+    </Colunas>
   );
 }
 
@@ -243,9 +339,16 @@ type PropsBotao = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   children: ReactNode;
 };
 
+/**
+ * `scale(0.985)` no pressed: o botão AFUNDA sob o dedo/ponteiro em vez de só
+ * trocar de campo. É `motion-safe` e some inteiro em reduced-motion; e o
+ * `disabled:` zera para que um botão desligado não finja responder.
+ */
 const BASE_BOTAO =
   "inline-flex min-h-toque items-center justify-center gap-2 rounded-plena px-5 " +
-  "text-corpo font-semibold transition-colors duration-(--dur-rapida) ease-(--ease-padrao) " +
+  "text-corpo font-semibold transition-[background-color,color,box-shadow,scale] " +
+  "duration-(--dur-rapida) ease-(--ease-padrao) " +
+  "motion-safe:active:scale-[0.985] disabled:scale-100 " +
   "disabled:cursor-default";
 
 const PRIMARIO =
@@ -292,6 +395,7 @@ export function LinkExterno({
       className={junta(
         "-mx-2 -my-[13px] inline-block rounded-campo px-2 py-[13px]",
         "text-ameixa underline decoration-from-font underline-offset-2",
+        TEXTO_INTERATIVO,
         className,
       )}
     >
@@ -316,6 +420,7 @@ export function LinkInterno({
       className={junta(
         "inline-flex min-h-toque items-center rounded-campo",
         "text-ameixa underline decoration-from-font underline-offset-2",
+        TEXTO_INTERATIVO,
         className,
       )}
     >
@@ -352,8 +457,19 @@ export function Detalhe({
 }) {
   return (
     <details className={junta("detalhe", className)} data-testid={idTeste}>
-      <summary className="inline-flex min-h-toque items-center gap-2 text-corpo font-semibold text-ameixa">
-        <span className="underline decoration-from-font underline-offset-2">{titulo}</span>
+      {/* O sublinhado mora no `<span>`, não no `<summary>` — então quem reage
+          ao hover do gatilho inteiro é o `group-hover` do span. */}
+      <summary className="group inline-flex min-h-toque items-center gap-2 text-corpo font-semibold text-ameixa transition-colors duration-(--dur-rapida) ease-(--ease-padrao) hover:text-ameixa-forte">
+        <span
+          className={junta(
+            "underline decoration-from-font underline-offset-2",
+            "transition-[text-decoration-color,text-decoration-thickness,text-underline-offset]",
+            "duration-(--dur-rapida) ease-(--ease-padrao)",
+            "group-hover:decoration-2 group-hover:underline-offset-4",
+          )}
+        >
+          {titulo}
+        </span>
         <span aria-hidden="true" className="chevron text-etiqueta">
           ▾
         </span>

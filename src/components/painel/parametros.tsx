@@ -15,12 +15,11 @@
 import {
   Bloco,
   Botao,
+  Cabecalho,
+  Colunas,
   LinkInterno,
   Nicho,
-  Pergunta,
-  Resposta,
   Subtitulo,
-  Traduzindo,
 } from "@/components/ui/blocos";
 import { Termo } from "@/components/ui/glossario";
 import { Celebra, Contagem } from "@/components/ui/movimento";
@@ -49,15 +48,12 @@ export function Parametros() {
 
   return (
     <Bloco rotuladoPor="titulo-simulacao">
-      <Pergunta id="titulo-simulacao">Quer mexer nos números você mesmo?</Pergunta>
-      <Resposta>
-        Estas quatro réguas são as suposições que o painel usa. Mexa nelas e o número muda na hora.
-      </Resposta>
-      <Traduzindo>
-        É teste seu: nada aqui altera os dados oficiais, e ninguém mais vê o que você mexeu. O botão
-        de voltar ao oficial fica sempre à vista. Se você mexer em alguma régua, o painel inteiro
-        passa a mostrar “simulação”.
-      </Traduzindo>
+      <Cabecalho
+        id="titulo-simulacao"
+        pergunta="Quer mexer nos números você mesmo?"
+        resposta="Estas quatro réguas são as suposições que o painel usa. Mexa nelas e o número muda na hora."
+        traduzindo="É teste seu: nada aqui altera os dados oficiais, e ninguém mais vê o que você mexeu. O botão de voltar ao oficial fica sempre à vista. Se você mexer em alguma régua, o painel inteiro passa a mostrar “simulação”."
+      />
 
       <div className="mt-5 grid gap-6 md:grid-cols-2">
         <Deslizador
@@ -68,6 +64,7 @@ export function Parametros() {
           faixa={FAIXAS.meiaVida}
           idTeste="slider-meia"
           onChange={(v) => definirParam("meiaVida", v)}
+          dicaResumo="Pesquisa mais nova conta mais na média."
           dica={
             <>
               Pesquisa mais nova conta mais na média. Aqui você diz em quantos dias uma pesquisa
@@ -86,6 +83,7 @@ export function Parametros() {
           faixa={FAIXAS.sigmaSys}
           idTeste="slider-sys"
           onChange={(v) => definirParam("sigmaSys", v)}
+          dicaResumo="Às vezes o erro não é de uma pesquisa só: todas erram para o mesmo lado."
           dica={
             <>
               Às vezes o erro não é de uma pesquisa só: todas erram para o mesmo lado. Em 2022 esse
@@ -108,6 +106,7 @@ export function Parametros() {
           faixa={FAIXAS.coefDeriva}
           idTeste="slider-deriva"
           onChange={(v) => definirParam("coefDeriva", v)}
+          dicaResumo="Até a votação ainda tem propaganda na TV, debate e fato novo."
           dica={
             <>
               Até a votação ainda tem propaganda na TV, debate e fato novo. Esta régua diz{" "}
@@ -132,6 +131,7 @@ export function Parametros() {
           faixa={FAIXAS.vies}
           idTeste="slider-vies"
           onChange={(v) => definirParam("vies", v)}
+          dicaResumo="Aqui você supõe que todas as pesquisas estão puxando para o mesmo lado, e diz o tamanho da puxada."
           dica={
             <>
               Aqui você supõe que todas as pesquisas estão puxando para o mesmo lado, e diz o
@@ -155,77 +155,88 @@ export function Parametros() {
           A condição é DUPLA — réguas no padrão E série igual à oficial. Tirar
           ou acrescentar uma pesquisa já é simulação, mesmo com as quatro
           réguas intocadas: os dois eixos são independentes. */}
+      {/* O texto do resultado à esquerda, o desenho à direita — a coluna do
+          desenho tem exatamente os 32rem que já eram o teto do mini-enxame
+          (§4.1), então a bolinha não muda de tamanho por causa da composição:
+          o que muda é que a faixa branca ao lado dela virou a frase que estava
+          empilhada em cima. */}
       <Nicho className="mt-6">
-        {simulando ? (
-          <>
-            <p data-testid="resultado-simulacao" className="text-intro text-tinta">
-              Nesta simulação, Lula é eleito em{" "}
-              <Celebra chave={simLula}>
-                <b className="text-dado text-lula numeros">
-                  {Number.isFinite(Number(simLula)) ? (
-                    <Contagem valor={Number(simLula)} />
-                  ) : (
-                    simLula
-                  )}
-                </b>
-              </Celebra>{" "}
-              de cada 100 cenários, e Flávio em <b className="text-flavio numeros">{simFlavio}</b>.
-              No painel oficial são <span className="numeros">{eleitoLula}</span> e{" "}
-              <span className="numeros">{eleitoFlavio}</span>.
-            </p>
-            <p className="sr-only" role="status" aria-live="polite">
-              Resultado da sua simulação: {simLula} em 100 para Lula, {simFlavio} em 100 para
-              Flávio.
-            </p>
-          </>
-        ) : (
-          <>
-            <p data-testid="resultado-oficial" className="text-intro text-tinta">
-              Com as réguas no padrão, este é o número oficial do painel: Lula é eleito em{" "}
-              <b className="text-dado text-lula numeros">{eleitoLula}</b> de cada 100 cenários, e
-              Flávio em <b className="text-flavio numeros">{eleitoFlavio}</b>.
-            </p>
-            <p className="sr-only" role="status" aria-live="polite">
-              Resultado com as réguas no padrão: {eleitoLula} em 100 para Lula, {eleitoFlavio} em
-              100 para Flávio.
-            </p>
-          </>
-        )}
+        <Colunas arranjo="leitura-dado">
+          <div>
+            {simulando ? (
+              <>
+                <p data-testid="resultado-simulacao" className="text-intro text-tinta">
+                  Nesta simulação, Lula é eleito em{" "}
+                  <Celebra chave={simLula}>
+                    <b className="text-dado text-lula numeros">
+                      {Number.isFinite(Number(simLula)) ? (
+                        <Contagem valor={Number(simLula)} />
+                      ) : (
+                        simLula
+                      )}
+                    </b>
+                  </Celebra>{" "}
+                  de cada 100 cenários, e Flávio em{" "}
+                  <b className="text-flavio numeros">{simFlavio}</b>. No painel oficial são{" "}
+                  <span className="numeros">{eleitoLula}</span> e{" "}
+                  <span className="numeros">{eleitoFlavio}</span>.
+                </p>
+                <p className="sr-only" role="status" aria-live="polite">
+                  Resultado da sua simulação: {simLula} em 100 para Lula, {simFlavio} em 100 para
+                  Flávio.
+                </p>
+              </>
+            ) : (
+              <>
+                <p data-testid="resultado-oficial" className="text-intro text-tinta">
+                  Com as réguas no padrão, este é o número oficial do painel: Lula é eleito em{" "}
+                  <b className="text-dado text-lula numeros">{eleitoLula}</b> de cada 100 cenários,
+                  e Flávio em <b className="text-flavio numeros">{eleitoFlavio}</b>.
+                </p>
+                <p className="sr-only" role="status" aria-live="polite">
+                  Resultado com as réguas no padrão: {eleitoLula} em 100 para Lula, {eleitoFlavio}{" "}
+                  em 100 para Flávio.
+                </p>
+              </>
+            )}
+          </div>
 
-        <div className="mt-4">
-          <Enxame
-            layout={layout}
-            escala="mini"
-            idTeste="enxame-simulacao"
-            rotuloAcessivel={`Cem bolinhas, uma por cenário da decisão de 25 de outubro: ${layout.nLula} do lado de Lula e ${layout.nFlavio} do lado de Flávio.`}
-          />
-          {/* A frase colada no desenho usa O NÚMERO DO DESENHO (§10.1c). O
-              mini-enxame desenha os quantis da margem do 2º turno; a frase
-              acima soma também o caminho que acaba em 4 de outubro. Sem esta
-              reconciliação, escrito e desenhado discordavam sem aviso (H3).
-              A cláusula do meio ensina a ler a FORMA, não só a contar os lados:
-              o desenho carregava a dúvida na largura da pilha e nenhuma legenda
-              do produto dizia isso — o leitor aprendia a contar as bolinhas de
-              cada lado e ia embora sem saber o que o espalhamento significa. */}
-          <p
-            data-testid="legenda-mini-enxame"
-            className="mt-3 max-w-texto text-micro text-tinta-media"
-          >
-            As bolinhas mostram só a decisão de 25 de outubro: {layout.nLula} caem do lado de Lula e{" "}
-            {layout.nFlavio} do lado de Flávio. A largura da pilha é o tamanho da dúvida no dia da
-            votação: quanto mais espalhadas, menos fechada está a disputa. A frase acima soma também
-            quem ganha já em 4 de outubro — por isso dá outro número.
-          </p>
-        </div>
+          <div className="mt-4 lg:mt-0">
+            <Enxame
+              layout={layout}
+              escala="mini"
+              idTeste="enxame-simulacao"
+              rotuloAcessivel={`Cem bolinhas, uma por cenário da decisão de 25 de outubro: ${layout.nLula} do lado de Lula e ${layout.nFlavio} do lado de Flávio.`}
+            />
+            {/* A frase colada no desenho usa O NÚMERO DO DESENHO (§10.1c). O
+                mini-enxame desenha os quantis da margem do 2º turno; a frase
+                acima soma também o caminho que acaba em 4 de outubro. Sem esta
+                reconciliação, escrito e desenhado discordavam sem aviso (H3).
+                A cláusula do meio ensina a ler a FORMA, não só a contar os
+                lados: o desenho carregava a dúvida na largura da pilha e
+                nenhuma legenda do produto dizia isso — o leitor aprendia a
+                contar as bolinhas de cada lado e ia embora sem saber o que o
+                espalhamento significa. */}
+            <p
+              data-testid="legenda-mini-enxame"
+              className="mt-3 max-w-texto text-micro text-tinta-media"
+            >
+              As bolinhas mostram só a decisão de 25 de outubro: {layout.nLula} caem do lado de Lula
+              e {layout.nFlavio} do lado de Flávio. A largura da pilha é o tamanho da dúvida no dia
+              da votação: quanto mais espalhadas, menos fechada está a disputa. A frase acima soma
+              também quem ganha já em 4 de outubro — por isso dá outro número.
+            </p>
+          </div>
+        </Colunas>
       </Nicho>
 
       {/* ---------------- as contas ---------------- */}
       <div className="mt-5">
         <Subtitulo>As contas, em uma linha cada</Subtitulo>
-        {/* Duas colunas a partir de lg: em coluna única as três contas
-            deixavam 32% da placa de 936px em branco à direita. Cada coluna
-            continua na medida de leitura. */}
-        <div className="mt-2 space-y-2 text-corpo text-tinta-media numeros lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-10 lg:gap-y-2 lg:space-y-0">
+        {/* TRÊS colunas a partir de lg — são três contas, e em duas colunas a
+            terceira ficava órfã embaixo, que é a mesma faixa morta com outro
+            nome. Cada coluna continua na medida de leitura. */}
+        <div className="mt-2 space-y-2 text-corpo text-tinta-media numeros lg:grid lg:grid-cols-3 lg:items-start lg:gap-x-8 lg:gap-y-2 lg:space-y-0">
           <p className="max-w-texto">
             Diferença nas pesquisas: {fmtSinal(M.margem)} menos a puxada suposta (
             {fmtSinal(params.vies)}) ={" "}

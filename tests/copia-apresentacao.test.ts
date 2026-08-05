@@ -7,7 +7,7 @@
  * tela consome.
  */
 import { describe, expect, it } from "vitest";
-import { CONTEXTO_TRADUZIDO } from "@/components/painel/copia-contexto";
+import { CONTEXTO_TRADUZIDO, primeiraFrase } from "@/components/painel/copia-contexto";
 import { ERROS_TRADUZIDOS, FONTES_TRADUZIDAS } from "@/components/painel/copia-erros";
 import { CONTEXTO } from "@/data/contexto";
 import { FONTES_ERROS } from "@/data/fontes-erros";
@@ -56,5 +56,50 @@ describe("camadas de tradução de apresentação", () => {
     for (const f of FONTES_TRADUZIDAS) {
       exigirSemJargao(f.nome, `fonte "${f.url}"`);
     }
+  });
+});
+
+/**
+ * A DIETA NÃO REESCREVE (missão v2.1 "ENCAIXE").
+ *
+ * A 1ª camada de cada cartão de contexto mostra só a abertura da leitura e põe
+ * o resto atrás do "?". A regra do dono é dura: o que fica visível tem de ser
+ * o texto auditado PALAVRA POR PALAVRA, cortado num ponto final — nunca um
+ * resumo redigido à parte, que envelheceria em silêncio quando a leitura
+ * mudasse. Aqui isso vira invariante: prefixo literal, corte em ponto final, e
+ * nada de resumo maior que o texto que ele resume.
+ */
+describe("dieta de texto: a 1ª camada é prefixo literal da 2ª", () => {
+  it("leituraCurta é prefixo VERBATIM de leitura em todos os cartões", () => {
+    for (const c of CONTEXTO_TRADUZIDO) {
+      expect(
+        c.leitura.startsWith(c.leituraCurta),
+        `"${c.titulo}": a abertura visível deixou de ser prefixo literal da leitura`,
+      ).toBe(true);
+    }
+  });
+
+  it("o corte cai sempre num ponto final, e nunca no meio de uma frase", () => {
+    for (const c of CONTEXTO_TRADUZIDO) {
+      expect(c.leituraCurta.length, `"${c.titulo}": abertura vazia`).toBeGreaterThan(0);
+      expect(c.leituraCurta.endsWith("."), `"${c.titulo}": "${c.leituraCurta}"`).toBe(true);
+      expect(c.leituraCurta.length).toBeLessThanOrEqual(c.leitura.length);
+    }
+  });
+
+  it("primeiraFrase anda até o próximo ponto quando a abertura é curta demais", () => {
+    // "País dividido." tem 14 caracteres: sozinha não resume nada.
+    expect(primeiraFrase("País dividido. Na Quaest foi a primeira vez. E mais.")).toBe(
+      "País dividido. Na Quaest foi a primeira vez.",
+    );
+    // Uma abertura que já se sustenta sozinha não anda.
+    const longa = "Os dois têm muita gente que não votaria neles de jeito nenhum. E mais coisa.";
+    expect(primeiraFrase(longa)).toBe(
+      "Os dois têm muita gente que não votaria neles de jeito nenhum.",
+    );
+    // Texto de uma frase só volta inteiro, sem corte nenhum.
+    expect(primeiraFrase("Uma frase só, sem ponto no meio.")).toBe(
+      "Uma frase só, sem ponto no meio.",
+    );
   });
 });

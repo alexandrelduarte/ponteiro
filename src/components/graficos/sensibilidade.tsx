@@ -19,7 +19,7 @@ import {
 } from "recharts";
 import type { MouseHandlerDataParam } from "recharts/types/synchronisation/types";
 import { fmt, type PontoSens } from "@/lib/modelo";
-import { COR, DicaSensibilidade, TICK } from "./comum";
+import { COR, CURSOR_DICA, DicaSensibilidade, PONTO_ATIVO, TICK, gatilhoDica } from "./comum";
 
 /** Domínio do eixo x, em pontos de puxada suposta. */
 const DOMINIO_X: [number, number] = [-3, 10];
@@ -180,7 +180,7 @@ export default function GraficoSensibilidade({
           stroke={COR.contorno}
           width={44}
         />
-        <Tooltip trigger="click" content={<DicaSensibilidade />} />
+        <Tooltip trigger={gatilhoDica()} cursor={CURSOR_DICA} content={<DicaSensibilidade />} />
 
         {/* A linha do 50 fica SEM rótulo dentro da plotagem. Não sobrou canto
             livre para ele: à direita e embaixo ele era cruzado pela curva que
@@ -236,6 +236,7 @@ export default function GraficoSensibilidade({
           stroke={COR.lula}
           strokeWidth={2.5}
           dot={false}
+          activeDot={{ ...PONTO_ATIVO, fill: COR.lula }}
           type="monotone"
           isAnimationActive={false}
         />
@@ -244,6 +245,7 @@ export default function GraficoSensibilidade({
           stroke={COR.flavio}
           strokeWidth={2.5}
           dot={false}
+          activeDot={{ ...PONTO_ATIVO, fill: COR.flavio }}
           type="monotone"
           isAnimationActive={false}
         />

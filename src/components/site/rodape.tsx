@@ -40,10 +40,12 @@ export function Rodape() {
             cada obrigação legal continua dita, com as palavras do deck.
             A linha das datas fica FORA daqui — ela é informação de calendário,
             não obrigação legal. */}
-        {/* A partir de lg o aviso vira duas colunas: numa placa de 936px, o
-            parágrafo corrido chegava a ~110 caracteres de medida — o dobro do
-            que §5.7 aceita para leitura. */}
-        <div className="mt-4 grid gap-x-10 gap-y-2 rounded-nicho bg-nicho p-4 text-micro text-tinta-media lg:grid-cols-2 lg:items-start">
+        {/* A partir de lg o aviso vira TRÊS colunas: numa placa de 1056px, o
+            parágrafo corrido passava de 110 caracteres de medida — o dobro do
+            que §5.7 aceita —, e em duas colunas o terceiro parágrafo ficava
+            órfão numa fileira só dele. São três parágrafos: são três colunas,
+            de ~310px cada, dentro da medida de leitura em `text-micro`. */}
+        <div className="mt-4 grid gap-x-10 gap-y-2 rounded-nicho bg-nicho p-4 text-micro text-tinta-media lg:grid-cols-3 lg:items-start">
           <p>
             <b className="font-semibold text-tinta">Isto não é previsão.</b> O que este site publica
             é uma <b className="font-semibold text-tinta">chance</b>, não um resultado: em quantas

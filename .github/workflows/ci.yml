@@ -35,12 +35,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
 
       - name: Instalar pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           # Fixado porque o package.json não tem campo `packageManager`; o
           # Dependabot (github-actions, semanal) cuida de propor as subidas.
@@ -48,7 +48,7 @@ jobs:
           run_install: false
 
       - name: Instalar Node 20
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "20"
           # Cache do store do pnpm chaveado pelo lockfile.

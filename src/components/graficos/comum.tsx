@@ -1,45 +1,47 @@
 "use client";
 
 /**
- * Peças compartilhadas dos gráficos (docs/DESIGN.md §7.6).
+ * Peças compartilhadas dos gráficos (docs/DESIGN-V2.md §5.3 e §7.2).
  *
- * Regras duras: `isAnimationActive={false}` em tudo (P3 — nada de movimento a
- * serviço de dado), tick de 12px no mínimo (§4.2), tooltip escuro em mono e
- * acionável por TOQUE (`trigger="click"`), cor sempre por `var(--color-*)`
- * porque o Recharts recebe cor por prop, fora do alcance do Tailwind.
+ * Regras duras:
+ *  - `isAnimationActive={false}` em TUDO. Movimento a serviço de dado é
+ *    proibido, e o custo de animar num Android barato sai do orçamento de INP.
+ *  - tick nunca abaixo de 13px (`--text-micro`), e em Lexend: mono não volta.
+ *  - cor sempre por `var(--color-*)` — o Recharts recebe cor por prop, fora do
+ *    alcance do scanner do Tailwind, e por isso `@theme static` emite tudo.
+ *  - a DÚVIDA é sempre o lilás da faixa, com borda obrigatória: é a borda que
+ *    cumpre o 3:1 de objeto gráfico sem transformar a dúvida num campo pesado.
+ *  - o tooltip flutua acima do conteúdo, então pode ter sombra (§3.5).
  */
 import type { ReactNode } from "react";
-import { Esqueleto } from "@/components/ui/basicos";
+import { Esqueleto } from "@/components/ui/blocos";
 import { fmt, fmtData } from "@/lib/modelo";
 
-/**
- * Alturas por breakpoint — o esqueleto usa AS MESMAS classes (CLS 0).
- *
- * A sensibilidade ganha +28px sobre o par distribuição: é a folga da banda de
- * anotação em duas fileiras (ver `sensibilidade.tsx`), somada de propósito à
- * caixa para que a área de plotagem NÃO encolha ao separar os rótulos.
- */
+/** Alturas por breakpoint — o esqueleto usa AS MESMAS classes (CLS 0). */
 export const ALTURA = {
-  evolucao: "h-[220px] md:h-[260px] lg:h-[300px]",
-  distribuicao: "h-[200px] md:h-[240px]",
-  sensibilidade: "h-[228px] md:h-[268px]",
+  evolucao: "h-[240px] md:h-[280px] lg:h-[320px]",
+  sensibilidade: "h-[264px] md:h-[300px]",
   historico: "h-[220px] md:h-[260px]",
 } as const;
 
 export const COR = {
   lula: "var(--color-lula)",
   flavio: "var(--color-flavio)",
-  linha: "var(--color-linha)",
-  linhaForte: "var(--color-linha-forte)",
-  cinza: "var(--color-cinza)",
+  ameixa: "var(--color-ameixa)",
+  ameixaClara: "var(--color-ameixa-clara)",
   tinta: "var(--color-tinta)",
-  confirma: "var(--color-confirma)",
+  tintaMedia: "var(--color-tinta-media)",
+  contorno: "var(--color-contorno)",
+  grade: "var(--color-grade)",
+  faixa: "var(--color-faixa)",
+  faixaBorda: "var(--color-faixa-borda)",
+  placa: "var(--color-placa)",
 } as const;
 
 export const TICK = {
-  fontSize: 12,
-  fontFamily: "var(--font-mono)",
-  fill: COR.cinza,
+  fontSize: 13,
+  fontFamily: "var(--font-texto)",
+  fill: COR.tintaMedia,
 } as const;
 
 /** dd/mm no fuso de Brasília (−03:00 fixo; o país não tem horário de verão). */
@@ -66,7 +68,7 @@ export interface PropsDica {
 
 export function MolduraDica({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-controle bg-tinta px-3 py-2 font-mono text-xs text-texto-inverso shadow-tip">
+    <div className="rounded-nicho bg-placa px-4 py-3 text-micro text-tinta shadow-erguido">
       {children}
     </div>
   );
@@ -75,7 +77,7 @@ export function MolduraDica({ children }: { children: ReactNode }) {
 const num = (v: unknown): number | null => (typeof v === "number" && isFinite(v) ? v : null);
 const texto = (v: unknown): string | null => (typeof v === "string" ? v : null);
 
-/** Tooltip da evolução: ponto de pesquisa (com instituto) ou média da série. */
+/** Tooltip da evolução: uma pesquisa (com instituto) ou a média do painel. */
 export function DicaEvolucao({ active, payload }: PropsDica) {
   if (!active || !payload?.length) return null;
   const comInstituto = payload.find((p) => typeof p.payload?.instituto === "string")?.payload;
@@ -83,12 +85,15 @@ export function DicaEvolucao({ active, payload }: PropsDica) {
   if (comInstituto) {
     return (
       <MolduraDica>
-        <div className="font-semibold">{String(comInstituto.instituto)}</div>
-        <div>
-          campo {fmtData(texto(comInstituto.inicio))}–{fmtData(texto(comInstituto.fim))}
+        <div className="font-semibold">
+          {String(comInstituto.instituto)} · pesquisa feita de {fmtData(texto(comInstituto.inicio))}
+          –{fmtData(texto(comInstituto.fim))}
         </div>
-        <div className="text-lula-claro">Lula {fmt(num(comInstituto.lVal))}%</div>
-        <div className="text-flavio-claro">Flávio {fmt(num(comInstituto.fVal))}%</div>
+        <div className="mt-1 numeros">
+          <span className="text-lula">Lula {fmt(num(comInstituto.lVal))}%</span>
+          {" · "}
+          <span className="text-flavio">Flávio {fmt(num(comInstituto.fVal))}%</span>
+        </div>
       </MolduraDica>
     );
   }
@@ -98,14 +103,17 @@ export function DicaEvolucao({ active, payload }: PropsDica) {
   const x = num(pt.x);
   return (
     <MolduraDica>
-      <div>média em {x === null ? "–" : ddmmDeMs(x)}</div>
-      <div className="text-lula-claro">Lula {fmt(num(pt.l))}%</div>
-      <div className="text-flavio-claro">Flávio {fmt(num(pt.f))}%</div>
+      <div>média do painel em {x === null ? "–" : ddmmDeMs(x)}</div>
+      <div className="mt-1 numeros">
+        <span className="text-lula">Lula {fmt(num(pt.l))}%</span>
+        {" · "}
+        <span className="text-flavio">Flávio {fmt(num(pt.f))}%</span>
+      </div>
     </MolduraDica>
   );
 }
 
-/** Tooltip da curva de sensibilidade — anuncia que o clique aplica o viés. */
+/** Tooltip da curva de sensibilidade — anuncia que o toque aplica a puxada. */
 export function DicaSensibilidade({ active, payload, label }: PropsDica) {
   if (!active || !payload?.length) return null;
   const l = num(payload.find((p) => p.dataKey === "l")?.value);
@@ -113,10 +121,14 @@ export function DicaSensibilidade({ active, payload, label }: PropsDica) {
   const v = typeof label === "number" ? label : Number(label);
   return (
     <MolduraDica>
-      <div>viés {Number.isFinite(v) ? (v >= 0 ? "+" : "−") + fmt(Math.abs(v)) : "–"} p.p.</div>
-      {l !== null ? <div className="text-lula-claro">Lula eleito: {Math.round(l)}%</div> : null}
-      {f !== null ? <div className="text-flavio-claro">Flávio eleito: {Math.round(f)}%</div> : null}
-      <div className="opacity-70">toque ou clique para aplicar ao painel</div>
+      <div className="numeros">
+        puxada suposta: {Number.isFinite(v) ? (v >= 0 ? "+" : "−") + fmt(Math.abs(v)) : "–"} pontos
+      </div>
+      {l !== null ? <div className="text-lula numeros">Lula: {Math.round(l)} em 100</div> : null}
+      {f !== null ? (
+        <div className="text-flavio numeros">Flávio: {Math.round(f)} em 100</div>
+      ) : null}
+      <div className="mt-1 text-tinta-media">toque para aplicar ao painel</div>
     </MolduraDica>
   );
 }
@@ -125,12 +137,9 @@ export function DicaSensibilidade({ active, payload, label }: PropsDica) {
  * Carregando                                                         *
  * ------------------------------------------------------------------ */
 
-/**
- * Esqueleto do gráfico: preenche o contêiner, que já tem a altura fixa de
- * `ALTURA.*`. Mesma caixa antes e depois → CLS 0, sem shimmer (§8.1).
- */
+/** Esqueleto: mesma caixa antes e depois → CLS 0, sem shimmer (§5.9). */
 export function EsqueletoGrafico() {
-  return <Esqueleto className="h-full w-full" rotulo="Carregando o gráfico…" />;
+  return <Esqueleto className="h-full w-full" rotulo="Carregando o gráfico." />;
 }
 
 /** Contêiner de altura fixa comum ao gráfico e ao seu esqueleto. */

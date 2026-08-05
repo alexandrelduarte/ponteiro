@@ -172,3 +172,209 @@ var(--color-linha-forte) 55%, transparent)` → mantém "zero hex em componente"
 - Custo do cron corrigido no README: ~US$ 5–20/mês (não "centavos") → o que domina são os
   tokens das páginas re-cobrados na resposta com web_search, não a taxa de busca; botões para
   reduzir documentados (`max_uses`, versão 2026-02 da tool).
+
+# REDESIGN v2 (branch redesign/v2; v1 preservada na tag v1-urna)
+
+## Fases 1–2 — pesquisa e naming
+
+- Nome escolhido pelo orquestrador entre 5 finalistas verificados: **PONTEIRO** → triplo
+  significado nativo ("ponteiro da tabela" = líder no vocabulário popular do futebol; agulha de
+  medidor = instrumento; ponteiro de relógio = tempo até a eleição), 3 sílabas, teste do rádio
+  perfeito, neutro, oponteiro.com.br/ponteiro.org.br livres (RDAP) → descartados: Pêndulo (SEO
+  dominado por esoterismo), Palmo (mudo sem tagline), Páreo (bairro das apostas), Em Miúdos
+  (não vira marca). Tagline: "Para onde apontam as pesquisas."
+- Salvaguarda anti-needle: a agulha do PONTEIRO é MARCA estática (logo/ícone) — proibido virar
+  medidor animado de probabilidade no hero → o "needle" do NYT 2016 é o contraexemplo canônico
+  (TENDENCIAS-2026 P1); o hero comunica probabilidade pelo campo contável de 100 unidades
+  (quantile dotplot, melhor evidência para baixa numeracia).
+
+## Fase 3 — direção visual
+
+- Três conceitos materializados em style tiles reais (/design-lab) com números do modelo:
+  A·LATÃO (régua de instrumento), B·ENXAME (quantile dotplot, serifa display + violeta),
+  C·CHUMBO (grade 10×10 acromática) → vencedor **B·ENXAME** pelos 4 critérios de peso igual →
+  o mais bonito/moderno com folga, metáfora mais intuitiva ("cada bolinha é uma eleição
+  possível"), neutralidade por POSIÇÃO (não cor); fraquezas corrigíveis viram requisitos:
+  (1) manchete usa o número de SER ELEITO (83/17) e o enxame vira visual da diferença do 2ºT
+  com micro-legenda (veto do data-scientist pendente na Fase 5/6); (2) bolinhas ≥8px a 390.
+  Descartes: A falha na própria assinatura a 390; C é frio e o campo vermelho grita.
+- Integração sem quebrar a v1 durante a transição: o design-lead escreve `tokens-v2.css` como
+  arquivo NOVO; a Fase 6 troca o tokens.css e deleta os tokens v1 → todo commit da branch
+  permanece com gates verdes (a regra "reescrever do zero" se cumpre na troca, não na criação).
+- Tokenização do ENXAME (detalhes em docs/DESIGN-V2.md §10–11): gráfico do conceito C adotado
+  ADAPTADO (barra monocromática lilás — isocromia dos fundos de candidato exigida por R4
+  tornaria a divisão bicolor invisível; a régua de tinta mostra o cruzamento) → "dúvida =
+  lilás" vale no produto inteiro e fecha as 3 escalas de P12; domínio do enxame passa a ser
+  derivado dos 100 quantis (piso de 8px vira consequência, não constante); faixa de incerteza
+  com borda obrigatória (1.4.11 sem escurecer o campo); sem verde-sucesso/vermelho-perigo em
+  lugar nenhum (inclusive /admin) — só âmbar e ameixa; sombra proibida em bloco parado; mono
+  NÃO volta nem para dados (tabular-nums da própria Lexend); reduced-motion zera
+  duração/deslocamento/stagger mas nunca `transform` (também posiciona); stagger por coluna
+  (o bin é o acúmulo), teto 260ms.
+- Fase 4 executada pelo orquestrador no MCP (sessão autenticada): 4 variantes de símbolo em 1
+  chamada → escolhido S0 (agulha rompendo o anel — relógio+medidor sem virar velocímetro;
+  S2 descartado por ser um velocímetro literal) → remove_background → upscale 2K → novo
+  remove_background (o upscaler achata alfa) → PNG 2160² RGBA. 7 operações no total,
+  abaixo do teto de ~10.
+
+## Fase 4 — composição da marca (design-lead; detalhes em docs/MARCA.md §6)
+
+- O mestre da marca virou VETOR: geometria ajustada por mínimos quadrados sobre o raster do
+  Higgsfield (RMS 0,34px, IoU 0,970) → nítido em qualquer tamanho, 457 B vs 1,1 MB, família
+  inteira sai de uma verdade só; fidelidade medida, não opinada.
+- Ícone do app é variante ÓTICA (anel mais grosso, vão maior, sem vazado) — reduzir o mestre a
+  16px fecharia o vazado; wordmark em paths extraídos do TTF (opentype.js só no scratchpad;
+  serializador reescrito à mão por bug do toPathData) → SVG autossuficiente, zero dependência
+  de fonte instalada.
+- PNGs recomprimidos por otimizador próprio sobre node:zlib (sips PIORAVA; zopfli/pngquant não
+  existem na máquina e dependência nova violaria R7): símbolo 2K 118→42 KB, OG 50→36,5 KB, sem
+  perder um pixel (identidade dos dados crus conferida).
+- PNG bruto de procedência (1,1 MB) movido pelo orquestrador de public/ para
+  docs/marca-origem/ → não é referenciado por nenhuma superfície; em public/ iria ao CDN.
+
+## Fase 7 — loop v2 (iteração 1: 2 BLOCKER · 12 MAJOR · 13 MINOR · 6 NIT; anti-regressão PASSOU
+
+com zero pixel da v1; teste do leigo 1/4 na dobra)
+
+- Cores de candidatos e traduções do histórico vivem na APRESENTAÇÃO (`cores-candidatos.ts`,
+  `copia-erros.ts`, keyed pelo dado, com fallback ao original) → `src/data/**` é intocável pela
+  paridade golden (campoCompleto carrega `cor`); rampa neutra de 7 degraus OKLCH com pior par
+  3,13:1 e ΔEok mínimo 0,0596 entre cores e 0,0556 contra a marca.
+- "Colisão de cor" definida como ΔE em OKLab, não razão de contraste → com luminância pura, 7
+  neutros ≥3:1 contra o nicho seriam matematicamente impossíveis (demonstrado no comentário).
+- Simulação: estados excludentes com condição DUPLA (réguas padrão E série oficial) e legenda
+  do mini-enxame com o número do DESENHO (redações assinadas, AUDITORIA §10); fechos
+  condicionais do hero APOSENTADOS (duas fontes para o mesmo fato foi como o 83↔82 nasceu).
+- Legenda do hero: 55 palavras com DUAS marcas de dúvida — a dobra de 390 sempre carrega dúvida
+  (medido: "ainda pode mudar" em y 647–693; e2e trava por varredura de texto até y=844).
+- Barras dos 9 candidatos: régua FIXA 0–50% rotulada (normalizar pelo líder é a barra 83/17
+  pela porta dos fundos); e2e trava razão <0,95 do trilho.
+- Breakpoint das tabelas subiu para lg (série e erros) → única saída que mantém o registro TSE
+  legível sem gesto a 768; cartões em 2 colunas na faixa md.
+- Altura da home: −35,6% a 390 (27.841→17.936px) por DEDUPLICAÇÃO + disclosure (nada saiu do
+  produto; 8 pesquisas antigas e aprofundamentos a um toque).
+- Motion auditável: evidências gravadas em .qa/motion-evidencias/ (frames da queda via
+  Animation.setPlaybackRate no CDP, reduced-motion com medições, rastro de slider,
+  pulso da celebração medido em px).
+
+## Fase 7 — loop v2 (iteração 2: 0 BLOCKER · 4 MAJOR · 8 MINOR · 5 NIT; leigo 3/4)
+
+- Cartões de CONTEXTO traduzidos em camada de apresentação (`copia-contexto.ts`, fallback ao
+  original) → mesmo precedente de cores/erros; o × ambíguo de aprova×desaprova virou texto.
+- Aviso legal: UMA fonte por página (bloco jurídico íntegro liderado por "Isto não é previsão.");
+  `rodape.simples.p1..p4` descontinuadas no deck (§T atualizado pelo orquestrador) → a tela dizia
+  o mesmo 3× e em /historico o rodapé era 43,5% da página.
+- Meta de altura da home (≤20.000px) NÃO renegociada nem forçada: 23.276px aceitos pelo
+  orquestrador → o que sobra é conteúdo, não repetição (medido bloco a bloco); esconder mais
+  atrás de disclosure violaria a regra que o próprio crítico validou; o crítico arbitra na
+  iteração 3.
+- 60fps provado por trace CDP (maior tarefa 13,76ms; zero quadros perdidos por trabalho da
+  página; "perdidos" do arraste são custo do robô de teste, testemunha rAF concorda).
+- Enxame com API de escala (hero > media > mini por construção); hero voltou a ocupar a placa
+  inteira (as 2 colunas de lg travavam a instância-manchete como a menor das três).
+
+## Fase 6 — reescrita da camada de apresentação (frontend-dev)
+
+### Fundação
+
+- `tokens-v2.css` virou `tokens.css` e o arquivo v1 foi APAGADO (não adaptado); `globals.css`
+  reescrito: body = bruma-ameixa + Lexend, grão de papel e CSS da tela da urna removidos,
+  `public/grao-papel.svg` deletado. Deslizador e rolagem-x foram RETOKENIZADOS (ameixa/grade/
+  placa/contorno), não reaproveitados.
+- Fontes: `Instrument_Serif` (400) + `Lexend` (variável, sem `weight`: um arquivo cobre
+  400/500/600/700). Archivo e IBM Plex Mono saíram do layout; os `.ttf` do OG foram trocados
+  por InstrumentSerif-400/Lexend-400/Lexend-600.
+- Token NOVO `--text-wordmark` (30→36px, MARCA §8.2): é o único corpo display abaixo de 32px
+  que o sistema autoriza, porque é a marca, não texto.
+- `pctComPiso` virou `emCem`/`parEmCem` em `ui/textos.ts`: a v2 publica FREQUÊNCIA ("83"),
+  não percentual ("83%"), e o par sempre fecha 100 por complemento (COPY-DECK §A.3).
+
+### Verificações de aceitação da Fase 6 (DESIGN-V2 §9.6)
+
+- **`tnum` da Lexend: REPROVOU.** Medido no Chromium a 40px, com `.numeros` aplicada e a fonte
+  carregada, os dez dígitos têm larguras diferentes (20,00 a 24,81px); forçar
+  `font-feature-settings:"tnum"` inline dá o mesmo resultado — a Lexend não tem a tabela.
+  Remédio prescrito pelo §3.2 aplicado: utilitário `coluna-numerica` (alinhamento à direita +
+  largura reservada em `ch`) nas colunas numéricas das duas tabelas. `numeros` FICA (funciona no
+  fallback de sistema e passa a valer sozinha se a Lexend publicar a feature); mono NÃO volta.
+- **Bolinha a 390: APROVOU.** Medido no artefato de produção: 28 colunas de 1 ponto, 100
+  bolinhas, diâmetro 9,36px, folga 2,0px (horizontal e vertical), pilha de 96,8px.
+- **Teto de colunas é 31, não 33.** Com bolinha = `min(0,84 × passo, passo − 2)`, 33 colunas em
+  318px dão 7,9px — abaixo do piso duro. 31 é o maior número que satisfaz os DOIS pisos
+  (≥8px de bolinha E ≥2px de folga) ao mesmo tempo; acima disso a coluna dobra para 2 pontos.
+- `probit` (inversa da normal, algoritmo de Acklam) vive na APRESENTAÇÃO
+  (`enxame-nucleo.ts`), não no modelo: ela não altera número publicado nenhum, só decide onde
+  cada bolinha cai. `src/lib/modelo/**` continua intocado.
+- O enxame CONTA as próprias bolinhas e publica essa contagem; o escrito e o desenhado são o
+  mesmo inteiro por construção (H3), em vez de dois arredondamentos independentes.
+
+### Movimento — onde o despacho e o DESIGN-V2 §7.2 se cruzam
+
+- **Count-up:** §7.2 proíbe ("número que sobe sugere tendência que o modelo não afirmou"), o
+  despacho pede. Meio-termo implementado: `Contagem` NUNCA anima na primeira pintura — o número
+  que aparece é o do servidor — e só conta quando MUDA por ação do leitor (régua, cenário).
+  É feedback de interação, não espetáculo de carregamento, e some em reduced-motion (a duração
+  vem do token, que zera).
+- **Entrada orquestrada:** §7.2 proíbe reveal-on-scroll e a manchete é o LCP. Então a entrada é
+  (1) a queda do enxame, por COLUNA, uma vez por visita à seção, e (2) `.entra` em CSS puro nos
+  elementos de apoio do hero. A manchete e as bolinhas nascem visíveis: com JavaScript desligado
+  nada fica escondido.
+- **Micro-celebração:** classe `celebra` (só `scale`, 200ms) aplicada por estado DEPOIS do toque;
+  nunca existe no HTML do servidor.
+- Motion (12.43) é usado onde o gesto é do leitor: folha do glossário/registro (AnimatePresence),
+  faixa de simulação, troca 1º⇄2º turno (`initial={false}`) e a contagem.
+
+### Forma dos gráficos
+
+- **Distribuição (AreaChart da v1) → ENXAME.** A seção "Isso ainda pode virar?" passa a mostrar
+  a MESMA distribuição contada em 100 bolinhas (DESIGN-V2 §4, segunda escala). Mesma informação
+  (forma da incerteza, onde está o zero, o espaço de virada), zero Recharts, e o deck já
+  descrevia a seção com "cada bolinha". `calcDadosDist` continua no modelo (golden tests).
+- **Evolução passa a plotar a DIFERENÇA**, não os dois níveis: só assim "empate" é uma ALTURA
+  ("nesta altura os dois teriam o mesmo tanto de voto", COPY-DECK §G) e "Lula na frente ↑" é
+  verdade geométrica. Os dados são os mesmos do inventário (média ponderada ponto a ponto,
+  scatter por pesquisa, toggle 1º/2º, tooltip com instituto/campo/valores, nota da série curta).
+  A faixa da dúvida é ±`sigmaHoje` no observado e cresce até o dia da votação pela MESMA fórmula
+  do modelo (`hypot(sigmaHoje, coefDeriva·√dias)`), com borda tracejada depois de hoje — nenhum
+  número novo é inventado.
+- **/historico continua sem faixa lilás.** `getSerieRuns` (em `src/lib/dados.ts`, arquivo
+  congelado nesta fase) expõe só as duas chances do dia, sem a dúvida daquele dia; desenhar uma
+  faixa a partir de um número que o modelo não publicou seria fabricar precisão (H11/H14). A
+  frase do deck que promete a faixa fica pendente para quem puder mexer na camada de dados.
+- **Bandas do cenário-base monocromáticas**: lilás da dúvida + banda modal em ameixa + régua de
+  tinta na fronteira "Flávio na frente"/"Lula por até 5". As quatro cores do protótipo
+  (`CORES.lula`, `#D96A7A`…) não entram na superfície; cada pedaço leva rótulo e número ao lado.
+- **Ranking de candidatos**: Lula e Flávio nos tokens v2 (é a cor própria deles no sistema); os
+  demais mantêm a cor de `src/data/constantes.ts`, que é dado do protótipo. A "cor própria por
+  candidato" do INVENTÁRIO 3.3 sobrevive sem reintroduzir a paleta v1 nos dois protagonistas.
+
+### Interface
+
+- Chip de glossário SEM margem negativa: a margem negativa devolve o alvo de toque sem gastar
+  altura de linha, e um `inline-flex` só empurra a linha pela caixa de margem — o chip passava a
+  ser pintado por cima das linhas vizinhas. Sem ela, a linha cresce e nada é coberto.
+- Cabeçalho da marca e rodapé subiram para o layout raiz (uma instância, todas as páginas);
+  as páginas deixaram de renderizar o rodapé por conta própria.
+- A navegação vive SÓ no rodapé; o cabeçalho é a marca e leva ao painel. Dois conjuntos de links
+  com o mesmo rótulo seriam ambiguidade para leitor de tela e para o teste.
+- Ilustrações de `public/ilustracoes/` aplicadas onde ELAS ensinam (MARCA §6.8 define o "para
+  quê" de cada uma): `explicando-incerteza` em "Como ler esta página", `explicando-empate` na
+  série, `vazio-sem-dados` nos estados vazios, `vazio-sem-conexao` no /historico. O bloco de
+  contexto social ficou sem ilustração — nenhuma das quatro fala de contexto social, e ornamento
+  ali seria enfeite.
+- `/admin`: sem verde de sucesso e sem vermelho de perigo. Ação primária ameixa, ação destrutiva
+  em botão-fantasma âmbar, chips "pendente" (âmbar) e "publicada" (ameixa).
+
+### Renomeação (MARCA §5)
+
+- Executados: `_lib/site.ts` (NOME_SITE, TITULO_PADRAO, DESCRICAO_PADRAO, NOME_DESCRITIVO,
+  TAGLINE), metadata e JSON-LD do layout (`alternateName` = "Agregador de pesquisas
+  presidenciais 2026"), JSON-LD da home, `keywords`, OG (arte e `alt`), cabeçalho/`<h1>`,
+  compartilhamento, `package.json` → `ponteiro`, README, CLAUDE.md, `.env.example`, e o teste
+  e2e do `<h1>`.
+- **NÃO executados, por decisão explícita**: os headers `x-application-name` de
+  `src/lib/supabase/{publico,admin}.ts` (itens 14–15) — os arquivos estão na lista de "não
+  tocar" do despacho desta fase, e a string não aparece para o usuário. Ficam como pendência.
+- `docs/DESIGN.md` e `RELATORIO.md` preservados com o título antigo: são registro histórico da
+  v1 (o primeiro é o contraexemplo citado pelo próprio DESIGN-V2); renomeá-los seria churn sem
+  efeito perceptível (R7).

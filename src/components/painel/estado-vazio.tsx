@@ -1,25 +1,37 @@
 "use client";
 
 /**
- * Série vazia (docs/DESIGN.md §8.2) — o leitor removeu todas as pesquisas em
- * modo simulação. Nenhum número do modelo é renderizado.
+ * Série vazia (docs/DESIGN-V2.md §5.9 · COPY-DECK §S) — o leitor tirou todas as
+ * pesquisas da simulação. NENHUM número do modelo é renderizado: o painel
+ * prefere não mostrar nada a mostrar zeros.
  */
+import { Bloco, Botao, Pergunta } from "@/components/ui/blocos";
+import { ACOES } from "@/components/ui/textos";
+
 export function EstadoVazio({ onRestaurar }: { onRestaurar: () => void }) {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-goteira text-center">
-      <p className="max-w-texto text-sm leading-leitura text-tinta">
-        <strong>A série está vazia — nenhuma pesquisa no agregado.</strong> Sem pesquisa não há
-        média, margem nem probabilidade: em vez de mostrar zeros, o painel espera. Isto é uma
-        simulação local — a base oficial continua intacta.
-      </p>
-      <button
-        type="button"
-        onClick={onRestaurar}
-        data-testid="restaurar-oficial-vazio"
-        className="min-h-toque rounded-controle bg-confirma px-4 py-2 text-sm font-semibold text-campo shadow-botao"
-      >
-        ↺ Restaurar dados oficiais
-      </button>
+    <div className="mx-auto w-full max-w-pagina px-goteira py-8 md:px-goteira-md lg:px-goteira-lg">
+      <Bloco className="max-w-texto">
+        {/* eslint-disable-next-line @next/next/no-img-element -- SVG estático, sem otimização a fazer */}
+        <img
+          src="/ilustracoes/vazio-sem-dados.svg"
+          alt=""
+          width={320}
+          height={118}
+          className="mb-4 h-auto w-full max-w-[20rem]"
+        />
+        <Pergunta>Sem pesquisa nenhuma, não há o que calcular.</Pergunta>
+        <p className="mt-3 text-corpo text-tinta-media">
+          Você tirou todas as pesquisas da sua simulação. Sem pesquisa não existe média, nem
+          diferença, nem chance — então o painel prefere não mostrar nada a mostrar zeros. A lista
+          oficial continua intacta.
+        </p>
+        <p className="mt-4">
+          <Botao onClick={onRestaurar} data-testid="restaurar-oficial-vazio">
+            {ACOES.restaurarOficial}
+          </Botao>
+        </p>
+      </Bloco>
     </div>
   );
 }

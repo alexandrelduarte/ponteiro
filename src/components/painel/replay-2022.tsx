@@ -1,13 +1,22 @@
 "use client";
 
 /**
- * Replay 2022 — "e se os erros se repetissem exatamente?".
+ * Replay 2022 — "e se o erro de 2022 se repetisse do mesmo tamanho?"
+ * (COPY-DECK §L, INVENTÁRIO 3.8).
  *
- * Terceiro (e último) bloco autorizado a usar `--color-tela` (docs/DESIGN.md
- * §3.2). O erro de cada turno é aplicado NO SEU PRÓPRIO TURNO: os erros de 2022
- * não se somam, porque o do 2ºT foi medido sobre pesquisas refeitas depois do 1º.
+ * É uma conta de "E SE" (H6): o aviso de que isto não prevê nada fica no mesmo
+ * bloco, nunca atrás de um clique. O erro de cada turno é aplicado NO SEU
+ * PRÓPRIO TURNO — os erros de 2022 não se somam, porque o do 2º turno foi
+ * medido sobre pesquisas refeitas depois do 1º.
+ *
+ * As probabilidades aqui são CONDICIONAIS a essa hipótese: dentro dela o erro
+ * vira suposição fixa e a única dúvida que sobra é o quanto a opinião ainda
+ * pode andar até outubro. Por isso os números diferem dos do painel principal,
+ * e o texto diz exatamente por quê.
  */
 import { useMemo } from "react";
+import { Botao, Chip, Detalhe, Nicho, Subtitulo } from "@/components/ui/blocos";
+import { emCem, parEmCem } from "@/components/ui/textos";
 import { ERRO_2022 } from "@/data/constantes";
 import { calcReplay, fmt, fmtSinal } from "@/lib/modelo";
 import { usePainel } from "./estado";
@@ -18,114 +27,113 @@ export function Replay2022() {
 
   if (!replay) return null;
 
-  const margem1T = M.t1valL && M.t1valF ? M.t1valL.valor - M.t1valF.valor : null;
+  const t1Dif = M.t1valL && M.t1valF ? M.t1valL.valor - M.t1valF.valor : null;
+  const [elDia, elDiaF] = parEmCem(replay.elRepD);
+  const p2t = emCem(replay.p2Trep);
+  const pv2 = emCem(replay.pV2rep);
+  const p1Direto = emCem(replay.p1Ld);
+  const v2Abs = Math.round(replay.p2Trep * replay.pV2rep * 100);
+  const r2lInt = Math.round(replay.r2L);
 
   return (
-    <div className="tela-urna mt-4 rounded-cartao border border-tela-borda bg-tela p-4">
-      <h3 className="font-mono text-xs tracking-etiqueta text-fosforo uppercase">
-        Replay 2022 — e se os erros se repetissem exatamente?
-      </h3>
+    <div className="mt-6">
+      <Subtitulo>E se o erro de 2022 se repetisse do mesmo tamanho?</Subtitulo>
 
-      {/* `items-start`: só o 3º cartão tem botão; esticar os três à mesma altura
-          deixava 100–150px de espaço morto nos dois primeiros.
-          O rótulo e o selo só dividem a linha quando há largura para isso (lg):
-          entre 768 e 1139 o rótulo estilhaçava em 4–5 linhas, com o token
-          «2ºT-2022» partido no hífen, e os placares desalinhavam. */}
-      <div className="mt-3 grid gap-3 text-sm md:grid-cols-3 md:items-start">
-        <div className="rounded-controle bg-tela-fundo p-3">
-          <div className="flex flex-col gap-1 lg:flex-row lg:items-start lg:justify-between lg:gap-2">
-            <span className="font-mono text-xs text-fosforo uppercase">
-              1º turno · erro do <span className="whitespace-nowrap">1ºT-2022</span> aplicado
-            </span>
-            <span className="w-fit rounded-controle border border-tela-borda px-1.5 py-0.5 font-mono text-xs font-semibold whitespace-nowrap text-fosforo-forte">
-              vai a 2ºT: {Math.round(replay.p2Trep * 100)}%
-            </span>
-          </div>
-          <p className="mt-1 text-dado font-mono text-fosforo-forte">
-            <span className="text-lula-claro">{fmt(replay.r1L)}%</span> ×{" "}
-            <span className="text-flavio-claro">{fmt(replay.r1F)}%</span>
-          </p>
-          {/* §4.1: os números que o modelo recalcula saem em mono, mesmo dentro
-              da prosa; os fixos editoriais (−1,0 · +5,3 · 50%) ficam em Archivo. */}
-          <p className="mt-1 text-xs leading-compacto text-fosforo">
-            dos válidos (Lula −1,0 · Flávio +5,3). Ninguém chega a 50%: <b>2º turno confirmado</b>,
-            com chegada apertada (
-            <span className="font-mono">{fmtSinal(replay.r1L - replay.r1F)} p.p.</span>) em vez dos{" "}
-            <span className="font-mono">{margem1T === null ? "–" : fmtSinal(margem1T)}</span> das
-            pesquisas. Probabilidade de Lula ainda chegar em 1º lugar:{" "}
-            <span className="font-mono">{Math.round(replay.pLider1 * 100)}%</span>.
-          </p>
-        </div>
+      <p className="mt-1 max-w-texto rounded-nicho bg-atencao-fundo px-4 py-3 text-corpo text-tinta">
+        Isto não diz que o erro vai se repetir. É uma conta de “e se”: pegamos o erro exato das
+        pesquisas de véspera de 2022 e aplicamos nos números de hoje. Em 2026 o candidato da direita
+        é outro e o contexto é outro.
+      </p>
 
-        <div className="rounded-controle bg-tela-fundo p-3">
-          <div className="flex flex-col gap-1 lg:flex-row lg:items-start lg:justify-between lg:gap-2">
-            <span className="font-mono text-xs text-fosforo uppercase">
-              2º turno · erro do <span className="whitespace-nowrap">2ºT-2022</span> aplicado
-            </span>
-            <span className="w-fit rounded-controle border border-tela-borda px-1.5 py-0.5 font-mono text-xs font-semibold whitespace-nowrap text-fosforo-forte">
-              Lula vence: {Math.round(replay.pV2rep * 100)}%
-            </span>
-          </div>
-          <p className="mt-1 text-dado font-mono text-fosforo-forte">
-            <span className="text-lula-claro">{fmt(replay.r2L)}%</span> ×{" "}
-            <span className="text-flavio-claro">{fmt(replay.r2F)}%</span>
+      {/* Três colunas só a partir de lg. A 768 a grade ficava severamente
+          desequilibrada — as colunas 1 e 2 terminavam ~450px acima da 3, que
+          carrega o dobro de texto — e a coluna de ~180px espremia o botão
+          primário em quatro linhas, virando uma pílula de 110px de altura. */}
+      <div className="mt-4 grid gap-3 lg:grid-cols-3 lg:items-start">
+        <Nicho>
+          <p className="text-secao text-tinta">1º turno, com o erro de 2022 aplicado</p>
+          <p className="mt-2">
+            <Chip tom="ameixa" className="numeros">
+              vai a 2º turno em {p2t} de cada 100
+            </Chip>
           </p>
-          <p className="mt-1 text-xs leading-compacto text-fosforo">
-            dos válidos (±1,6).{" "}
-            <b>
-              Vitória apertada de Lula por{" "}
-              <span className="font-mono">{fmtSinal(replay.r2L - replay.r2F)} p.p.</span>
-            </b>{" "}
-            — réplica quase exata do placar real de 2022 (50,9×49,1).
+          <p className="mt-2 text-micro text-tinta-media numeros">
+            Lula {fmt(replay.r1L)}% × Flávio {fmt(replay.r1F)}% dos votos válidos. Pelos números
+            centrais, ninguém chega à metade: em {p2t} de cada 100 cenários dessa hipótese haveria
+            2º turno, com uma chegada apertada de {fmtSinal(replay.r1L - replay.r1F)} pontos, em vez
+            dos {t1Dif === null ? "–" : fmtSinal(t1Dif)} das pesquisas. Lula chegar em 1º lugar
+            acontece em {emCem(replay.pLider1)} de cada 100.
           </p>
-        </div>
+        </Nicho>
 
-        <div className="rounded-controle border border-confirma bg-tela-fundo p-3">
-          <span className="font-mono text-xs text-fosforo uppercase">
-            Estimativa de vitória · condicional à réplica exata
-          </span>
-          <p className="mt-1 text-dado font-mono text-fosforo-forte">
-            <span className="text-lula-claro">{Math.round(replay.elRepD * 100)}%</span> ×{" "}
-            <span className="text-flavio-claro">{100 - Math.round(replay.elRepD * 100)}%</span>
+        <Nicho>
+          <p className="text-secao text-tinta">2º turno, com o erro de 2022 aplicado</p>
+          <p className="mt-2">
+            <Chip tom="ameixa" className="numeros">
+              Lula ganha em {pv2} de cada 100
+            </Chip>
           </p>
-          <p className="mt-0.5 font-mono text-xs text-fosforo">
-            = {fmt(replay.p1Ld * 100, 0)}% (direto no 1ºT) + {Math.round(replay.p2Trep * 100)}% ×{" "}
-            {Math.round(replay.pV2rep * 100)}% (2ºT)
+          <p className="mt-2 text-micro text-tinta-media numeros">
+            Lula {fmt(replay.r2L)}% × Flávio {fmt(replay.r2F)}% dos votos válidos: vitória apertada
+            de Lula por {fmtSinal(replay.r2L - replay.r2F)} pontos — quase o resultado real de 2022,
+            que foi 50,9 × 49,1.
           </p>
-          <p className="mt-1 text-xs leading-compacto text-fosforo">
-            projeção p/ o dia da votação: o erro vira premissa fixa (turno a turno, como em 2022) e
-            a única incerteza que sobra é o movimento da opinião até outubro. Se a votação fosse
-            hoje sob a réplica, o placar{" "}
-            <span className="font-mono">
-              ~{fmt(replay.r2L, 0)}×{fmt(replay.r2F, 0)}
-            </span>{" "}
-            seria quase certo (Lula{" "}
-            <span className="font-mono">≈{Math.round(replay.elRepH * 100)}%</span>).
+        </Nicho>
+
+        {/* Tom neutro de propósito: sobre o lilás da faixa, o carmim dos números
+            fica em 4,47:1 — 0,03 abaixo do piso AA (axe reprova). O lilás segue
+            reservado às formas de incerteza; a síntese destaca pelo título. */}
+        <Nicho>
+          <p className="text-secao text-tinta">Somando os dois turnos nesta hipótese</p>
+          <p className="mt-2 text-dado numeros">
+            <span className="text-lula">Lula {elDia} em 100</span>
+            <span className="text-tinta-media"> × </span>
+            <span className="text-flavio">Flávio {elDiaF} em 100</span>
           </p>
-          <button
-            type="button"
-            data-testid="aplicar-replica"
-            onClick={() => definirParam("vies", ERRO_2022.t2.margem)}
-            className="mt-2 min-h-toque rounded-controle bg-confirma px-3 text-xs font-semibold text-campo"
-          >
-            aplicar réplica (viés +3,1) ao painel
-          </button>
-        </div>
+          <p className="mt-2 text-micro text-tinta numeros">
+            De cada 100 cenários desta hipótese: <b className="font-semibold">{p1Direto}</b>{" "}
+            terminam com Lula eleito já no 1º turno. Os outros{" "}
+            <b className="font-semibold">{p2t}</b> vão à decisão, e Lula ganha em {pv2} de cada 100
+            deles — o que dá <b className="font-semibold">{v2Abs}</b> em 100. Somando os dois
+            caminhos: <b className="font-semibold">{elDia}</b> em 100.
+          </p>
+          <p className="mt-2 text-micro text-tinta-media numeros">
+            Nesta hipótese o erro vira suposição fixa, turno a turno, como aconteceu em 2022. A
+            única dúvida que sobra é o quanto a opinião ainda pode andar até outubro. Se a votação
+            fosse hoje sob essa hipótese, a dúvida quase desapareceria: a diferença ficaria perto de{" "}
+            {r2lInt} × {100 - r2lInt} e Lula seria eleito em {emCem(replay.elRepH)} de cada 100
+            cenários. É a distância até outubro que derruba esse número para {elDia}.
+          </p>
+        </Nicho>
       </div>
 
-      <p className="mt-3 text-xs leading-compacto text-fosforo opacity-85">
-        Calibração: erro médio «pesquisas de véspera × urna» de 2022 em votos válidos — 1º turno:
-        margens de +7,1 a +14 (média +11,6) contra +5,2 real; 2º turno: margens de +0,8 a +8 (média
-        +4,9) contra +1,8 real. Por que os erros não se somam: em 2022, as pesquisas do 2º turno
-        foram refeitas depois do choque do 1º — o erro remanescente na decisão foi só +3,1. A
-        réplica fiel, portanto, <b>ainda elege Lula por pouco, como em 2022</b>. No painel principal
-        esse mesmo cenário aparece como{" "}
-        <span className="font-mono">≈{Math.round(replay.pPainel * 100)}%</span>, porque lá a
-        incerteza sobre o próprio viés é mantida. A inversão da corrida exige uma hipótese que NÃO
-        aconteceu em 2022: o erro do 1º turno persistir intacto na decisão — é o cartão
-        «teste-limite +6,3» acima, além do ponto de virada (
-        <span className="font-mono">{fmtSinal(M.margem)}</span>).
+      {/* O botão saiu de dentro do terceiro cartão: ele é a ação da SEÇÃO
+          inteira, não daquele cartão, e numa coluna de grade ele nunca tem
+          largura para caber em uma linha. */}
+      <p className="mt-3">
+        <Botao
+          data-testid="aplicar-replica"
+          onClick={() => definirParam("vies", ERRO_2022.t2.margem)}
+        >
+          Aplicar esta hipótese ao painel (puxada de 3,1)
+        </Botao>
       </p>
+
+      {/* Vira um detalhe com afordância de controle, e sem a frase "eleito em
+          NN de cada 100 cenários, por pouco" — ela já aparecia duas vezes
+          neste mesmo bloco, na resposta do topo e no cartão da soma. */}
+      <Detalhe titulo="De onde saem esses números" className="mt-4 max-w-texto">
+        <p className="mt-1 text-micro text-tinta-media numeros">
+          Em 2022, as pesquisas de véspera do 1º turno davam a Lula uma vantagem de 7,1 a 14 pontos
+          (média de 11,6), e o resultado real foi 5,2. No 2º turno davam de 0,8 a 8 pontos (média de
+          4,9), e o resultado real foi 1,8. Os dois erros não se somam: as do 2º turno foram
+          refeitas depois do susto do 1º, e o que sobrou de erro na decisão foi 3,1. No painel
+          principal esta mesma hipótese aparece como cerca de {emCem(replay.pPainel)} em 100, porque
+          lá a dúvida sobre o tamanho da puxada continua na conta. Para a corrida se inverter seria
+          preciso algo que <b className="font-semibold text-tinta">não</b> aconteceu em 2022: o erro
+          do 1º turno chegar inteiro à decisão — é o cartão de teste-limite, acima.
+        </p>
+      </Detalhe>
     </div>
   );
 }

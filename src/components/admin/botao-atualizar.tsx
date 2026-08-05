@@ -1,11 +1,12 @@
 "use client";
 
 /**
- * Disparo manual do coletor. Custa dinheiro (IA + busca), então o backend
- * impõe um cooldown de 60s — aqui só tratamos o erro que ele devolve, com a
- * largura do botão travada para o rótulo "⏳ Buscando…" não pular o layout.
+ * Disparo manual do coletor. Custa dinheiro (IA + busca), então o backend impõe
+ * um cooldown de 60s — aqui só tratamos o erro que ele devolve, com a largura do
+ * botão travada para o rótulo de espera não pular o layout.
  */
 import { useState, useTransition } from "react";
+import { Botao } from "@/components/ui/blocos";
 import { dispararAtualizacao, type ResultadoAtualizacao } from "@/lib/admin/acoes";
 
 export function BotaoAtualizar() {
@@ -14,36 +15,33 @@ export function BotaoAtualizar() {
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <button
-        type="button"
+      <Botao
         disabled={buscando}
         onClick={() =>
           iniciar(async () => {
             setResultado(await dispararAtualizacao());
           })
         }
-        className="min-h-toque w-52 rounded-controle bg-confirma px-4 text-sm font-black tracking-botao text-campo uppercase shadow-botao disabled:cursor-wait"
+        className="w-56"
       >
-        {buscando ? "⏳ Buscando…" : "▶ Verificar agora"}
-      </button>
+        {buscando ? "Buscando…" : "Verificar agora"}
+      </Botao>
 
-      <p role="status" aria-live="polite" className="font-mono text-xs">
+      <p role="status" aria-live="polite" className="text-micro numeros">
         {buscando ? (
-          <span className="text-cinza">
-            buscando rodadas novas nos institutos… (até ~1 min). O que for encontrado entra como
+          <span className="text-tinta-media">
+            buscando pesquisas novas nos institutos… (até ~1 min). O que for encontrado entra como
             pendente.
           </span>
         ) : resultado ? (
           <span
             className={[
-              "inline-block rounded-controle border px-3 py-2",
-              resultado.ok
-                ? "border-confirma bg-confirma-fundo text-confirma-texto"
-                : "border-alerta bg-alerta-fundo text-alerta-texto",
+              "inline-block rounded-nicho px-4 py-2",
+              resultado.ok ? "bg-ameixa-bruma text-tinta" : "bg-atencao-fundo text-tinta",
             ].join(" ")}
           >
             {resultado.ok
-              ? `✓ ${resultado.mensagem} (encontradas ${resultado.resumo.encontradas} · rejeitadas ${resultado.resumo.rejeitadas.length})`
+              ? `${resultado.mensagem} (encontradas ${resultado.resumo.encontradas} · rejeitadas ${resultado.resumo.rejeitadas.length})`
               : `⚠ ${resultado.erro}`}
           </span>
         ) : null}

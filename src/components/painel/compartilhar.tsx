@@ -1,17 +1,23 @@
 "use client";
 
 /**
- * Compartilhar o cenário atual: Web Share API quando existe, cópia do link
- * quando não. O feedback é sempre visível E anunciado (`role="status"`).
+ * Compartilhar o que o leitor está vendo: Web Share API quando existe, cópia do
+ * link quando não. O feedback é sempre visível E anunciado (`role="status"`).
+ *
+ * Quando as réguas estão fora do padrão, o texto compartilhado diz que o número
+ * é de SIMULAÇÃO (H7) — o link não pode sair por aí passando por oficial.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Botao } from "@/components/ui/blocos";
+import { ACOES, parEmCem } from "@/components/ui/textos";
+import { NOME_SITE } from "@/app/_lib/site";
 import { paramsParaQuery } from "./parametros-url";
 import { usePainel } from "./estado";
 
 type Estado = "pronto" | "copiado" | "erro";
 
 export function Compartilhar() {
-  const { params } = usePainel();
+  const { params, paramsAlterados, M } = usePainel();
   const [estado, setEstado] = useState<Estado>("pronto");
   const timer = useRef<number | null>(null);
 
@@ -30,10 +36,13 @@ export function Compartilhar() {
 
   const compartilhar = useCallback(async () => {
     const url = `${window.location.origin}${window.location.pathname}${paramsParaQuery(params)}`;
-    const titulo = "Agregador Presidencial 2026 — cenário com os meus parâmetros";
+    const [lula, flavio] = parEmCem(M.eleito.dia.l);
+    const texto = paramsAlterados
+      ? `Minha simulação no ${NOME_SITE}: com as réguas que eu mexi, Lula é eleito em ${lula} de cada 100 cenários. Não é o número oficial do painel.`
+      : `Em 100 eleições parecidas com esta, Lula é eleito em ${lula} e Flávio em ${flavio}. Não é previsão — veja de onde vem esse número.`;
     try {
       if (typeof navigator.share === "function") {
-        await navigator.share({ title: titulo, url });
+        await navigator.share({ title: `${NOME_SITE} — Presidente 2026`, text: texto, url });
         return;
       }
       await navigator.clipboard.writeText(url);
@@ -43,25 +52,20 @@ export function Compartilhar() {
       if (erro instanceof DOMException && erro.name === "AbortError") return;
       avisar("erro");
     }
-  }, [params, avisar]);
+  }, [params, paramsAlterados, M, avisar]);
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <button
-        type="button"
-        onClick={compartilhar}
-        data-testid="compartilhar"
-        className="min-h-toque rounded-controle border border-cinza px-3 text-sm font-semibold text-tinta"
-      >
-        ▶ Compartilhar este cenário
-      </button>
-      <p role="status" aria-live="polite" className="font-mono text-xs text-cinza">
+    <span className="inline-flex flex-wrap items-center gap-3">
+      <Botao variante="fantasma" onClick={compartilhar} data-testid="compartilhar">
+        {ACOES.compartilhar}
+      </Botao>
+      <span role="status" aria-live="polite" className="text-micro text-tinta-media">
         {estado === "copiado"
-          ? "✓ link copiado — ele reabre o painel com estes parâmetros"
+          ? ACOES.compartilharCopiado
           : estado === "erro"
-            ? "⚠ não foi possível copiar; selecione a barra de endereço e copie o link"
+            ? ACOES.compartilharErro
             : ""}
-      </p>
-    </div>
+      </span>
+    </span>
   );
 }

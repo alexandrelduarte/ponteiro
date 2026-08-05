@@ -1,41 +1,64 @@
+"use client";
+
 /**
- * Metodologia resumida no painel — o texto completo (limitações, classificação
- * dos cenários, fontes da série) mora em /metodologia.
+ * "De onde vêm esses números?" — o método em quatro linhas (COPY-DECK §N).
+ * O texto completo (limitações, classificação, fontes) mora em /metodologia.
  */
-import Link from "next/link";
-import { Cartao } from "@/components/ui/cartao";
-import { DEF_EMPATE_TECNICO } from "@/components/ui/textos";
+import { Bloco, Cabecalho, LinkInterno } from "@/components/ui/blocos";
+import { Termo } from "@/components/ui/glossario";
+import { usePainel } from "./estado";
 
 export function MetodologiaResumo() {
+  const { pesquisas } = usePainel();
+
   return (
-    <Cartao titulo="Metodologia e limitações — resumo">
-      <div className="space-y-2 text-sm leading-compacto text-cinza">
-        <p>
-          <b className="text-tinta">Peso de cada pesquisa</b> = recência (decaimento exponencial,
-          com meia-vida ajustável) × √(amostra/2000), com teto 1,5. A probabilidade «no cenário
-          atual» usa a incerteza de hoje (dispersão entre institutos + erro sistemático possível de
-          todo o setor); a «no dia da votação» soma a deriva da opinião, que cresce com a raiz do
-          tempo restante — por isso ela é sempre menos cravada.
-        </p>
-        <p>
-          <b className="text-tinta">Tendência</b> compara cada instituto com ele mesmo (última
-          rodada menos a anterior, até 75 dias), para que diferença de metodologia não vire
-          tendência falsa.
-        </p>
-        <p>
-          <b className="text-tinta">Classificação</b> da chance projetada: 50–60% empate técnico
-          projetado · 60–75% leve favoritismo · 75–90% favorito · 90%+ amplamente favorito. Em cada
-          pesquisa isolada, {DEF_EMPATE_TECNICO}.
-        </p>
-      </div>
-      <p className="mt-3">
-        <Link
-          href="/metodologia"
-          className="inline-flex min-h-toque items-center text-sm font-semibold text-confirma-texto underline decoration-dotted underline-offset-2"
-        >
-          Ler a metodologia completa, as limitações e as fontes da série →
-        </Link>
+    <Bloco rotuladoPor="titulo-metodo">
+      <Cabecalho
+        id="titulo-metodo"
+        pergunta="De onde vêm esses números?"
+        resposta={
+          <>
+            De {pesquisas.length} pesquisas registradas no TSE, misturadas numa média que dá mais
+            peso às mais novas e às que ouviram mais gente.
+          </>
+        }
+        traduzindo={
+          <>
+            Depois da média, o painel calcula duas chances: uma se a votação fosse hoje e outra para
+            o dia da votação. A segunda carrega mais dúvida, porque até lá a corrida ainda pode
+            andar. Nada aqui é torcida: as contas estão abertas e as quatro suposições do painel
+            ficam à vista.
+          </>
+        }
+      />
+
+      <ul className="mt-4 max-w-texto space-y-2 text-corpo text-tinta-media numeros">
+        <li>
+          <b className="font-semibold text-tinta">O peso de cada pesquisa</b> vem de duas coisas:
+          quando ela foi feita e quantas pessoas ouviu.
+        </li>
+        <li>
+          <b className="font-semibold text-tinta">A tendência</b> compara cada instituto com ele
+          mesmo, para que diferença de método não vire movimento falso.
+        </li>
+        <li>
+          <b className="font-semibold text-tinta">As faixas:</b> de 50 a 60 em 100{" "}
+          <b className="font-semibold text-tinta">está em aberto</b>; de 60 a 75, na frente por
+          pouco; de 75 a 90, na frente; acima de 90, bem na frente — e nem aí é garantia.
+        </li>
+        <li>
+          <b className="font-semibold text-tinta">
+            <Termo chave="empateTecnico">Empate técnico</Termo>
+          </b>
+          , em uma pesquisa isolada, é quando a diferença é menor que o dobro da folga da medida.
+        </li>
+      </ul>
+
+      <p className="mt-4">
+        <LinkInterno href="/metodologia" className="text-corpo font-semibold">
+          Ler a metodologia completa, com as limitações e as fontes →
+        </LinkInterno>
       </p>
-    </Cartao>
+    </Bloco>
   );
 }

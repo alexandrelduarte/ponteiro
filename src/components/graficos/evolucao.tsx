@@ -1,14 +1,32 @@
 "use client";
 
 /**
- * Evolução — pontos por pesquisa + média ponderada, com alternância 1ºT/2ºT.
- * Domínio Y fixo ([30,55] / [20,50]) de propósito: é o que impede que 0,3 p.p.
- * pareçam um terremoto (P2).
+ * Evolução da DIFERENÇA no tempo, com a faixa da dúvida dominante
+ * (docs/DESIGN-V2.md §5.3).
+ *
+ * O que mudou em relação à v1, e por quê: a v1 desenhava dois níveis de
+ * intenção de voto (30–55%), e ali "empate" não é altura nenhuma — os dois
+ * números não somam 100. Aqui o eixo é a DIFERENÇA, então o zero é literalmente
+ * o empate, "Lula na frente ↑" e "Flávio na frente ↓" são verdade geométrica,
+ * e a mesma régua do enxame reaparece deitada. Os dados são os mesmos: a média
+ * ponderada do painel ponto a ponto e cada pesquisa como um ponto.
+ *
+ * A FAIXA é a forma principal; a média é uma linha ameixa DENTRO dela. A faixa
+ * tem borda obrigatória (é ela que cumpre o 3:1 de objeto gráfico), e a borda
+ * vira TRACEJADA depois de hoje para separar observado de projetado — sem
+ * nenhum token de cor novo.
+ *
+ * A projeção não inventa número: o centro é a margem ajustada que o painel já
+ * publica, e a largura cresce pela MESMA fórmula do modelo,
+ * `hypot(sigmaHoje, coefDeriva × √dias)`, que fecha exatamente em `sigmaDia`
+ * no dia da votação.
  */
 import {
+  Area,
   CartesianGrid,
   ComposedChart,
   Line,
+  ReferenceLine,
   ResponsiveContainer,
   Scatter,
   Tooltip,
@@ -18,73 +36,207 @@ import {
 import type { PontoGrafico, PontoSerie } from "@/lib/modelo";
 import { COR, DicaEvolucao, TICK, ddmmDeMs } from "./comum";
 
+export interface PropsEvolucao {
+  serie: PontoSerie[];
+  pontos: PontoGrafico[];
+  /** instante de referência do modelo (fim do observado) */
+  hojeMs: number;
+  /** dia da votação do turno exibido */
+  eleicaoMs: number;
+  /** centro da projeção: a diferença ajustada pela puxada suposta */
+  centroProjetado: number;
+  /** dúvida de hoje (± pontos) */
+  sigmaHoje: number;
+  /** coeficiente da deriva — o quanto a corrida ainda pode andar */
+  coefDeriva: number;
+}
+
+interface PontoPlotado {
+  x: number;
+  /** diferença observada (Lula − Flávio) */
+  dif?: number;
+  l?: number;
+  f?: number;
+  faixa?: [number, number];
+  proj?: [number, number];
+}
+
+const PASSOS_PROJECAO = 8;
+
 export default function GraficoEvolucao({
   serie,
   pontos,
-  turno,
-}: {
-  serie: PontoSerie[];
-  pontos: PontoGrafico[];
-  turno: 1 | 2;
-}) {
+  hojeMs,
+  eleicaoMs,
+  centroProjetado,
+  sigmaHoje,
+  coefDeriva,
+}: PropsEvolucao) {
+  const observado: PontoPlotado[] = serie.map((p) => ({
+    x: p.x,
+    dif: p.l - p.f,
+    l: p.l,
+    f: p.f,
+    faixa: [p.l - p.f - sigmaHoje, p.l - p.f + sigmaHoje],
+  }));
+
+  const projetado: PontoPlotado[] = [];
+  if (eleicaoMs > hojeMs) {
+    for (let i = 0; i <= PASSOS_PROJECAO; i++) {
+      const t = hojeMs + ((eleicaoMs - hojeMs) * i) / PASSOS_PROJECAO;
+      const dias = Math.max(0, (eleicaoMs - t) / 864e5);
+      const restante = Math.max(0, (eleicaoMs - hojeMs) / 864e5) - dias;
+      const sigma = Math.hypot(sigmaHoje, coefDeriva * Math.sqrt(restante));
+      projetado.push({ x: t, proj: [centroProjetado - sigma, centroProjetado + sigma] });
+    }
+  }
+
+  const dados = [...observado, ...projetado].sort((a, b) => a.x - b.x);
+
+  const extremos = dados.flatMap((d) => [
+    ...(d.faixa ?? []),
+    ...(d.proj ?? []),
+    ...(d.dif !== undefined ? [d.dif] : []),
+  ]);
+  const dosPontos = pontos.map((p) => p.lVal - p.fVal);
+  const todos = [...extremos, ...dosPontos, 0];
+  const folga = 1.5;
+  const dominio: [number, number] = [Math.min(...todos) - folga, Math.max(...todos) + folga];
+
+  /**
+   * Marcas do eixo vertical com PASSO CONSTANTE.
+   * O passo automático do Recharts saía irregular (3, 4, 4, 4 pontos entre as
+   * marcas), e uma régua com passo desigual mente sobre distância. O zero
+   * entra sempre — é a régua do empate.
+   */
+  const alcance = dominio[1] - dominio[0];
+  const passoY = alcance > 32 ? 10 : alcance > 16 ? 5 : alcance > 8 ? 2 : 1;
+  const marcasY: number[] = [];
+  for (let v = Math.ceil(dominio[0] / passoY) * passoY; v <= dominio[1]; v += passoY) {
+    marcasY.push(Math.round(v * 100) / 100);
+  }
+
+  /**
+   * Marcas do eixo horizontal: só datas com significado editorial — o começo
+   * da lista, HOJE e o dia da votação. O passo automático sorteava uma data do
+   * meio ("09/06") que não quer dizer nada para ninguém.
+   */
+  const primeiroX = dados.length ? dados[0].x : hojeMs;
+  const ultimoX = dados.length ? dados[dados.length - 1].x : hojeMs;
+  const marcasX = Array.from(
+    new Set([primeiroX, hojeMs, ultimoX].filter((t) => t >= primeiroX && t <= ultimoX)),
+  ).sort((a, b) => a - b);
+
+  const scatter = pontos.map((p) => ({ ...p, dif: p.lVal - p.fVal }));
+
   return (
     <ResponsiveContainer width="100%" height="100%">
-      {/* `right: 26`: o último tick do eixo X cai EXATAMENTE no limite direito
-          do domínio, e o `<text>` centrado nele vazava 2px além do `<svg>` do
-          ResponsiveContainer nos três viewports — o `8` de «06/08» (a data mais
-          recente da série) saía sem a haste direita. A margem reserva a metade
-          do rótulo mais largo (`dd/mm` em mono de 12px ≈ 36px) e sobra folga. */}
-      <ComposedChart data={serie} margin={{ top: 10, right: 26, bottom: 0, left: -18 }}>
-        <CartesianGrid stroke={COR.linha} strokeDasharray="2 4" />
+      <ComposedChart data={dados} margin={{ top: 12, right: 26, bottom: 0, left: -14 }}>
+        <CartesianGrid stroke={COR.grade} strokeDasharray="2 4" />
         <XAxis
           dataKey="x"
           type="number"
-          domain={["dataMin - 259200000", "dataMax + 259200000"]}
+          domain={["dataMin", "dataMax"]}
+          ticks={marcasX}
           tickFormatter={(t: number) => ddmmDeMs(t)}
           tick={TICK}
-          stroke={COR.linha}
-          interval="preserveStartEnd"
-          minTickGap={48}
+          stroke={COR.contorno}
+          interval={0}
         />
-        {/* Passo REGULAR: o `tickCount` do Recharts entregava 30·37·44·51·55,
-            com o último degrau quebrado. Domínio fixo preservado (P2). */}
         <YAxis
-          domain={turno === 2 ? [30, 55] : [20, 50]}
-          ticks={turno === 2 ? [30, 35, 40, 45, 50, 55] : [20, 25, 30, 35, 40, 45, 50]}
+          domain={dominio}
+          ticks={marcasY}
+          tickFormatter={(v: number) => String(Math.round(v))}
           tick={TICK}
-          stroke={COR.linha}
+          stroke={COR.contorno}
+          width={40}
         />
         <Tooltip trigger="click" content={<DicaEvolucao />} />
+
+        {/* A dúvida, observada: campo lilás com borda. */}
+        <Area
+          dataKey="faixa"
+          fill={COR.faixa}
+          fillOpacity={1}
+          stroke={COR.faixaBorda}
+          strokeWidth={1.5}
+          type="monotone"
+          connectNulls={false}
+          isAnimationActive={false}
+        />
+        {/* A dúvida, projetada: mesma faixa, borda TRACEJADA. */}
+        <Area
+          dataKey="proj"
+          fill={COR.faixa}
+          fillOpacity={1}
+          stroke={COR.faixaBorda}
+          strokeWidth={1.5}
+          strokeDasharray="5 4"
+          type="monotone"
+          connectNulls={false}
+          isAnimationActive={false}
+        />
+
+        {/* A régua do empate: a referência do produto inteiro, em tinta. */}
+        <ReferenceLine
+          y={0}
+          stroke={COR.tinta}
+          strokeWidth={2}
+          label={{
+            value: "empate",
+            position: "insideTopLeft",
+            fontSize: 13,
+            fill: COR.tinta,
+            className: "rotulo-grafico",
+          }}
+        />
+
+        {/* HOJE — a fronteira entre o que foi medido e o que é projetado.
+            Sem ela a linha da média terminava em corte seco e a borda da faixa
+            simplesmente virava tracejada, sem nada dizendo onde nem por quê. */}
+        {ultimoX > hojeMs ? (
+          <ReferenceLine
+            x={hojeMs}
+            stroke={COR.ameixaClara}
+            strokeWidth={1.5}
+            label={{
+              value: "hoje",
+              position: "insideTopRight",
+              fontSize: 13,
+              fill: COR.ameixa,
+              className: "rotulo-grafico",
+            }}
+          />
+        ) : null}
+
+        {/* A leitura do painel sobre a evidência — ameixa, dentro da faixa. */}
         <Line
-          dataKey="l"
-          stroke={COR.lula}
+          dataKey="dif"
+          stroke={COR.ameixa}
           strokeWidth={2.5}
           dot={false}
           type="monotone"
+          connectNulls={false}
           isAnimationActive={false}
         />
-        <Line
-          dataKey="f"
-          stroke={COR.flavio}
-          strokeWidth={2.5}
-          dot={false}
-          type="monotone"
-          isAnimationActive={false}
-        />
+
+        {/* Cada pesquisa, do lado em que ela caiu. Duas séries em vez de uma
+            forma customizada: a cor sai do LADO da régua, não de um `if` dentro
+            do desenho — e o halo em placa garante o limite discernível. */}
         <Scatter
-          data={pontos}
-          dataKey="lVal"
+          data={scatter.filter((p) => p.dif >= 0)}
+          dataKey="dif"
           fill={COR.lula}
-          fillOpacity={0.55}
-          stroke={COR.linhaForte}
+          stroke={COR.placa}
+          strokeWidth={2}
           isAnimationActive={false}
         />
         <Scatter
-          data={pontos}
-          dataKey="fVal"
+          data={scatter.filter((p) => p.dif < 0)}
+          dataKey="dif"
           fill={COR.flavio}
-          fillOpacity={0.55}
-          stroke={COR.linhaForte}
+          stroke={COR.placa}
+          strokeWidth={2}
           isAnimationActive={false}
         />
       </ComposedChart>

@@ -4,13 +4,20 @@
  * Aprovar / rejeitar uma pesquisa da fila (R3).
  *
  * Confirmação em dois passos, inline: nada de `window.confirm` (não é
- * estilizável, não é testável e some no mobile). O resultado é anunciado por
- * `role="status"`.
+ * estilizável, não é testável e some no mobile). A ação primária é ameixa
+ * cheia; a destrutiva é botão-fantasma com tinta e contorno em âmbar-queimado.
+ * Não existe verde de sucesso nem vermelho de perigo aqui (DESIGN-V2 §5.8).
  */
 import { useState, useTransition } from "react";
+import { Botao } from "@/components/ui/blocos";
 import { aprovarPesquisa, rejeitarPesquisa, type ResultadoAcao } from "@/lib/admin/acoes";
 
 type Passo = null | "aprovar" | "rejeitar";
+
+const FANTASMA_ATENCAO =
+  "inline-flex min-h-toque items-center justify-center rounded-plena bg-placa px-5 " +
+  "text-corpo font-semibold text-atencao shadow-[inset_0_0_0_2px_var(--color-atencao)] " +
+  "transition-colors duration-(--dur-rapida) ease-(--ease-padrao) hover:bg-atencao-fundo";
 
 export function AcoesPendente({ id, descricao }: { id: string; descricao: string }) {
   const [passo, setPasso] = useState<Passo>(null);
@@ -30,59 +37,44 @@ export function AcoesPendente({ id, descricao }: { id: string; descricao: string
   return (
     <div className="mt-3">
       {passo === null ? (
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => setPasso("aprovar")}
-            disabled={processando}
-            className="min-h-toque rounded-controle bg-confirma px-3 text-sm font-semibold text-campo shadow-botao"
-          >
-            ✓ Aprovar
-          </button>
+        <div className="flex flex-wrap gap-3">
+          <Botao onClick={() => setPasso("aprovar")} disabled={processando}>
+            Aprovar e publicar
+          </Botao>
           <button
             type="button"
             onClick={() => setPasso("rejeitar")}
             disabled={processando}
-            className="min-h-toque rounded-controle border border-alerta px-3 text-sm font-semibold text-alerta-texto"
+            className={FANTASMA_ATENCAO}
           >
-            × Rejeitar
+            Rejeitar
           </button>
         </div>
       ) : (
-        <div className="rounded-controle border border-dashed border-cinza bg-mini p-3">
-          <p className="text-sm text-tinta">
+        <div className="rounded-campo bg-placa p-4">
+          <p className="text-corpo text-tinta">
             {passo === "aprovar"
-              ? `Publicar na série oficial: ${descricao}?`
+              ? `Publicar na lista oficial: ${descricao}?`
               : `Rejeitar e tirar da fila: ${descricao}?`}
           </p>
           {passo === "rejeitar" ? (
-            <label className="mt-2 block text-xs text-cinza">
+            <label className="mt-2 block text-micro text-tinta-media">
               Motivo (opcional, fica na auditoria)
               <input
                 value={motivo}
                 onChange={(e) => setMotivo(e.target.value)}
                 maxLength={500}
-                className="mt-1 min-h-toque w-full rounded-controle border border-linha bg-campo px-2 text-sm text-tinta"
+                className="mt-1 min-h-toque w-full rounded-campo bg-placa px-3 text-corpo text-tinta shadow-[inset_0_0_0_1px_var(--color-contorno)]"
               />
             </label>
           ) : null}
-          <div className="mt-2 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => executar(passo)}
-              disabled={processando}
-              className="min-h-toque rounded-controle bg-tinta px-3 text-sm font-semibold text-texto-inverso disabled:cursor-wait"
-            >
-              {processando ? "⏳ Executando…" : "Confirmar"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setPasso(null)}
-              disabled={processando}
-              className="min-h-toque rounded-controle border border-cinza px-3 text-sm font-semibold text-tinta"
-            >
+          <div className="mt-3 flex flex-wrap gap-3">
+            <Botao onClick={() => executar(passo)} disabled={processando}>
+              {processando ? "Executando…" : "Confirmar"}
+            </Botao>
+            <Botao variante="fantasma" onClick={() => setPasso(null)} disabled={processando}>
               Cancelar
-            </button>
+            </Botao>
           </div>
         </div>
       )}
@@ -91,13 +83,11 @@ export function AcoesPendente({ id, descricao }: { id: string; descricao: string
         {resultado ? (
           <span
             className={[
-              "inline-block rounded-controle border px-3 py-2 font-mono text-xs",
-              resultado.ok
-                ? "border-confirma bg-confirma-fundo text-confirma-texto"
-                : "border-alerta bg-alerta-fundo text-alerta-texto",
+              "inline-block rounded-nicho px-4 py-2 text-micro",
+              resultado.ok ? "bg-ameixa-bruma text-tinta" : "bg-atencao-fundo text-tinta",
             ].join(" ")}
           >
-            {resultado.ok ? `✓ ${resultado.mensagem}` : `⚠ ${resultado.erro}`}
+            {resultado.ok ? resultado.mensagem : `⚠ ${resultado.erro}`}
           </span>
         ) : null}
       </p>

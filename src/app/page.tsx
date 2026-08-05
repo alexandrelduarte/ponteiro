@@ -1,37 +1,45 @@
 /**
  * Painel — a página principal.
  *
- * Server Component com ISR de 5 minutos. Duas decisões estruturais:
+ * Server Component com ISR de 5 minutos. Duas decisões estruturais que a v2
+ * mantém, porque continuam certas:
  *
  *  1. `hojeMs` é calculado UMA vez aqui e desce por prop. O modelo é
  *     determinístico nesse instante, então o HTML do servidor e a hidratação
  *     produzem exatamente os mesmos números — e o cliente nunca lê o relógio.
- *  2. Os números-manchete saem prontos do servidor (o painel nasce com a base
- *     oficial e os parâmetros padrão). Só os gráficos carregam depois, com
- *     esqueleto da mesma altura.
+ *  2. Os números-manchete saem prontos do servidor, e o ENXAME junto: ele é
+ *     SVG feito à mão, sem Recharts e sem medir o DOM. Só os gráficos de
+ *     evolução e de sensibilidade carregam depois, com esqueleto da mesma
+ *     altura (CLS 0).
+ *
+ * A ordem das seções é a do COPY-DECK: hero → como ler → quem está na frente →
+ * pode virar → evolução → as pesquisas → outros candidatos → contexto → réguas
+ * → erro de 2022 → cenário-base → método.
  */
 import { Suspense } from "react";
 import { PARAMS_PADRAO } from "@/data/constantes";
 import { getFrescor, getPesquisasPublicadas } from "@/lib/dados";
 import { rodarModelo } from "@/lib/modelo";
-import { Secao } from "@/components/ui/basicos";
+import { Secao } from "@/components/ui/blocos";
 import { JsonLd } from "@/components/site/json-ld";
-import { Rodape } from "@/components/site/rodape";
-import { Abas } from "@/components/painel/abas";
-import { Cabecalho } from "@/components/painel/cabecalho";
 import { CenarioBase } from "@/components/painel/cenario-base";
+import { ComoLer } from "@/components/painel/como-ler";
 import { ContextoSocial } from "@/components/painel/contexto-social";
+import { Erro2022 } from "@/components/painel/erro-2022";
+import { Evolucao } from "@/components/painel/evolucao";
 import { FaixaSimulacao } from "@/components/painel/faixa-simulacao";
-import { HistoricoErros } from "@/components/painel/historico-erros";
+import { Frente } from "@/components/painel/frente";
+import { Hero } from "@/components/painel/hero";
 import { MetodologiaResumo } from "@/components/painel/metodologia-resumo";
+import { OutrosCandidatos } from "@/components/painel/outros-candidatos";
 import { PainelProvider } from "@/components/painel/estado";
 import { Parametros } from "@/components/painel/parametros";
 import { SeriePesquisas } from "@/components/painel/serie-pesquisas";
 import { SincronizadorURL } from "@/components/painel/sincronizador-url";
-import { TelaUrna } from "@/components/painel/tela-urna";
+import { Virada } from "@/components/painel/virada";
 import { montarSelo } from "@/components/painel/frescor";
 import { instanteDoRender } from "./_lib/relogio";
-import { DESCRICAO_PADRAO, NOME_SITE, URL_SITE } from "./_lib/site";
+import { DESCRICAO_PADRAO, NOME_DESCRITIVO, NOME_SITE, URL_SITE } from "./_lib/site";
 
 export const revalidate = 300;
 
@@ -56,14 +64,32 @@ export default async function Painel() {
             <SincronizadorURL />
           </Suspense>
 
-          <Cabecalho selo={selo} />
           <FaixaSimulacao />
+          <Hero selo={selo} />
 
-          <section className="mx-auto w-full max-w-leitura px-goteira lg:px-goteira-lg">
-            <TelaUrna />
-          </section>
+          <Secao>
+            <ComoLer />
+          </Secao>
 
-          <Abas />
+          <Secao>
+            <Frente />
+          </Secao>
+
+          <Secao>
+            <Virada />
+          </Secao>
+
+          <Secao>
+            <Evolucao />
+          </Secao>
+
+          <Secao>
+            <SeriePesquisas />
+          </Secao>
+
+          <Secao>
+            <OutrosCandidatos />
+          </Secao>
 
           <Secao>
             <ContextoSocial />
@@ -74,15 +100,11 @@ export default async function Painel() {
           </Secao>
 
           <Secao>
-            <HistoricoErros />
+            <Erro2022 />
           </Secao>
 
           <Secao>
             <CenarioBase />
-          </Secao>
-
-          <Secao>
-            <SeriePesquisas />
           </Secao>
 
           <Secao>
@@ -91,13 +113,12 @@ export default async function Painel() {
         </PainelProvider>
       </main>
 
-      <Rodape />
-
       <JsonLd
         dados={{
           "@context": "https://schema.org",
           "@type": "Dataset",
-          name: "Agregado de pesquisas presidenciais 2026 (Brasil)",
+          name: `${NOME_SITE} — ${NOME_DESCRITIVO}`,
+          alternateName: NOME_DESCRITIVO,
           description: DESCRICAO_PADRAO,
           url: `${URL_SITE}/`,
           inLanguage: "pt-BR",
@@ -119,12 +140,12 @@ export default async function Painel() {
                 {
                   "@type": "PropertyValue",
                   name: "Chance de Flávio Bolsonaro ser eleito (projeção para o dia da votação)",
-                  value: Math.round(oficial.eleito.dia.f * 100),
+                  value: 100 - Math.round(oficial.eleito.dia.l * 100),
                   unitText: "%",
                 },
                 {
                   "@type": "PropertyValue",
-                  name: "Margem agregada no 2º turno (Lula − Flávio)",
+                  name: "Diferença agregada no 2º turno (Lula − Flávio)",
                   value: Number(oficial.margem.toFixed(2)),
                   unitText: "p.p.",
                 },

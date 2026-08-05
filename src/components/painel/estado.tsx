@@ -47,6 +47,13 @@ export interface EstadoPainel {
   params: ParamsModelo;
   /** resultado do modelo; garantido não-nulo (série vazia troca a página) */
   M: ResultadoModelo;
+  /**
+   * O painel OFICIAL: série publicada + réguas no padrão. Fora de simulação é
+   * literalmente `M`; dentro dela existe para o número da simulação poder
+   * aparecer com o oficial ao lado, sem obrigar ninguém a rolar até o topo
+   * (H7 pede a volta ao oficial a um toque, não a uma rolagem).
+   */
+  Moficial: ResultadoModelo | null;
   campoCompleto: CampoCompleto | null;
 
   serieAlterada: boolean;
@@ -98,6 +105,16 @@ export function PainelProvider({
   );
 
   const paramsAlterados = !ehPadrao(params);
+  const simulando = serieAlterada || paramsAlterados;
+
+  // Fora de simulação o oficial É o resultado em tela: reaproveitar `M` evita
+  // uma segunda rodada do modelo no caminho quente (a home renderiza isso a
+  // cada mudança de régua) e garante que os dois números sejam byte a byte o
+  // mesmo, sem chance de divergirem por arredondamento.
+  const Moficial = useMemo(
+    () => (simulando ? rodarModelo(pesquisasOficiais, PARAMS_PADRAO, hojeMs) : M),
+    [simulando, pesquisasOficiais, hojeMs, M],
+  );
 
   /* ---- URL compartilhável: escreve só o que sai do padrão ---- */
   const primeiraSincronia = useRef(true);
@@ -150,10 +167,11 @@ export function PainelProvider({
       pesquisas,
       params,
       M,
+      Moficial,
       campoCompleto,
       serieAlterada,
       paramsAlterados,
-      simulando: serieAlterada || paramsAlterados,
+      simulando,
       aba,
       turnoGrafico,
       definirParam,
@@ -172,9 +190,11 @@ export function PainelProvider({
     pesquisas,
     params,
     M,
+    Moficial,
     campoCompleto,
     serieAlterada,
     paramsAlterados,
+    simulando,
     aba,
     turnoGrafico,
     definirParam,

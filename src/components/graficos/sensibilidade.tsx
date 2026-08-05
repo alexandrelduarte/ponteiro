@@ -1,9 +1,10 @@
 "use client";
 
 /**
- * Curva de sensibilidade ao viés — "e se as pesquisas estiverem erradas de
- * novo?". CLICÁVEL: o clique (ou toque) aplica aquele viés ao painel inteiro.
- * O caminho acessível equivalente são os 3 cartões de cenário logo abaixo.
+ * Curva da puxada suposta — "e se as pesquisas estiverem puxando para um
+ * lado?". CLICÁVEL: o toque aplica aquela puxada ao painel inteiro. O caminho
+ * acessível equivalente são os três cartões de cenário logo abaixo (botões com
+ * `aria-pressed` e alvo ≥44px), porque clique em curva é afordância invisível.
  */
 import {
   CartesianGrid,
@@ -17,57 +18,117 @@ import {
   YAxis,
 } from "recharts";
 import type { MouseHandlerDataParam } from "recharts/types/synchronisation/types";
-import { CENARIOS_VIES } from "@/data/constantes";
-import { fmt, fmtSinal, type PontoSens } from "@/lib/modelo";
+import { fmt, type PontoSens } from "@/lib/modelo";
 import { COR, DicaSensibilidade, TICK } from "./comum";
 
+/** Domínio do eixo x, em pontos de puxada suposta. */
+const DOMINIO_X: [number, number] = [-3, 10];
+
+/** Onde um valor de x cai no domínio, de 0 (borda esquerda) a 1 (direita). */
+const fracaoX = (v: number) =>
+  Math.min(1, Math.max(0, (v - DOMINIO_X[0]) / (DOMINIO_X[1] - DOMINIO_X[0])));
+
 /**
- * Banda de anotação acima da plotagem, em DUAS fileiras.
+ * Banda de anotação ACIMA da plotagem, em quatro fileiras.
  *
- * Com os três rótulos na mesma altura, «réplica 2022» e «teste-limite +6,3» se
- * sobrepunham a 390px (−8px de folga medidos, e a troca para mono os alarga
- * ainda mais). Descer o rótulo do meio uma fileira separa exatamente o par que
- * colide e preserva os três textos inteiros nos três viewports — nenhuma
- * palavra é encurtada. O deslocamento é fixo em px, não depende da largura.
+ * O que mudou na Fase 7, e por quê (todos eram colisões medidas no print):
  *
- * `MARGEM_TOPO` é a altura da banda; as duas fileiras se assentam a partir do
- * topo da plotagem (`viewBox.y`), então mexer na margem move as duas juntas.
- * A altura do contêiner (`ALTURA.sensibilidade`) já foi acrescida da mesma
- * folga, para a área de plotagem não encolher.
+ *  1. **Cada rótulo é ancorado à sua vertical por um filete de chamada.** As
+ *     três frases ficavam empilhadas e centralizadas acima do gráfico, sem
+ *     nada ligando cada uma à linha que ela nomeia — e duas dessas linhas eram
+ *     tracejados claros indistinguíveis da grade.
+ *  2. **A âncora de texto sai da POSIÇÃO, não do índice da fileira.** Rótulo
+ *     perto da borda esquerda alinha à esquerda; perto da direita, à direita;
+ *     no meio, centralizado. Assim nenhum sai da área do cartão a 390px.
+ *  3. **"onde você está" subiu para a banda**, na fileira mais alta: dentro da
+ *     plotagem ele caía em cima da linha azul, e é justamente o rótulo que se
+ *     move quando o leitor arrasta a régua.
+ *  4. **O rótulo do ponto de virada saiu de dentro da plotagem** — ele cruzava
+ *     as duas curvas e dois tracejados, com a palavra "virada" riscada por um
+ *     deles. O ponto preto continua no lugar e a frase logo abaixo do gráfico
+ *     já diz, com o mesmo número, o que ele é.
+ *  5. **Dois rótulos na MESMA abscissa se empilham, e só o de baixo puxa o
+ *     filete.** No padrão, "onde você está" e "As pesquisas estão certas"
+ *     nomeiam a mesma vertical (x = 0): o filete do de cima descia até o topo
+ *     da plotagem e atravessava o de baixo no meio, passando entre "pesquisas"
+ *     e "estão". Agora a linha só sobe até o primeiro rótulo, e o de cima fica
+ *     empilhado sobre ele, sem traço nenhum entre os dois.
+ *  6. **"metade a metade" saiu de dentro da plotagem.** No canto inferior
+ *     direito ela era cruzada pela curva que sobe depois do ponto de virada
+ *     (medido a 390: a linha atravessava as letras entre x≈250 e x≈275); nos
+ *     cantos da esquerda, pela vertical ameixa de x = 0. O rótulo mede ~105px
+ *     e a plotagem a 390 tem 262px, com a vertical a 60px da borda — não
+ *     existe canto livre. Ele passou a nomear a linha DE FORA, na legenda do
+ *     eixo y, logo acima do gráfico.
  */
-const MARGEM_TOPO = 44;
-const RECUO_FILEIRA = [30, 4] as const;
-/** Fileira de cada cenário, na ordem de `CENARIOS_VIES` (o do meio desce). */
-const FILEIRA_CENARIO = [0, 1, 0] as const;
+const MARGEM_TOPO = 84;
+const RECUO_FILEIRA = [66, 48, 30, 12] as const;
+
+export interface CenarioMarcado {
+  vies: number;
+  rotulo: string;
+}
 
 interface CaixaRotulo {
   x?: number;
   y?: number;
   width?: number;
-  height?: number;
 }
 
-function RotuloCenario({
+/**
+ * Alinhamento do texto pela posição do rótulo no DOMÍNIO, não na geometria: a
+ * fração vem do próprio valor de x contra `DOMINIO_X`, então não depende de
+ * como o Recharts preenche o `viewBox` do rótulo em cada versão.
+ */
+function ancora(t: number): "start" | "middle" | "end" {
+  if (t < 0.18) return "start";
+  if (t > 0.82) return "end";
+  return "middle";
+}
+
+function RotuloAncorado({
   viewBox,
   texto,
   fileira,
+  cor,
+  t,
+  filete = true,
 }: {
   viewBox?: CaixaRotulo;
   texto: string;
-  fileira: 0 | 1;
+  fileira: 0 | 1 | 2 | 3;
+  cor: string;
+  /** posição do rótulo no domínio do eixo x, de 0 a 1 */
+  t: number;
+  /** desenha a chamada até o topo da plotagem — falso quando há outro rótulo empilhado abaixo */
+  filete?: boolean;
 }) {
   if (viewBox?.x == null || viewBox.y == null) return null;
+  const y = viewBox.y - RECUO_FILEIRA[fileira];
   return (
-    <text
-      className="rotulo-grafico"
-      x={viewBox.x}
-      y={viewBox.y - RECUO_FILEIRA[fileira]}
-      textAnchor="middle"
-      fontSize={12}
-      fill={COR.cinza}
-    >
-      {texto}
-    </text>
+    <g>
+      {/* O filete de chamada: do rótulo até o topo da vertical que ele nomeia. */}
+      {filete ? (
+        <line
+          x1={viewBox.x}
+          y1={y + 4}
+          x2={viewBox.x}
+          y2={viewBox.y}
+          stroke={cor}
+          strokeWidth={1}
+        />
+      ) : null}
+      <text
+        className="rotulo-grafico"
+        x={viewBox.x}
+        y={y}
+        textAnchor={ancora(t)}
+        fontSize={13}
+        fill={cor}
+      >
+        {texto}
+      </text>
+    </g>
   );
 }
 
@@ -75,54 +136,77 @@ export default function GraficoSensibilidade({
   serie,
   margem,
   vies,
-  onAplicarVies,
+  cenarios,
+  onAplicar,
 }: {
   serie: PontoSens[];
   margem: number;
   vies: number;
-  onAplicarVies: (v: number) => void;
+  cenarios: CenarioMarcado[];
+  onAplicar: (v: number) => void;
 }) {
   const aoClicar = (estado: MouseHandlerDataParam) => {
     const bruto = estado?.activeLabel;
     const v = typeof bruto === "number" ? bruto : Number(bruto);
     if (!Number.isFinite(v)) return;
-    onAplicarVies(Math.round(v * 10) / 10);
+    onAplicar(Math.round(v * 10) / 10);
   };
+
+  /** Há um cenário na mesma vertical de "onde você está"? Então ele leva o filete. */
+  const viesEmpilhado = cenarios.some((c) => Math.abs(c.vies - vies) < 0.05);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
       <ComposedChart
         data={serie}
-        margin={{ top: MARGEM_TOPO, right: 10, bottom: 0, left: -22 }}
+        margin={{ top: MARGEM_TOPO, right: 12, bottom: 0, left: -6 }}
         onClick={aoClicar}
         style={{ cursor: "pointer" }}
       >
-        <CartesianGrid stroke={COR.linha} strokeDasharray="2 4" />
+        <CartesianGrid stroke={COR.grade} strokeDasharray="2 4" />
         <XAxis
           dataKey="v"
           type="number"
-          domain={[-3, 10]}
+          domain={DOMINIO_X}
           ticks={[-2, 0, 2, 4, 6, 8, 10]}
           tickFormatter={(v: number) => fmt(v, 0)}
           tick={TICK}
-          stroke={COR.linha}
+          stroke={COR.contorno}
         />
         <YAxis
           domain={[0, 100]}
           ticks={[0, 25, 50, 75, 100]}
-          tickFormatter={(v: number) => `${v}%`}
           tick={TICK}
-          stroke={COR.linha}
+          stroke={COR.contorno}
+          width={44}
         />
         <Tooltip trigger="click" content={<DicaSensibilidade />} />
-        <ReferenceLine y={50} stroke={COR.cinza} strokeDasharray="4 3" />
-        {CENARIOS_VIES.map((c, i) => (
+
+        {/* A linha do 50 fica SEM rótulo dentro da plotagem. Não sobrou canto
+            livre para ele: à direita e embaixo ele era cruzado pela curva que
+            sobe depois do ponto de virada, e à esquerda pela vertical ameixa,
+            que no padrão mora em x = 0 (a 390 o texto mede ~105px e a vertical
+            está a 60px da borda da plotagem — ele passava por baixo dela em
+            qualquer alinhamento). Quem nomeia a linha agora é a legenda ACIMA
+            do gráfico, fora da área de tinta, junto do nome do eixo y. */}
+        <ReferenceLine y={50} stroke={COR.tintaMedia} strokeDasharray="4 3" />
+        {/* Verticais dos cenários em tinta média e tracejado longo: contra a
+            grade (`grade`, 1px, 2 4) elas eram invisíveis. */}
+        {cenarios.map((c, i) => (
           <ReferenceLine
             key={c.vies}
             x={c.vies}
-            stroke={COR.tinta}
-            strokeDasharray="3 3"
-            label={<RotuloCenario texto={c.rotulo} fileira={FILEIRA_CENARIO[i] ?? 0} />}
+            stroke={COR.tintaMedia}
+            strokeWidth={1.5}
+            strokeDasharray="6 3"
+            label={
+              <RotuloAncorado
+                texto={c.rotulo}
+                fileira={((i % 3) + 1) as 1 | 2 | 3}
+                cor={COR.tintaMedia}
+                t={fracaoX(c.vies)}
+              />
+            }
           />
         ))}
         <ReferenceDot
@@ -130,27 +214,22 @@ export default function GraficoSensibilidade({
           y={50}
           r={5}
           fill={COR.tinta}
-          stroke={COR.linha}
-          strokeWidth={1.5}
-          label={{
-            value: `virada (${fmtSinal(margem)})`,
-            position: "bottom",
-            fontSize: 12,
-            fill: COR.tinta,
-            className: "rotulo-grafico",
-          }}
+          stroke={COR.placa}
+          strokeWidth={2}
         />
         <ReferenceLine
           x={vies}
-          stroke={COR.confirma}
+          stroke={COR.ameixa}
           strokeWidth={2}
-          label={{
-            value: "◆ atual",
-            position: "insideBottom",
-            fontSize: 12,
-            fill: COR.confirma,
-            className: "rotulo-grafico",
-          }}
+          label={
+            <RotuloAncorado
+              texto="onde você está"
+              fileira={0}
+              cor={COR.ameixa}
+              t={fracaoX(vies)}
+              filete={!viesEmpilhado}
+            />
+          }
         />
         <Line
           dataKey="l"

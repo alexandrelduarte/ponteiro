@@ -1,18 +1,26 @@
 /**
- * /historico — a memória pública do painel.
+ * /historico — a memória pública do painel (COPY-DECK §V).
  *
- * Duas peças: como a probabilidade se moveu ao longo do tempo (um ponto por
- * snapshot gravado) e a linha do tempo de transparência (o que entrou e o que
- * saiu da série, e quando). O feed é ANÔNIMO por desenho: mostra o ato, nunca
- * quem o praticou.
+ * Duas peças: como a chance se moveu ao longo do tempo (um ponto por retrato
+ * gravado) e a lista do que entrou e do que saiu da série. O feed é ANÔNIMO por
+ * desenho: mostra o ato, nunca quem o praticou.
+ *
+ * Mesma gramática do painel: título-pergunta, blocos-conversa, régua do empate
+ * onde houver diferença.
  */
 import type { Metadata } from "next";
-import Link from "next/link";
 import { formatInTimeZone } from "date-fns-tz";
-import { Cartao } from "@/components/ui/cartao";
-import { Secao, Vazio } from "@/components/ui/basicos";
+import {
+  Bloco,
+  Cabecalho,
+  LinkInterno,
+  Resposta,
+  Secao,
+  Subtitulo,
+  Traduzindo,
+  Vazio,
+} from "@/components/ui/blocos";
 import { GraficoHistorico } from "@/components/historico/grafico";
-import { Rodape } from "@/components/site/rodape";
 import { getFeedTransparencia, getSerieRuns, type EventoTransparencia } from "@/lib/dados";
 
 export const revalidate = 300;
@@ -20,10 +28,10 @@ export const revalidate = 300;
 const TZ = "America/Sao_Paulo";
 
 export const metadata: Metadata = {
-  title: "Histórico e transparência",
+  title: "O que já mudou",
   description:
-    "Como a probabilidade de eleição se moveu ao longo do tempo e o registro público de tudo " +
-    "que entrou ou saiu da série de pesquisas — a prova de que o agregado não é ajustado a gosto.",
+    "Como a chance de cada candidato se moveu ao longo do tempo e o registro público de tudo " +
+    "que entrou ou saiu da lista de pesquisas — a prova de que os números não são ajustados a gosto.",
   alternates: { canonical: "/historico" },
 };
 
@@ -40,11 +48,8 @@ function ddmm(iso: string | null): string | null {
 function frase(e: EventoTransparencia): string {
   const instituto = texto(e.detalhes?.instituto_id) ?? "instituto não identificado";
   const campo = ddmm(texto(e.detalhes?.campo_fim));
-  const alvo = campo ? `pesquisa do ${instituto} (campo até ${campo})` : `pesquisa do ${instituto}`;
-
-  if (e.acao === "aprovacao") return `${alvo} entrou na série`;
-  if (e.acao === "inclusao_manual") return `${alvo} foi incluída manualmente na série`;
-  return `${alvo} saiu da série`;
+  const alvo = campo ? `${instituto}, pesquisa de ${campo}` : instituto;
+  return e.acao === "remocao" ? `saiu: ${alvo}` : `entrou: ${alvo}`;
 }
 
 export default async function Historico() {
@@ -60,97 +65,117 @@ export default async function Historico() {
     .filter((p) => Number.isFinite(p.x));
 
   return (
-    <>
-      <main>
-        <header className="mx-auto w-full max-w-leitura px-goteira pt-8 lg:px-goteira-lg">
-          <p className="font-mono text-xs tracking-sobretitulo text-confirma-texto uppercase">
-            Memória pública do agregado
-          </p>
-          <h1 className="mt-1 text-titulo">HISTÓRICO E TRANSPARÊNCIA</h1>
-          <p className="mt-2 max-w-texto text-sm leading-leitura text-cinza">
-            Um agregador só vale o que vale a sua rastreabilidade. Se a série pudesse ser ajustada
-            em silêncio — uma rodada inconveniente removida aqui, uma favorável adicionada ali — o
-            número da capa seria opinião com cara de estatística. Por isso duas coisas ficam
-            públicas: <b className="text-tinta">a trajetória da probabilidade</b>, que mostra se o
-            painel mudou de ideia e quando, e{" "}
-            <b className="text-tinta">o registro de cada entrada e saída da série</b>, gravado no
-            mesmo instante em que acontece. Quem quiser auditar não precisa da nossa boa-fé: compara
-            a linha do tempo com as fontes originais de cada pesquisa.{" "}
-            <Link
-              href="/"
-              className="font-semibold text-confirma-texto underline decoration-dotted underline-offset-2"
-            >
+    <main>
+      <Secao>
+        {/* Mesma disposição de duas colunas dos blocos da home a partir de lg:
+            a resposta na medida de leitura à esquerda e o traduzindo na faixa
+            que sobrava à direita. Em coluna única este bloco deixava 46,6% da
+            placa de 936px em branco — o mesmo "L" que a home já tinha
+            corrigido. A ORDEM DE LEITURA não muda: é a do DOM. */}
+        <Bloco rotuladoPor="titulo-historico">
+          <div className="lg:grid lg:grid-cols-[minmax(0,34rem)_minmax(0,1fr)] lg:items-start lg:gap-10">
+            <div>
+              <h1 id="titulo-historico" className="text-pergunta text-tinta">
+                O que já mudou nesta página?
+              </h1>
+              <Resposta>
+                Toda pesquisa que entrou ou saiu da lista está registrada aqui, com data.
+              </Resposta>
+            </div>
+            <Traduzindo className="lg:mt-0">
+              Este é o histórico do próprio painel. Ele existe para você poder conferir se algum
+              número mudou de um dia para o outro — e por quê. Quem fez a alteração não aparece; o
+              que aparece é o ato.
+            </Traduzindo>
+          </div>
+          <p className="mt-4">
+            <LinkInterno href="/" className="text-corpo font-semibold">
               ← voltar ao painel
-            </Link>
+            </LinkInterno>
           </p>
-        </header>
+        </Bloco>
+      </Secao>
 
-        <Secao>
-          <Cartao
-            titulo="Probabilidade de ser eleito ao longo do tempo (projeção para o dia da votação)"
-            destaque="tinta"
-          >
-            {dados.length >= 2 ? (
-              <>
-                <p className="mb-2 text-xs text-cinza">
-                  Vermelho: Lula · Azul: Flávio. Cada ponto é um retrato gravado do modelo, com os
-                  parâmetros padrão do painel. A linha tracejada em 50% é o limiar do favoritismo.
-                </p>
+      <Secao>
+        <Bloco rotuladoPor="titulo-grafico-historico">
+          <Cabecalho
+            id="titulo-grafico-historico"
+            pergunta="Como a chance mudou com o tempo"
+            traduzindo="Cada ponto é a chance calculada naquele dia, projetada para o dia da votação."
+          />
+
+          {dados.length >= 2 ? (
+            <>
+              <div className="mt-4">
                 <GraficoHistorico dados={dados} />
-                <p className="mt-1 text-xs text-cinza">
-                  {dados.length} retratos registrados, de{" "}
-                  {formatInTimeZone(dados[0].x, TZ, "dd/MM/yyyy")} a{" "}
-                  {formatInTimeZone(dados[dados.length - 1].x, TZ, "dd/MM/yyyy")}. Último valor:
-                  Lula {Math.round(dados[dados.length - 1].l)}% × Flávio{" "}
-                  {Math.round(dados[dados.length - 1].f)}%.
-                </p>
-              </>
-            ) : (
-              <Vazio titulo="Ainda não há retratos suficientes para desenhar uma trajetória.">
-                O gráfico precisa de pelo menos dois registros do modelo, e eles são gravados uma
-                vez por dia. Enquanto o painel roda apenas sobre a base editorial — sem banco
-                conectado — nenhum retrato é persistido, então esta série começa vazia por
-                construção, e não por falha. O painel principal continua completo e correto.
+              </div>
+              <p className="mt-2 text-micro text-tinta-media numeros">
+                Vermelho: Lula. Azul: Flávio. {dados.length} retratos registrados, de{" "}
+                {formatInTimeZone(dados[0].x, TZ, "dd/MM/yyyy")} a{" "}
+                {formatInTimeZone(dados[dados.length - 1].x, TZ, "dd/MM/yyyy")}. Último valor: Lula{" "}
+                {Math.round(dados[dados.length - 1].l)} em 100 × Flávio{" "}
+                {Math.round(dados[dados.length - 1].f)} em 100.
+              </p>
+            </>
+          ) : (
+            <div className="mt-4">
+              <Vazio
+                titulo="Ainda não há pesquisas suficientes para desenhar uma linha do tempo."
+                ilustracao={{ src: "/ilustracoes/vazio-sem-conexao.svg", alt: "" }}
+              >
+                Assim que houver, ela aparece aqui. O gráfico precisa de pelo menos dois retratos do
+                modelo, e eles são gravados uma vez por dia — enquanto o painel roda só com a lista
+                guardada no próprio site, nenhum retrato é persistido. O painel principal continua
+                completo e correto.
               </Vazio>
-            )}
-          </Cartao>
-        </Secao>
+            </div>
+          )}
+        </Bloco>
+      </Secao>
 
-        <Secao>
-          {/* Mesmo filete do cartão irmão: não há diferença semântica entre os
-              dois blocos que justifique cores diferentes de régua. */}
-          <Cartao titulo="Linha do tempo — o que entrou e o que saiu da série" destaque="tinta">
-            {feed.length ? (
-              <>
-                <p className="mb-3 text-xs text-cinza">
-                  Registro automático, gravado no momento da ação. Mostramos o ato e a data; não
-                  mostramos quem executou — publicar o nome de quem aprova convida a pressão sobre
-                  uma pessoa, e a auditoria não precisa disso para funcionar.
-                </p>
-                <ol className="space-y-2">
-                  {feed.map((e) => (
-                    <li key={e.id} className="flex gap-3 border-t border-linha pt-2 text-sm">
-                      <span className="font-mono text-xs whitespace-nowrap text-cinza">
-                        {formatInTimeZone(Date.parse(e.em), TZ, "dd/MM/yyyy HH:mm")}
-                      </span>
-                      <span className="text-tinta">{frase(e)}</span>
-                    </li>
-                  ))}
-                </ol>
-              </>
-            ) : (
-              <Vazio titulo="Nenhuma alteração registrada até agora.">
-                A série exibida é a base editorial inicial, publicada de uma vez — não houve
-                inclusão nem remoção depois disso. A partir da primeira aprovação, cada entrada e
-                cada saída aparecem aqui automaticamente, com data e hora, sem depender de alguém
-                lembrar de anotar.
+      <Secao>
+        <Bloco rotuladoPor="titulo-linha-tempo">
+          <Cabecalho
+            id="titulo-linha-tempo"
+            pergunta="O que entrou e o que saiu da lista"
+            traduzindo="Registro automático, gravado no momento da ação. Mostramos o ato e a data; não mostramos quem executou — publicar o nome de quem aprova convida a pressão sobre uma pessoa, e a auditoria não precisa disso para funcionar."
+          />
+          {feed.length ? (
+            <>
+              <ol className="mt-4 space-y-2">
+                {feed.map((e) => (
+                  <li key={e.id} className="flex flex-wrap gap-x-3 border-t border-filete pt-2">
+                    <span className="text-micro whitespace-nowrap text-tinta-media numeros">
+                      {formatInTimeZone(Date.parse(e.em), TZ, "dd/MM/yyyy HH:mm")}
+                    </span>
+                    <span className="text-corpo text-tinta">{frase(e)}</span>
+                  </li>
+                ))}
+              </ol>
+            </>
+          ) : (
+            <div className="mt-4">
+              <Vazio titulo="Nenhuma mudança registrada até agora.">
+                A lista exibida é a inicial, publicada de uma vez — não houve inclusão nem remoção
+                depois disso. A partir da primeira aprovação, cada entrada e cada saída aparecem
+                aqui automaticamente, com data e hora, sem depender de alguém lembrar de anotar.
               </Vazio>
-            )}
-          </Cartao>
-        </Secao>
-      </main>
-
-      <Rodape />
-    </>
+            </div>
+          )}
+          <Subtitulo className="mt-6">Por que isto existe</Subtitulo>
+          <div className="mt-1 lg:grid lg:grid-cols-2 lg:items-start lg:gap-10">
+            <p className="max-w-texto text-corpo text-tinta-media">
+              Se a lista pudesse ser ajustada em silêncio — uma pesquisa inconveniente removida
+              aqui, uma favorável adicionada ali — o número do topo seria opinião com cara de
+              estatística.
+            </p>
+            <p className="mt-3 max-w-texto text-corpo text-tinta-media lg:mt-0">
+              Quem quiser conferir não precisa da nossa boa-fé: compara esta lista com a publicação
+              original de cada pesquisa.
+            </p>
+          </div>
+        </Bloco>
+      </Secao>
+    </main>
   );
 }

@@ -40,7 +40,7 @@ export function criarClientePublico(): SupabaseClient | null {
   if (!envs) return null;
   cliente = createClient(envs.url, envs.anonKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-    global: { headers: { "x-application-name": "agregador-presidencial-2026" } },
+    global: { headers: { "x-application-name": "ponteiro" } },
   });
   return cliente;
 }

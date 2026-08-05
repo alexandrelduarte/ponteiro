@@ -1,34 +1,37 @@
 /**
- * Tendência pareada (P8): cada instituto comparado COM ELE MESMO.
- * Glifo + sinal além da cor — cor nunca é o único canal (docs/DESIGN.md §5.6).
+ * Tendência pareada (COPY-DECK §E): cada instituto comparado COM ELE MESMO.
+ *
+ * A palavra faz o trabalho — "subiu", "caiu", "praticamente igual" —, então a
+ * cor nunca é o único canal, e aqui ela nem entra: não existe verde de alta
+ * nem vermelho de queda neste sistema (vermelho é de candidato, R4). Subir
+ * agora não quer dizer que vai continuar subindo, e o texto diz isso.
  */
+import { abs1 } from "@/components/ui/textos";
 import { fmtSinal, type Tendencia as TendenciaModelo } from "@/lib/modelo";
 
-export function Tendencia({ t, rotulo }: { t: TendenciaModelo | null; rotulo: string }) {
-  let corpo: string;
-  let cor = "text-cinza";
+const ESTAVEL = 0.8;
 
+export function Tendencia({ t, rotulo }: { t: TendenciaModelo | null; rotulo: string }) {
   if (!t) {
-    corpo = "sem base p/ tendência";
-  } else if (Math.abs(t.delta) < 0.8) {
-    corpo = `▬ estável (${fmtSinal(t.delta)})`;
-  } else if (t.delta > 0) {
-    corpo = `▲ ${fmtSinal(t.delta)}`;
-    cor = "text-confirma-texto";
-  } else {
-    corpo = `▼ ${fmtSinal(t.delta)}`;
-    cor = "text-alerta-texto";
+    return (
+      <span className="text-micro text-tinta-media">
+        <b className="font-medium text-tinta">{rotulo}</b> ainda não dá para comparar
+      </span>
+    );
   }
 
+  const unidade = Math.abs(t.delta) === 1 ? "ponto" : "pontos";
+  const corpo =
+    Math.abs(t.delta) < ESTAVEL
+      ? `praticamente igual (${fmtSinal(t.delta)})`
+      : t.delta > 0
+        ? `subiu ${abs1(t.delta)} ${unidade}`
+        : `caiu ${abs1(t.delta)} ${unidade}`;
+
   return (
-    <span className="inline-flex items-baseline gap-1 font-mono text-xs">
-      <span className="text-cinza">{rotulo}</span>
-      <span className={`font-semibold ${cor}`}>{corpo}</span>
-      {t ? (
-        <span className="text-cinza">
-          · {t.pares} par{t.pares > 1 ? "es" : ""}
-        </span>
-      ) : null}
+    <span className="text-micro text-tinta-media numeros">
+      <b className="font-medium text-tinta">{rotulo}</b> {corpo} · comparando {t.pares}{" "}
+      {t.pares === 1 ? "instituto" : "institutos"} com {t.pares === 1 ? "ele mesmo" : "eles mesmos"}
     </span>
   );
 }

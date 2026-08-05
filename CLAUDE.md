@@ -4,8 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## O que é
 
-Agregador de pesquisas presidenciais Brasil 2026 (Lula × Flávio Bolsonaro): Next.js 16
-(App Router, React 19, TS strict) + Tailwind v4 + Supabase + Recharts, deploy na Vercel.
+PONTEIRO — "para onde apontam as pesquisas": agregador de pesquisas presidenciais Brasil 2026
+(Lula × Flávio Bolsonaro). Next.js 16 (App Router, React 19, TS strict) + Tailwind v4 +
+Supabase + Recharts, deploy na Vercel.
 O protótipo `agregador-presidencial-2026.jsx` na raiz é a **fonte da verdade** do modelo
 estatístico, dos dados e dos textos editoriais — não é código do app (está fora de lint/tsc).
 
@@ -57,8 +58,20 @@ Gates antes de qualquer commit: `pnpm typecheck && pnpm lint && pnpm test && pnp
 - `supabase/migrations/` — schema versionado (RLS default-deny; ver SECURITY.md).
 - `src/app/` — App Router: `/` painel, `/historico`, `/metodologia`, `/admin`; tokens de design
   em `src/app/tokens.css` (Tailwind v4 `@theme`) — zero hex hardcoded em componente.
-- Identidade visual: "boletim de urna" — papel #E8E8DF, tela fósforo verde, IBM Plex Mono para
-  dados, Archivo para títulos (self-host via next/font). Ver `docs/DESIGN.md`.
+- Identidade visual v2: ver `docs/DESIGN-V2.md` e `docs/MARCA.md` (nome/logo/voz).
+
+## Estética v1 — BANIDA (regra permanente do repo, decisão do dono do produto)
+
+A identidade original "boletim de urna" (v1, preservada na tag `v1-urna`) foi REVOGADA.
+É proibido reutilizar em qualquer superfície: a paleta papel/fósforo (`#E8E8DF`, `#0E241A`,
+`#A7EFBB` e parentes), o motivo "urna eletrônica/boletim/apuração", o cursor `▊`, mono como
+fonte dominante e o par Archivo + IBM Plex Mono como identidade (mono só sobrevive como
+utilitária de dados tabulares se a direção vigente pedir). Também banidos os clichês: creme +
+serifa + terracota; quase-preto + acento ácido único; broadsheet capilar raio-zero; dark mode
+sem justificativa; glassmorphism e gradientes decorativos. A MARCA (nome, logo, cor de
+identidade) usa família cromática TERCEIRA e neutra — vermelho/azul são exclusivos dos dois
+candidatos nos DADOS. Nenhuma imagem de pessoa, partido, bandeira ou símbolo oficial.
+Reaproveitar aparência da v1 "porque já existe" é falha; eficiência é reaproveitar LÓGICA.
 
 ## Convenções
 

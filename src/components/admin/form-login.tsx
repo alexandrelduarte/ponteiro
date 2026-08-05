@@ -1,10 +1,12 @@
 "use client";
 
 /**
- * Login por magic link. A resposta é sempre a mesma para e-mail autorizado e
- * não autorizado — a tela de login não é um oráculo de quem é administrador.
+ * Login por link de uso único. A resposta é sempre a mesma para e-mail
+ * autorizado e não autorizado — a tela de login não é um oráculo de quem é
+ * administrador.
  */
 import { useActionState } from "react";
+import { Botao } from "@/components/ui/blocos";
 import { enviarMagicLink, type ResultadoLogin } from "@/lib/admin/login";
 
 async function acao(_anterior: ResultadoLogin | null, dados: FormData): Promise<ResultadoLogin> {
@@ -15,11 +17,11 @@ export function FormLogin() {
   const [estado, enviar, pendente] = useActionState<ResultadoLogin | null, FormData>(acao, null);
 
   return (
-    <form action={enviar} className="mt-4 max-w-texto">
-      <label htmlFor="email-admin" className="block text-sm font-semibold text-tinta">
+    <form action={enviar} className="mt-4">
+      <label htmlFor="email-admin" className="block text-secao text-tinta">
         E-mail de administrador
       </label>
-      <div className="mt-1 flex flex-wrap gap-2">
+      <div className="mt-2 flex flex-wrap gap-3">
         <input
           id="email-admin"
           name="email"
@@ -27,29 +29,22 @@ export function FormLogin() {
           autoComplete="email"
           required
           data-testid="campo-email-admin"
-          className="min-h-toque flex-1 rounded-controle border border-linha bg-campo px-3 text-sm text-tinta"
+          className="min-h-toque flex-1 rounded-campo bg-placa px-3 text-corpo text-tinta shadow-[inset_0_0_0_1px_var(--color-contorno)]"
         />
-        <button
-          type="submit"
-          disabled={pendente}
-          data-testid="enviar-magic-link"
-          className="min-h-toque w-40 rounded-controle bg-confirma px-4 text-sm font-semibold text-campo shadow-botao disabled:cursor-wait"
-        >
-          {pendente ? "⏳ Enviando…" : "Enviar link"}
-        </button>
+        <Botao type="submit" disabled={pendente} data-testid="enviar-magic-link" className="w-44">
+          {pendente ? "Enviando…" : "Enviar link"}
+        </Botao>
       </div>
 
-      <p role="status" aria-live="polite" className="mt-2 text-sm">
+      <p role="status" aria-live="polite" className="mt-3">
         {estado ? (
           <span
             className={[
-              "inline-block rounded-controle border px-3 py-2 font-mono text-xs",
-              estado.ok
-                ? "border-confirma bg-confirma-fundo text-confirma-texto"
-                : "border-alerta bg-alerta-fundo text-alerta-texto",
+              "inline-block rounded-nicho px-4 py-2 text-micro",
+              estado.ok ? "bg-ameixa-bruma text-tinta" : "bg-atencao-fundo text-tinta",
             ].join(" ")}
           >
-            {estado.ok ? `✓ ${estado.mensagem}` : `⚠ ${estado.erro}`}
+            {estado.ok ? estado.mensagem : `⚠ ${estado.erro}`}
           </span>
         ) : null}
       </p>

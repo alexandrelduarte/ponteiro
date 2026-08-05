@@ -1028,3 +1028,146 @@ décimo contra uma série que andou 3,4 pontos). Nenhum deles é opinião: os tr
 tela em menos de um minuto.
 
 — _data-scientist, 04/08/2026_
+
+---
+
+## 12. Adendo — o hover por coluna do enxame (leitura acumulada)
+
+Uma frase só. Rodei o enxame na mesma data-base do §0 (`tests/reference/original.mjs` sobre
+`pesquisas.seed.json`, `PARAMS_PADRAO`, 03/08/2026 12:00 −03) e montei o layout com o algoritmo
+real de `enxame-nucleo.ts`. **Todo número abaixo foi calculado, não estimado.**
+
+Estado oficial: `margemAj` = +4,7177 · `sigmaDia2` = 5,1776 → **coluna de 1 ponto, 28 colunas, de
+[−9,−8) a [18,19)**, bolinha de 9,36px a 390, `nFlavio` = 18, `nLula` = 82. (A largura de 2 pontos
+é rejeitada pelo teto de pilha: 16 bolinhas dariam 339px contra o limite de 180.)
+
+### 12.1 A tabela que decide o caso
+
+| coluna  | bolinhas | **acumulado da esquerda** | lado   |
+| ------- | -------- | ------------------------- | ------ |
+| [−9,−8) | 1        | 1                         | Flávio |
+| [−8,−7) | **0**    | 1                         | Flávio |
+| [−3,−2) | 3        | 10                        | Flávio |
+| [−1, 0) | 5        | **18**                    | Flávio |
+| [ 0, 1) | 6        | **24**                    | Lula   |
+| [ 4, 5) | 8        | 52                        | Lula   |
+| [10,11) | 4        | 89                        | Lula   |
+| [16,17) | **0**    | 99                        | Lula   |
+| [17,18) | **0**    | 99                        | Lula   |
+| [18,19) | 1        | **100**                   | Lula   |
+
+Três fatos desta tabela decidem tudo o que vem abaixo: o acumulado na última coluna de Flávio é
+**exatamente 18**, o mesmo inteiro já impresso sob o desenho; **três das 28 colunas estão vazias**;
+e a última coluna lê **100**.
+
+### 12.2 Veredito da frase proposta — **APROVADA COM EMENDA** (a âncora não é opcional)
+
+> ✗ até aqui, {n} de 100 cenários
+
+A frase **não é falsa**: com a âncora que o autor tem na cabeça, ela é exata. Ela é **incompleta**,
+e a lacuna é a palavra que diz de onde se conta. A régua tem UM lugar com nome no desenho — a linha
+chamada **"empate"**. É de lá que o leitor mede "aqui", e a partir dela o número está errado:
+
+- na primeira coluna do lado de Lula, [0,1), a frase mostra **24** onde a coluna tem **6 bolinhas**
+  e o lado de Lula acabou de começar — erro de **4×**, contável na tela em dez segundos;
+- em [4,5), mostra **52** onde a contagem a partir da régua dá **34** — 18 cenários de Flávio
+  entram no número sem aviso, 53% a mais.
+
+É a mesma assinatura dos três vetos do §11: **uma frase que o próprio gráfico desmente**. Como o
+conserto é uma âncora e não uma reescrita, o selo é emenda — mas a emenda é obrigatória.
+
+### 12.3 Substituta exata
+
+> ✓ **da esquerda até aqui: {n} de 100 cenários**
+
+40 caracteres com `n` de dois dígitos. Quatro razões, nesta ordem de força:
+
+1. **A âncora já está publicada na tela, não neste documento.** `virada.tsx` diz, no `traduzindo`
+   do mesmo enxame: _"As que caem à direita da régua são cenários em que Lula ganha; à esquerda,
+   cenários em que Flávio ganha"_ — e as pontas do próprio desenho dizem "← Flávio na frente · 18"
+   e "82 · Lula na frente →". "Da esquerda" não ensina palavra nova: cobra uma que a página já
+   pagou.
+2. **A âncora é ESPACIAL de propósito, nunca quantitativa.** Qualquer redação por quantidade vira
+   ao cruzar o zero: à direita o acumulado é _"diferença de ATÉ x pontos para Lula"_; à esquerda é
+   _"diferença de PELO MENOS |x| pontos para Flávio"_. Mesma aritmética, duas frases opostas, e a
+   virada cai exatamente onde o leitor já está confuso. A leitura espacial é a única que atravessa
+   a régua com uma frase só — e a única que sobrevive aos estados em que o enxame não tem nenhuma
+   coluna de Flávio (`nFlavio` = 0 é alcançável).
+3. **"de 100 cenários", nunca "de cada 100 cenários".** "De cada 100" é a forma que VOZ §2.1 exige
+   para **chance** — ela promove uma leitura de gesto a probabilidade publicada, e aí a linha
+   passaria a dever a ressalva de H2 no hover. "De 100" conta as cem bolinhas que estão na tela,
+   que é tudo o que a linha afirma. É o que cumpre a promessa da missão: nenhuma afirmação nova
+   sobre o mundo.
+4. **A forma não quebra em n = 1** (o valor da primeira coluna): o plural pertence ao 100, então
+   "1 de 100 cenários" está certo sem caso especial.
+
+**Descartadas:** nomear o lado ("a partir do lado de Flávio") quebra quando `nFlavio` = 0;
+"acumulado" é jargão de §5.1; o complemento ("os outros {100−n} estão à direita") é **permitido,
+não exigido** — é honesto e simétrico, mas dobra a linha e a missão já dispensa o número duplo.
+
+### 12.4 Condições de implementação (1 e 2 são veto se descumpridas)
+
+1. **`n` é a soma corrida de `layout.colunas[].qtd` — nunca `normCdf`.** Dois âncoras têm de valer
+   exatos: na última coluna de Flávio (`i = −1`) a leitura é **18**, o mesmo inteiro impresso sob o
+   desenho; na última coluna é **100**. Calcular a acumulada analiticamente em vez de somar as
+   colunas desenhadas erra por uma ou duas bolinhas — foi assim que o 83 ↔ 82 nasceu (§2). H3.
+2. **A leitura existe em TODA coluna, inclusive nas vazias.** Hoje três das 28 estão vazias. O alvo
+   do hover é a **faixa** da coluna, não o grupo de bolinhas: senão 3 de 28 colunas viram zona
+   morta e o número parece pular (1 → 2, e 99 → 100 sem coluna no meio). Sobre coluna vazia o
+   número **não muda** — é a resposta certa, e é a que ensina o que uma coluna vazia significa.
+3. **Nunca 0; e o 100 fica.** A primeira coluna sempre contém a bolinha 1 por construção (`min` sai
+   dos próprios dados), então "0 de 100" é inalcançável — desde que a faixa de hover não comece
+   antes dela. Já **"100 de 100 cenários" na última coluna FICA**: H13 e §2.3 governam **chance
+   publicada**, não a contagem das bolinhas desenhadas, e "corrigir" para "mais de 99 em 100" seria
+   escrever uma falsidade — são exatamente 100, e o leitor acabou de ver o número subir até lá.
+   Registro isto aqui para que ninguém conserte depois.
+4. **A linha não empurra nada.** Espaço reservado, sempre. Número que aparece sob o desenho e
+   desloca o desenho tira do leitor a âncora visual no meio da comparação entre colunas — é o primo
+   do "referência que se mexe mente". E, sendo só de ponteiro fino, ela **não pode existir a 390**:
+   a dobra de 390 já está calibrada até "Isto não é previsão" (H4).
+5. **`aria-hidden` aceito, com condição.** O SVG já publica os dois totais no `rotuloAcessivel`, e a
+   linha do hover não é a única casa de nenhum fato — é leitura de gesto sobre números que já estão
+   na tela. Tem de continuar assim: no dia em que carregar um fato próprio, deixa de poder ser
+   `aria-hidden`.
+6. **No mini-enxame (`parametros.tsx`) o número é de simulação** — e está dentro do cartão que já
+   carrega o rótulo (H7, §10.1). A linha não pode ser içada para fora desse cartão.
+
+### 12.5 Consistência com a legenda de 55 palavras e com VOZ
+
+- **Sem colisão com `hero.enxame.legenda`.** Os únicos inteiros que o hover compartilha com ela são
+  18 e 82, e são o mesmo inteiro por construção (H3). Nenhum 83 ↔ 82 novo: a linha não fala em
+  eleição, só em cenários do desenho, e a legenda logo abaixo já faz a reconciliação com 83 e 17.
+- **A operação já foi ensinada.** "Como ler esta página", item 2: _"As 100 bolinhas são 100
+  resultados possíveis. Conte de que lado da régua elas caem."_ O hover é essa mesma contagem,
+  continuada — gramática existente, não gramática nova.
+- **VOZ:** §2.2 (denominador 100) ✔ · §2.1 não se aplica, não é chance publicada ✔ · §5.1 sem
+  jargão ✔ · §5.3 sem caixa alta ✔ · §1.1 uma ideia por frase ✔ · H1/H2 não disparam (a linha não
+  atribui favoritismo a ninguém) ✔ · H9 ✔ — a linha não nomeia candidato, e os dois totais das
+  pontas continuam impressos com o mesmo peso.
+- **Bônus verificável, e era o risco que eu procurava.** `int80` = [−1,92; +11,35] é, por
+  construção, a 10ª e a 90ª bolinha. O acumulado confirma: a coluna [−3,−2) fecha em **10**, e a
+  bolinha 90 cai em [11,12). Quem varrer o enxame das pontas encontra a faixa de 80% que
+  `frente.tsx` publica — o painel se **confirmando** na tela, não se desmentindo. É o argumento mais
+  forte a favor do recurso.
+
+### 12.6 Nota que não é veto — VOZ §2.4 tem a justificativa invertida
+
+VOZ §2.4 (e o comentário de `src/components/ui/textos.ts:16`) diz: _"Lula sempre à esquerda, Flávio
+sempre à direita — **porque essa é a posição deles na régua da diferença**"_. Na régua a posição é a
+inversa: as três escalas do elemento-assinatura põem **Flávio à esquerda e Lula à direita**
+(`enxame-nucleo.ts`, `lado: i >= 0 ? "lula" : "flavio"`; os rótulos de ponta do `enxame.tsx`; a
+`ReguaPesquisas` de `barra-pesquisa.tsx`). A **regra** de ordem na prosa continua boa — ordem fixa é
+o que impede a ordem de virar juízo (R4); só a **justificativa** está de cabeça para baixo. Nada na
+tela muda hoje, mas é a armadilha exata desta frase: quem for escrever a âncora do hover
+consultando §2.4 escreve "da esquerda" achando que é o lado de Lula. Trocar a justificativa por
+"é a ordem de leitura, e ela é fixa" resolve em uma linha.
+
+### Fecho do §12
+
+**Substituta exata: "da esquerda até aqui: {n} de 100 cenários".** A frase proposta estava a duas
+palavras da honestidade, e as duas palavras são a âncora. A leitura acumulada em si é legítima e
+bem-vinda: é a acumulada empírica das próprias bolinhas desenhadas, ela reencontra o 18 e o 100 que
+a página já imprime, e reencontra a faixa de 80% que ela já publica. O que não pode é atravessar a
+régua do empate calada.
+
+— _data-scientist, 05/08/2026_

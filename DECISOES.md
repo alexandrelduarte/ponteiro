@@ -378,3 +378,26 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
 - `docs/DESIGN.md` e `RELATORIO.md` preservados com o título antigo: são registro histórico da
   v1 (o primeiro é o contraexemplo citado pelo próprio DESIGN-V2); renomeá-los seria churn sem
   efeito perceptível (R7).
+
+# MISSÃO v2.1 — "ENCAIXE" (branch encaixe/v2.1; plano aprovado pelo dono)
+
+- Feedback do dono a olho nu, confirmado por medição: 440px do monitor 1440 sem uso; 38,8% da
+  altura do documento sem tinta à direita; tabela rolando 7px em qualquer monitor; "?" a 95%
+  da prosa; 5 regras de hover no CSS inteiro → recomposição de desktop (container 1200 = duas
+  medidas de leitura na placa), dieta de texto MODERADA e motion EXPRESSIVO.
+- A trava "não esconder mais texto atrás de disclosure" (arbitragem de altura da Fase 7) CAI
+  por ordem expressa do dono → a dieta moderada move o secundário para a 2ª camada
+  (Revelador: folha no toque, popover no ponteiro fino — nunca title nativo), sempre com o
+  texto completo preservado (sr-only/balão) e 1ª camada como PREFIXO literal da 2ª (teste
+  trava isso).
+- Registro no TSE passa a ser "a um toque" TAMBÉM no desktop (o número vira o gatilho do
+  balão da linha) → mesmo padrão que o cartão mobile já usava; R4/H12 seguem honrados
+  (instituto, registro e fonte sempre alcançáveis).
+- contexto-social NÃO ganha gráfico: `CONTEXTO[].dado` é string livre — parsear seria
+  fabricar dado; o visual da seção é o grid 3×2 de cartões curtos (escolha, não omissão).
+- Motion: emenda consciente ao DESIGN-V2 §7 — "tudo que é interativo responde ao ponteiro";
+  exceção nomeada para sublinhado animado (repintura de 1 linha); activeDot é ESTADO
+  (isAnimationActive=false fica); reveal-on-scroll SEGUE banido; sombra só em interativo+hover.
+- Breakpoints xl/2xl do Tailwind vazavam do tema base sem terem sido desenhados → desligados;
+  acima de lg a coluna satura em 1200 e a composição não muda (passo que não muda nada é
+  dívida).

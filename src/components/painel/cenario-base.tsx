@@ -18,7 +18,7 @@
  * medem" fica na MESMA dobra dos chips, nunca colapsado.
  */
 import { useMemo } from "react";
-import { Bloco, Cabecalho, Detalhe, Nicho, Subtitulo } from "@/components/ui/blocos";
+import { Bloco, Cabecalho, Colunas, Detalhe, Nicho, Subtitulo } from "@/components/ui/blocos";
 import { Termo } from "@/components/ui/glossario";
 import { emCem, inteiroEmCem } from "@/components/ui/textos";
 import { calcCenarioBase, fmt } from "@/lib/modelo";
@@ -170,35 +170,55 @@ export function CenarioBase() {
         </p>
       </div>
 
-      <div className="mt-6 max-w-texto">
+      {/* Um parágrafo de nove orações numerado por dentro ("Um:… Dois:… Três:…
+          Quatro:") é uma LISTA disfarçada de prosa — e, preso na medida de
+          leitura, era 678px de altura contra 49% da placa em branco ao lado.
+          Aqui ele vira o que já era: quatro itens, palavra por palavra, em duas
+          colunas a partir de lg. Os marcadores são os do próprio texto
+          auditado; nenhuma frase foi reescrita nem reordenada. */}
+      <div className="mt-6">
         <Subtitulo>Por que este é o caminho mais provável</Subtitulo>
-        <p className="mt-1 text-corpo text-tinta-media numeros">
-          Quatro motivos. <b className="font-semibold text-tinta">Um:</b> a vantagem é constante — 6
-          dos 7 institutos de julho mostram Lula à frente, e no sétimo os dois estão em empate
-          técnico; a comparação de cada instituto com ele mesmo está estável.{" "}
-          <b className="font-semibold text-tinta">Dois:</b> o contexto medido não desfavorece quem
-          está no governo: aprovação e desaprovação próximas, rejeição alta dos dois lados e mais
-          gente aberta a votar em Lula (47% contra 38%).{" "}
-          <b className="font-semibold text-tinta">Três:</b> com dois terços de cada lado já
-          decididos, a diferença anda devagar. Virar exige movimento fora do padrão de 2026.{" "}
-          <b className="font-semibold text-tinta">Quatro:</b> mesmo assim a diferença fica apertada.
-          Quando as pesquisas erraram em 2018 e em 2022, o erro foi na mesma direção — subestimando
-          a direita — e a repetição fiel de 2022 dá algo perto de 51 × 49.
-        </p>
+        <p className="mt-1 max-w-texto text-corpo text-tinta-media">Quatro motivos.</p>
+        <ul className="mt-2 text-corpo text-tinta-media numeros lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-10 lg:gap-y-3">
+          <li className="mt-2 max-w-texto lg:mt-0">
+            <b className="font-semibold text-tinta">Um:</b> a vantagem é constante — 6 dos 7
+            institutos de julho mostram Lula à frente, e no sétimo os dois estão em empate técnico;
+            a comparação de cada instituto com ele mesmo está estável.
+          </li>
+          <li className="mt-2 max-w-texto lg:mt-0">
+            <b className="font-semibold text-tinta">Dois:</b> o contexto medido não desfavorece quem
+            está no governo: aprovação e desaprovação próximas, rejeição alta dos dois lados e mais
+            gente aberta a votar em Lula (47% contra 38%).
+          </li>
+          <li className="mt-2 max-w-texto">
+            <b className="font-semibold text-tinta">Três:</b> com dois terços de cada lado já
+            decididos, a diferença anda devagar. Virar exige movimento fora do padrão de 2026.
+          </li>
+          <li className="mt-2 max-w-texto">
+            <b className="font-semibold text-tinta">Quatro:</b> mesmo assim a diferença fica
+            apertada. Quando as pesquisas erraram em 2018 e em 2022, o erro foi na mesma direção —
+            subestimando a direita — e a repetição fiel de 2022 dá algo perto de 51 × 49.
+          </li>
+        </ul>
         {/* A lista das "três coisas que mudariam o quadro" mora no bloco
             "Isso ainda pode virar?" — aqui ela voltava quase palavra por
             palavra, na mesma página. */}
       </div>
 
-      <Detalhe titulo="Como este caminho foi escolhido" className="mt-4 max-w-texto">
-        <p className="mt-1 text-corpo text-tinta-media numeros">
-          O painel vai perguntando, uma coisa de cada vez, e fica sempre com a resposta mais
-          provável. Cada resposta é a mais provável da sua pergunta — juntas elas descrevem o
-          caminho mais comum, não o único. Acaba no 1º turno? Não, em {p2t} de cada 100 cenários vai
-          para o 2º. Quem chega na frente? {lider1T}. Quem ganha a decisão? {lider}. Por quanto? A
-          faixa em destaque acima. Nada disso é opinião fixa: mude a régua da puxada para 6,3 e esta
-          seção passa a descrever, sozinha, a vitória de Flávio.
-        </p>
+      <Detalhe titulo="Como este caminho foi escolhido" className="mt-4">
+        <Colunas arranjo="iguais" className="mt-1 text-corpo text-tinta-media numeros">
+          <p className="max-w-texto">
+            O painel vai perguntando, uma coisa de cada vez, e fica sempre com a resposta mais
+            provável. Cada resposta é a mais provável da sua pergunta — juntas elas descrevem o
+            caminho mais comum, não o único.
+          </p>
+          <p className="mt-3 max-w-texto lg:mt-0">
+            Acaba no 1º turno? Não, em {p2t} de cada 100 cenários vai para o 2º. Quem chega na
+            frente? {lider1T}. Quem ganha a decisão? {lider}. Por quanto? A faixa em destaque acima.
+            Nada disso é opinião fixa: mude a régua da puxada para 6,3 e esta seção passa a
+            descrever, sozinha, a vitória de Flávio.
+          </p>
+        </Colunas>
       </Detalhe>
 
       <p className="mt-4 max-w-texto text-micro text-tinta-media numeros">

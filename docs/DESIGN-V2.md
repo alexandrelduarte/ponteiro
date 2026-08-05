@@ -396,6 +396,55 @@ interrompível (P8). Os tokens estão em `tokens-v2.css` §13.
 O stagger é **por coluna** por um motivo de conteúdo: o gesto precisa dizer "a nuvem é acumulada",
 e é a coluna (o bin) que representa o acúmulo. Escalonar por bolinha viraria chuva decorativa.
 
+### 7.1b Emenda da v2.1 — o que RESPONDE AO PONTEIRO
+
+_Emenda aprovada pelo dono na missão "ENCAIXE" (branch `encaixe/v2.1`); registro em
+DECISOES.md. §7.1 acima descreve o que ANIMA sozinho; esta seção descreve o que responde a uma
+ação, que é coisa diferente e estava faltando._
+
+A medição que motivou a emenda: **cinco regras de `:hover` no CSS inteiro**, todas de cor; zero
+transição em link, linha de tabela, cartão ou `summary`; os três gráficos com `Tooltip
+trigger="click"`, mudos ao mouse e sem `activeDot`. Uma página que não responde ao ponteiro
+parece quebrada num desktop, e o produto é lido em desktop.
+
+**Princípio: tudo que é interativo responde ao ponteiro. Nada que é dado se mexe sozinho.**
+A separação é essa, e ela preserva §7.2 inteiro — o que anima aqui é sempre consequência de uma
+ação do leitor, nunca da passagem do tempo.
+
+| O quê                            | O que muda                                                           | Duração        | Observação                                                                  |
+| -------------------------------- | -------------------------------------------------------------------- | -------------- | --------------------------------------------------------------------------- |
+| Link e `summary` no hover        | cor → `ameixa-forte`, sublinhado 2px, `underline-offset` 4px         | `--dur-rapida` | exceção nomeada abaixo                                                      |
+| Linha de tabela no hover         | campo → `nicho` (`LINHA_TABELA`, com `group`)                        | `--dur-rapida` | a linha é a unidade de leitura, não a célula                                |
+| Cartão que é controle            | campo + `translateY(-1px)` + `shadow-flutua` (`CARTAO_INTERATIVO`)   | `--dur-rapida` | sombra **só** em interativo + hover: §3.5 segue valendo para bloco parado   |
+| Botão, aba, × de remover         | pressed `scale(0.985)`                                               | `--dur-rapida` | `motion-safe`; `disabled` não responde                                      |
+| Thumb do deslizador no hover     | 2º anel `ameixa-tenue` por `box-shadow`                              | `--dur-rapida` | dentro de `@media (hover: hover)`; o thumb **não muda de tamanho**          |
+| Tooltip de gráfico               | abre no hover (ponteiro fino) ou no clique (toque)                   | —              | `gatilhoDica()` em `graficos/comum.tsx`                                     |
+| `activeDot` dos gráficos         | ponto de raio 5 sob o ponteiro                                       | —              | é ESTADO, não série animada: `isAnimationActive={false}` continua em tudo   |
+| Coluna do enxame no hover        | campo `ameixa-tenue` ATRÁS da coluna + leitura acumulada em palavras | `--dur-rapida` | momento-assinatura 1 — ver abaixo                                           |
+| Barra da folga na linha da série | o `aria-label` vira balão visível em `group-hover`                   | `--dur-rapida` | momento-assinatura 2 — só `opacity`; `aria-hidden` + `pointer-events: none` |
+
+**Exceção nomeada ao orçamento "só `transform` e `opacity`":** o sublinhado dos links e dos
+`summary` anima `text-decoration-thickness` e `text-underline-offset`. É repintura de **uma linha
+de 1–2px**, não de uma caixa, e sem ela o único sinal de hover num link seria a cor — canal único
+que o próprio §7 recusa. Nenhuma outra propriedade fora do orçamento entra por esta porta.
+
+**Gatilho por CAPACIDADE, nunca por largura.** Um tablet de 1024 é dedo; um laptop de 1024 é
+mouse. Todo `hover:` do Tailwind já compila dentro de `@media (hover: hover)`, e os gráficos
+decidem em runtime com `matchMedia("(hover: hover) and (pointer: fine)")` — leitura segura porque
+os três são `ssr: false` e não existe HTML de servidor para divergir.
+
+**Os dois momentos-assinatura, e por que são honestos.** (1) A coluna do enxame diz "da esquerda
+até aqui: _n_ de 100 cenários", onde _n_ é a **soma corrida das próprias bolinhas** (campo
+`acumulado`, derivado no núcleo) — nunca uma normal reavaliada: na última coluna do lado de Flávio
+o número é exatamente o inteiro impresso sob o desenho, e na última coluna é exatamente 100. O
+alvo do hover é a FAIXA da coluna, inclusive das vazias, senão o número pareceria pular; e o
+destaque é campo ATRÁS das bolinhas, nunca apagamento das outras (1.4.11). (2) A barra da folga
+mostra a frase que o leitor de tela já ouvia — nada novo é dito, e nada recebe foco.
+
+**Reserva de espaço, sempre.** As duas leituras nascem em espaço já reservado (a fileira de 20px
+que hospeda o rótulo "empate"; o balão é `position: absolute`): nenhum estado de ponteiro empurra
+uma única linha de layout. CLS continua zero.
+
 ### 7.2 O que NUNCA anima
 
 - **A régua do empate, o eixo e os rótulos.** São a referência: referência que se mexe mente.
@@ -409,8 +458,13 @@ e é a coluna (o bin) que representa o acúmulo. Escalonar por bolinha viraria c
   proibido; e o custo de animação num Android barato sai do orçamento de INP (P9).
 - **Esqueletos de carregamento.** Sem shimmer/pulse: bloco `--color-nicho` parado, na altura exata.
 - **Scroll.** Zero scroll-jacking, zero parallax, zero reveal-on-scroll. A página existe para ser
-  lida em 20 segundos.
+  lida em 20 segundos. **A emenda §7.1b não abre exceção aqui:** ela cobre resposta a ação do
+  leitor (ponteiro, toque, teclado), e rolar a página não é uma ação sobre um controle.
 - **Ação iniciada por teclado** não recebe animação de entrada (P8).
+- **Bloco parado não ganha sombra.** A sombra que §7.1b autoriza existe só enquanto o ponteiro
+  está sobre um controle: é por ela aparecer apenas ali que ela informa alguma coisa (§3.5).
+- **Nenhum estado de ponteiro move layout.** Nada de crescer, reordenar ou empurrar linha no
+  hover: o que se move é `translate`/`opacity`/campo, e o espaço já está reservado.
 
 ### 7.3 `prefers-reduced-motion`
 

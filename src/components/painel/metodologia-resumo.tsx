@@ -32,21 +32,24 @@ export function MetodologiaResumo() {
         }
       />
 
-      <ul className="mt-4 max-w-texto space-y-2 text-corpo text-tinta-media numeros">
-        <li>
+      {/* Quatro itens curtos empilhados numa coluna de 512px deixavam 45,9% da
+          placa em branco. Duas colunas a partir de lg — uma linha de classe, e
+          cada item continua na medida de leitura. */}
+      <ul className="mt-4 space-y-2 text-corpo text-tinta-media numeros lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-10 lg:gap-y-3 lg:space-y-0">
+        <li className="max-w-texto">
           <b className="font-semibold text-tinta">O peso de cada pesquisa</b> vem de duas coisas:
           quando ela foi feita e quantas pessoas ouviu.
         </li>
-        <li>
+        <li className="max-w-texto">
           <b className="font-semibold text-tinta">A tendência</b> compara cada instituto com ele
           mesmo, para que diferença de método não vire movimento falso.
         </li>
-        <li>
+        <li className="max-w-texto">
           <b className="font-semibold text-tinta">As faixas:</b> de 50 a 60 em 100{" "}
           <b className="font-semibold text-tinta">está em aberto</b>; de 60 a 75, na frente por
           pouco; de 75 a 90, na frente; acima de 90, bem na frente — e nem aí é garantia.
         </li>
-        <li>
+        <li className="max-w-texto">
           <b className="font-semibold text-tinta">
             <Termo chave="empateTecnico">Empate técnico</Termo>
           </b>

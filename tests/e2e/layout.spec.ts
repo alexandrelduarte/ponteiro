@@ -132,23 +132,41 @@ test.describe("o enxame escala em todas as larguras", () => {
  */
 test.describe("os rótulos das réguas caem sobre a marca", () => {
   for (const largura of LARGURAS) {
+    /**
+     * O invariante é o mesmo; o que mudou na v2.1 é que ele passou a valer em
+     * DUAS árvores. A partir de `lg` o ranking se recolhe e a régua vive no
+     * cabeçalho da coluna da matriz; abaixo de `lg` ela continua acima da lista
+     * de cartões. As duas existem no DOM o tempo todo — só uma é visível —,
+     * então o teste procura o par VISÍVEL em vez de assumir a estrutura: é a
+     * única forma de a mesma asserção cobrir 390, 768 e 1440.
+     */
     test(`"25%" fica sobre a marca da metade a ${largura}px`, async ({ page }) => {
       await page.setViewportSize({ width: largura, height: 900 });
       await page.goto("/");
       await painelPronto(page);
       await page.getByTestId("aba-todos").scrollIntoViewIfNeeded();
       await page.getByTestId("aba-todos").click();
-      await page.getByTestId("lista-candidatos").scrollIntoViewIfNeeded();
+      // A árvore VISÍVEL é que manda: a outra está em `display:none` e não
+      // rola para lugar nenhum.
+      await page.locator('[data-testid="barra-candidato-0"]:visible').scrollIntoViewIfNeeded();
 
       const desvio = await page.evaluate(() => {
-        const lista = document.querySelector('[data-testid="lista-candidatos"]')!;
-        const regua = lista.previousElementSibling!;
-        const rotulo = [...regua.querySelectorAll("span")]
-          .find((s) => s.textContent?.trim() === "25%")!
-          .getBoundingClientRect();
-        const trilho = document.querySelector('[data-testid="barra-candidato-0"]')!.parentElement!;
-        const marca = trilho.querySelector("span")!.getBoundingClientRect();
-        return Math.abs(rotulo.left + rotulo.width / 2 - (marca.left + marca.width / 2));
+        const painel = document.querySelector("#painel-outros")!;
+        const visivel = (el: Element) => el.getBoundingClientRect().width > 0;
+
+        const barra = [...painel.querySelectorAll('[data-testid="barra-candidato-0"]')].find(
+          visivel,
+        );
+        if (!barra) throw new Error("nenhuma barra-candidato-0 visível");
+        const marca = barra.parentElement!.querySelector("span")!.getBoundingClientRect();
+
+        const rotulo = [...painel.querySelectorAll("span")].find(
+          (s) => s.textContent?.trim() === "25%" && visivel(s),
+        );
+        if (!rotulo) throw new Error('nenhum rótulo "25%" visível');
+        const caixa = rotulo.getBoundingClientRect();
+
+        return Math.abs(caixa.left + caixa.width / 2 - (marca.left + marca.width / 2));
       });
       expect(desvio).toBeLessThanOrEqual(2);
     });

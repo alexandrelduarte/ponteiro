@@ -10,6 +10,7 @@
  * traduz o histórico de erros. O dado continua intocado.
  */
 import { Bloco, Cabecalho, LinkExterno, Nicho, Subtitulo } from "@/components/ui/blocos";
+import { MaisSobre } from "@/components/ui/glossario";
 import { aspasCurvas } from "@/components/ui/textos";
 import { CONTEXTO_TRADUZIDO } from "./copia-contexto";
 
@@ -44,18 +45,41 @@ export function ContextoSocial() {
       />
 
       <div className="mt-5 grid items-start gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {CONTEXTO_TRADUZIDO.map((c, i) => (
-          <Nicho key={c.titulo}>
-            <Subtitulo>{TITULOS[i] ?? c.titulo}</Subtitulo>
-            <p className="mt-2 text-corpo text-tinta numeros">{aspasCurvas(c.dado)}</p>
-            <p className="mt-2 text-micro text-tinta-media">{aspasCurvas(c.leitura)}</p>
-            <p className="mt-3">
-              <LinkExterno href={c.fonte} className="text-micro">
-                Ver a fonte deste número
-              </LinkExterno>
-            </p>
-          </Nicho>
-        ))}
+        {/* DIETA: a leitura de cada cartão ia de três a cinco frases, e esta
+            era a seção com mais texto por pixel de altura da página inteira
+            (168%, sem um desenho sequer). Fica visível a ABERTURA da leitura,
+            palavra por palavra — `leituraCurta` é um prefixo calculado do
+            texto auditado, nunca um resumo reescrito —, e o texto inteiro abre
+            no "?", na mesma folha do glossário.
+            Esta seção não ganha gráfico: `CONTEXTO[].dado` é string livre
+            ("Quaest: 48% aprovam, 47% desaprovam · …"), e transformar isso em
+            série pedida seria fabricar dado que ninguém publicou. */}
+        {CONTEXTO_TRADUZIDO.map((c, i) => {
+          const titulo = TITULOS[i] ?? c.titulo;
+          const temMais = c.leituraCurta.length < c.leitura.length;
+          return (
+            <Nicho key={c.titulo}>
+              <Subtitulo>{titulo}</Subtitulo>
+              <p className="mt-2 text-corpo text-tinta numeros">{aspasCurvas(c.dado)}</p>
+              <p className="mt-2 text-micro text-tinta-media">
+                {aspasCurvas(c.leituraCurta)}{" "}
+                {temMais ? (
+                  <MaisSobre
+                    titulo={titulo}
+                    rotuloAcessivel={`ler a leitura completa: ${titulo.toLowerCase()}`}
+                  >
+                    {aspasCurvas(c.leitura)}
+                  </MaisSobre>
+                ) : null}
+              </p>
+              <p className="mt-3">
+                <LinkExterno href={c.fonte} className="text-micro">
+                  Ver a fonte deste número
+                </LinkExterno>
+              </p>
+            </Nicho>
+          );
+        })}
 
         {/* Este cartão repetia, palavra quase por palavra, a resposta do topo
             do bloco ("Os dois lados têm voto fechado e rejeição alta. Por isso

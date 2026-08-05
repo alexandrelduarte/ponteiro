@@ -21,7 +21,16 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { COR, MolduraDica, TICK, ddmmDeMs, type PropsDica } from "./comum";
+import {
+  COR,
+  CURSOR_DICA,
+  MolduraDica,
+  PONTO_ATIVO,
+  TICK,
+  ddmmDeMs,
+  gatilhoDica,
+  type PropsDica,
+} from "./comum";
 
 export interface PontoProbabilidade {
   /** instante do retrato (ms) */
@@ -73,7 +82,7 @@ export default function GraficoProbabilidadeTempo({ dados }: { dados: PontoProba
           stroke={COR.contorno}
           width={44}
         />
-        <Tooltip trigger="click" content={<Dica />} />
+        <Tooltip trigger={gatilhoDica()} cursor={CURSOR_DICA} content={<Dica />} />
         <ReferenceLine
           y={50}
           stroke={COR.tinta}
@@ -91,6 +100,7 @@ export default function GraficoProbabilidadeTempo({ dados }: { dados: PontoProba
           stroke={COR.lula}
           strokeWidth={2.5}
           dot={false}
+          activeDot={{ ...PONTO_ATIVO, fill: COR.lula }}
           type="monotone"
           isAnimationActive={false}
         />
@@ -99,6 +109,7 @@ export default function GraficoProbabilidadeTempo({ dados }: { dados: PontoProba
           stroke={COR.flavio}
           strokeWidth={2.5}
           dot={false}
+          activeDot={{ ...PONTO_ATIVO, fill: COR.flavio }}
           type="monotone"
           isAnimationActive={false}
         />

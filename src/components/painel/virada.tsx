@@ -44,32 +44,40 @@ export function Virada() {
         }
       />
 
-      <div className="mt-5">
+      {/* O desenho à esquerda, o que ele quer dizer à direita.
+          A coluna da esquerda tem exatamente os 40rem que são o teto desta
+          escala do enxame (§4.1): o desenho não encolhe nem cresce por causa
+          da composição — ele fica do tamanho que já tinha, e o que era faixa
+          morta ao lado dele passa a ser o texto que já existia embaixo.
+          Abaixo de `lg` nada muda: desenho, depois os dois parágrafos. */}
+      <div className="mt-5 lg:grid lg:grid-cols-[minmax(0,40rem)_minmax(0,1fr)] lg:items-start lg:gap-10">
         <Enxame
           layout={layout}
           escala="media"
           idTeste="enxame-virada"
           rotuloAcessivel={`Gráfico dos cenários da diferença no dia da votação: ${layout.nLula} em 100 do lado de Lula, ${layout.nFlavio} em 100 do lado de Flávio.`}
         />
+
+        <div className="mt-4 lg:mt-0">
+          {/* A faixa "em 8 de cada 10 cenários…" aparecia três vezes na mesma
+              página (aqui, em "Quem está na frente?" e na divisão de votos).
+              Ela fica onde nasce: no bloco da diferença medida.
+              A frase "a régua do meio é o empate: ali os dois teriam o mesmo
+              tanto de voto" saiu daqui: o traduzindo, cinco linhas acima, já
+              diz qual lado é de quem, e a régua já vem rotulada "empate". */}
+          <p className="max-w-texto text-corpo text-tinta-media">
+            Tudo o que está do lado esquerdo da régua é o espaço de virada que os dados de hoje
+            ainda comportam.
+          </p>
+
+          <p className="mt-4 max-w-texto text-corpo text-tinta-media">
+            Três coisas mudariam este quadro. Pesquisas novas trazendo a diferença para baixo de 2
+            pontos. Três institutos seguidos com Flávio na frente, fora da folga. Ou uma puxada das
+            pesquisas a favor de Lula maior que <span className="numeros">{abs1(M.margem)}</span>{" "}
+            pontos — menos que os 6,3 do 1º turno de 2022.
+          </p>
+        </div>
       </div>
-
-      {/* A faixa "em 8 de cada 10 cenários…" aparecia três vezes na mesma
-          página (aqui, em "Quem está na frente?" e na divisão de votos). Ela
-          fica onde nasce: no bloco da diferença medida.
-          A frase "a régua do meio é o empate: ali os dois teriam o mesmo tanto
-          de voto" saiu daqui: o traduzindo, cinco linhas acima, já diz qual
-          lado é de quem, e a régua já vem rotulada "empate" no desenho. */}
-      <p className="mt-4 max-w-texto text-corpo text-tinta-media">
-        Tudo o que está do lado esquerdo da régua é o espaço de virada que os dados de hoje ainda
-        comportam.
-      </p>
-
-      <p className="mt-4 max-w-texto text-corpo text-tinta-media">
-        Três coisas mudariam este quadro. Pesquisas novas trazendo a diferença para baixo de 2
-        pontos. Três institutos seguidos com Flávio na frente, fora da folga. Ou uma puxada das
-        pesquisas a favor de Lula maior que <span className="numeros">{abs1(M.margem)}</span> pontos
-        — menos que os 6,3 do 1º turno de 2022.
-      </p>
     </Bloco>
   );
 }

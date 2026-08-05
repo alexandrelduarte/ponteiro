@@ -9,7 +9,7 @@
  * desfecho sem número enquanto os outros carregam a dúvida (H9).
  */
 import { useMemo } from "react";
-import { Subtitulo } from "@/components/ui/blocos";
+import { CARTAO_INTERATIVO, Subtitulo } from "@/components/ui/blocos";
 import { Celebra } from "@/components/ui/movimento";
 import { parEmCem } from "@/components/ui/textos";
 import { ALTURA, CaixaGrafico } from "@/components/graficos/comum";
@@ -118,7 +118,7 @@ export function CurvaSensibilidade() {
               aria-pressed={ativo}
               className={[
                 "min-h-toque rounded-nicho p-4 text-left",
-                "transition-colors duration-(--dur-rapida) ease-(--ease-padrao)",
+                CARTAO_INTERATIVO,
                 ativo ? "bg-ameixa-bruma" : "bg-nicho hover:bg-ameixa-tenue",
               ].join(" ")}
             >

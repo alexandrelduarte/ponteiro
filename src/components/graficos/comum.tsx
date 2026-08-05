@@ -44,6 +44,42 @@ export const TICK = {
   fill: COR.tintaMedia,
 } as const;
 
+/**
+ * O leitor tem ponteiro que PAIRA e é fino (mouse, trackpad)?
+ *
+ * O gesto do tooltip é decidido por CAPACIDADE, nunca por largura de tela: um
+ * tablet de 1024 é dedo, um laptop de 1024 é mouse, e a mesma media query que
+ * o Tailwind usa em `hover:` responde certo nos dois. Com ponteiro fino o
+ * tooltip abre ao passar (`trigger="hover"`); no toque continua sendo clique,
+ * porque `:hover` grudado num dedo é o defeito clássico.
+ *
+ * Ler `matchMedia` direto no render é seguro AQUI e só aqui: os três gráficos
+ * são `next/dynamic` com `ssr: false` (ver `carregados.tsx`), então não existe
+ * HTML de servidor para divergir na hidratação.
+ */
+export function ponteiroFino(): boolean {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
+  return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+}
+
+/** Como o tooltip abre, por capacidade do ponteiro. */
+export const gatilhoDica = (): "hover" | "click" => (ponteiroFino() ? "hover" : "click");
+
+/**
+ * O ponto que aparece sob o ponteiro. É ESTADO de interação, não animação de
+ * série: `isAnimationActive={false}` continua valendo em tudo (§7.2) — o que
+ * este ponto faz é dizer QUAL dado está sendo lido, e ele nasce e some com o
+ * ponteiro, sem percorrer trajeto nenhum.
+ */
+export const PONTO_ATIVO = { r: 5, strokeWidth: 2, stroke: COR.placa } as const;
+
+/** Vertical de leitura que acompanha o ponteiro — a mesma tinta da grade. */
+export const CURSOR_DICA = {
+  stroke: COR.contorno,
+  strokeWidth: 1,
+  strokeDasharray: "4 3",
+} as const;
+
 /** dd/mm no fuso de Brasília (−03:00 fixo; o país não tem horário de verão). */
 export function ddmmDeMs(ms: number): string {
   const d = new Date(ms - 3 * 3600e3);

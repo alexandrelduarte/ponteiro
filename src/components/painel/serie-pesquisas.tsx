@@ -24,11 +24,14 @@ import { useState } from "react";
 import {
   Bloco,
   Botao,
-  Cabecalho,
   Chip,
+  Colunas,
   Detalhe,
   LINHA_TABELA,
   LinkExterno,
+  Pergunta,
+  Resposta,
+  Traduzindo,
 } from "@/components/ui/blocos";
 import { Termo } from "@/components/ui/glossario";
 import { Revelador } from "@/components/ui/revelador";
@@ -207,53 +210,49 @@ export function SeriePesquisas() {
 
   return (
     <Bloco rotuladoPor="titulo-serie">
-      {/* O topo passa a ser o MESMO cabeçalho das outras oito seções: pergunta
-          e resposta na medida de leitura à esquerda, traduzindo e ilustração na
-          coluna da direita. O `flex-wrap` improvisado que estava aqui quebrava
-          o ritmo — era a única seção com uma composição própria de topo. */}
-      <Cabecalho
-        id="titulo-serie"
-        pergunta={`O que dizem as ${pesquisas.length} pesquisas?`}
-        resposta={
-          <>
+      {/* Cabeçalho em TRÊS colunas de alturas parecidas (v2.1 rodada 2): com a
+          ilustração empilhada sob o traduzindo, a coluna direita ficava ~350px
+          mais alta que a esquerda e abria um buraco branco sob o título. Em
+          terços — pergunta+resposta | traduzindo | exemplo — as alturas casam
+          (≈3, ≈6 e ≈6 linhas) e o topo fecha sem vazio. A 390 empilha na mesma
+          ordem de leitura de antes. */}
+      <Colunas arranjo="tres">
+        <div>
+          <Pergunta id="titulo-serie">O que dizem as {pesquisas.length} pesquisas?</Pergunta>
+          <Resposta>
             <span className="numeros">{M.qtdEmpate}</span> das{" "}
             <span className="numeros">{M.qtdRecentes}</span> pesquisas dos últimos 35 dias estão em{" "}
             <Termo chave="empateTecnico">empate técnico</Termo>; nas outras{" "}
             <span className="numeros">{naoEmpate}</span>, Lula aparece na frente.
-          </>
-        }
-        traduzindo={
-          <>
-            Cada linha é uma pesquisa registrada no TSE, da mais nova para a mais antiga. O{" "}
-            <Termo chave="peso">peso</Termo> diz o quanto ela conta na média: mais nova e com mais
-            gente ouvida pesa mais. A barra mostra{" "}
-            <b className="font-semibold text-tinta">o dobro</b> da{" "}
-            <Termo chave="margemErro">folga da medida</Termo> — é essa a folga da diferença entre os
-            dois. Quando a barra cruza a régua do empate, não dá para dizer quem está na frente.
-          </>
-        }
-        /* A ilustração é EXEMPLO, e diz isso. Sem a legenda, ela ficava colada
-           na frase "nas outras 4, Lula aparece na frente" e mostrava exatamente
-           quatro cápsulas, uma delas inteiramente do lado de Flávio: o leitor
-           lia "1 em 4 pesquisas com Flávio à frente" onde o painel tem 1 em 13.
-           O acoplamento era falso e visível. */
-        ilustracao={
-          <figure className="w-full max-w-[15rem]">
-            {/* eslint-disable-next-line @next/next/no-img-element -- SVG estático, sem otimização a fazer */}
-            <img
-              src="/ilustracoes/explicando-empate.svg"
-              alt=""
-              width={320}
-              height={190}
-              className="h-auto w-full"
-            />
-            <figcaption className="mt-1 text-micro text-tinta-media">
-              Exemplo: quatro pesquisas imaginárias, só para mostrar como ler a barra. Não são as
-              pesquisas da lista.
-            </figcaption>
-          </figure>
-        }
-      />
+          </Resposta>
+        </div>
+        <Traduzindo className="lg:mt-0">
+          Cada linha é uma pesquisa registrada no TSE, da mais nova para a mais antiga. O{" "}
+          <Termo chave="peso">peso</Termo> diz o quanto ela conta na média: mais nova e com mais
+          gente ouvida pesa mais. A barra mostra <b className="font-semibold text-tinta">o dobro</b>{" "}
+          da <Termo chave="margemErro">folga da medida</Termo> — é essa a folga da diferença entre
+          os dois. Quando a barra cruza a régua do empate, não dá para dizer quem está na frente.
+        </Traduzindo>
+        {/* A ilustração é EXEMPLO, e diz isso. Sem a legenda, ela ficava colada
+            na frase "nas outras 4, Lula aparece na frente" e mostrava exatamente
+            quatro cápsulas, uma delas inteiramente do lado de Flávio: o leitor
+            lia "1 em 4 pesquisas com Flávio à frente" onde o painel tem 1 em 13.
+            O acoplamento era falso e visível. */}
+        <figure className="mt-3 w-full max-w-[15rem] lg:mt-0">
+          {/* eslint-disable-next-line @next/next/no-img-element -- SVG estático, sem otimização a fazer */}
+          <img
+            src="/ilustracoes/explicando-empate.svg"
+            alt=""
+            width={320}
+            height={190}
+            className="h-auto w-full"
+          />
+          <figcaption className="mt-1 text-micro text-tinta-media">
+            Exemplo: quatro pesquisas imaginárias, só para mostrar como ler a barra. Não são as
+            pesquisas da lista.
+          </figcaption>
+        </figure>
+      </Colunas>
 
       {serieAlterada ? (
         <p
@@ -417,11 +416,13 @@ export function SeriePesquisas() {
                     <span className="text-tinta-media"> × </span>
                     <span className="text-flavio">{fmt(l.t2.flavio)}</span>
                   </td>
-                  <td className="py-3 pr-3">
+                  {/* Andar ÚNICO (v2.1 rodada 2): a linha "folga de N pontos"
+                      repetida 13× criava linhas de dois andares e ruído — o
+                      número já vive no balão da PRÓPRIA barra (hover) e no
+                      registro da linha; o cabeçalho da seção ensina a leitura
+                      uma vez. */}
+                  <td className="py-3 pr-3 align-middle">
                     <BarraPesquisa linha={l} escala={escala} balaoNaLinha />
-                    <span className="mt-1 block text-tinta-media numeros">
-                      folga de {fmt(l.moe)} pontos
-                    </span>
                   </td>
                   <td className="py-3 pr-3">
                     {/* Sem `whitespace-nowrap`: numa tabela de larguras fixas o

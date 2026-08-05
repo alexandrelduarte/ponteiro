@@ -401,3 +401,17 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
 - Breakpoints xl/2xl do Tailwind vazavam do tema base sem terem sido desenhados → desligados;
   acima de lg a coluna satura em 1200 e a composição não muda (passo que não muda nada é
   dívida).
+
+## v2.1 — rodada 2 (feedback pixel a pixel do dono)
+
+- Pílula de glossário com "?" sobrescrito REPROVADA pelo dono ("botão visualmente quebrado")
+  → termo em SUBLINHADO PONTILHADO âmbar no fluxo da prosa (padrão editorial
+  Wikipedia/FT/MDN), cursor-help, hover sólido + fundo suave; o "?" morre no Termo e o selo
+  redondo MaisSobre perde o anel → a afordância deixa de gritar mais que o conteúdo; nomes
+  acessíveis e testes intactos (o rótulo visível é o próprio termo).
+- Chips de leitura (empate técnico/na frente) sem anel → campo macio do próprio lado
+  (fundos suaves, contrastes ≥4,5 documentados) → fadiga de contorno apontada pelo dono.
+- Cabeçalho da série em TRÊS colunas (pergunta+resposta | traduzindo | exemplo) → a ilustração
+  empilhada criava ~350px de buraco sob o título; em terços as alturas casam.
+- "folga de N pontos" 13× sob as barras REMOVIDA da tabela → o número vive no balão da própria
+  barra (hover) e no registro da linha; linhas de andar único, ruído morto.

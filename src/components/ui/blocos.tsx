@@ -292,12 +292,16 @@ export type TomChip = "neutro" | "ameixa" | "atencao" | "lula" | "flavio";
  * tela. O contorno de 1,5px cumpre o 3:1 de objeto gráfico contra placa e
  * contra nicho (atenção 6,11/5,6 · lula 6,18/5,3 · flávio 9,50/8,2).
  */
+/* Campo macio, SEM anel (fadiga de contorno apontada pelo dono, v2.1 rodada 2):
+   o tom vem do fundo suave do próprio lado + tinta forte por cima. Contrastes
+   (tokens §comentários): atencao/atencao-fundo 5,23 · lula/lula-fundo 4,80 ·
+   flavio/flavio-fundo ≥4,5. */
 const CAMPO_CHIP: Record<TomChip, string> = {
   neutro: "bg-nicho text-tinta-media",
   ameixa: "bg-ameixa-bruma text-tinta",
-  atencao: "bg-bruma text-atencao shadow-[inset_0_0_0_1.5px_var(--color-atencao)]",
-  lula: "bg-bruma text-lula shadow-[inset_0_0_0_1.5px_var(--color-lula)]",
-  flavio: "bg-bruma text-flavio shadow-[inset_0_0_0_1.5px_var(--color-flavio)]",
+  atencao: "bg-atencao-fundo text-atencao",
+  lula: "bg-lula-fundo text-lula",
+  flavio: "bg-flavio-fundo text-flavio",
 };
 
 /** Etiqueta curta e arredondada. Nunca em caixa alta (P3). */

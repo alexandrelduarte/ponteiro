@@ -68,3 +68,35 @@ next-env.d.ts
 
 # exemplo de env é versionado; reais nunca
 !.env.example
+
+# QA — loop v2: versionam-se a linha de base ANTES (régua do redesign), o
+# estado FINAL entregue e as críticas de todas as iterações; prints
+# intermediários (iter-v2-1..8, ~200MB) ficam locais.
+!.qa/antes
+!.qa/antes/**
+!.qa/iter-v2-final
+!.qa/iter-v2-final/**
+!.qa/iter-v2-1
+!.qa/iter-v2-2
+!.qa/iter-v2-3
+!.qa/iter-v2-4
+!.qa/iter-v2-5
+!.qa/iter-v2-6
+!.qa/iter-v2-7
+!.qa/iter-v2-8
+.qa/iter-v2-1/*
+.qa/iter-v2-2/*
+.qa/iter-v2-3/*
+.qa/iter-v2-4/*
+.qa/iter-v2-5/*
+.qa/iter-v2-6/*
+.qa/iter-v2-7/*
+.qa/iter-v2-8/*
+!.qa/iter-v2-1/critica.md
+!.qa/iter-v2-2/critica.md
+!.qa/iter-v2-3/critica.md
+!.qa/iter-v2-4/critica.md
+!.qa/iter-v2-5/critica.md
+!.qa/iter-v2-6/critica.md
+!.qa/iter-v2-7/critica.md
+!.qa/iter-v2-8/critica.md

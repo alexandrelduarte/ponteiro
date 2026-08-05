@@ -59,8 +59,10 @@ test.describe("páginas de apoio", () => {
   test("navegação leva às outras páginas, do cabeçalho e do rodapé", async ({ page }) => {
     await page.goto("/");
     // O cabeçalho ganhou saída visível na primeira dobra (era só wordmark).
+    // A navegação virou barra sticky IRMÃ do banner (branding 2026): landmark
+    // próprio, com as TRÊS rotas — inclusive a volta visível ao Painel.
     const noCabecalho = page
-      .getByRole("banner")
+      .getByRole("navigation", { name: "Páginas do site" })
       .getByRole("link", { name: "Metodologia", exact: true });
     await expect(noCabecalho).toBeVisible();
     await noCabecalho.click();
@@ -134,7 +136,7 @@ test.describe("páginas de apoio", () => {
     for (const rota of ["/", "/historico", "/metodologia"]) {
       await page.goto(rota);
       // O símbolo é o único SVG com este viewBox; MARCA.md §6.6.10.
-      const simbolos = page.locator('svg[viewBox="0 0 200 220.49"]');
+      const simbolos = page.locator('svg[viewBox="548 228 1240 1416"]');
       expect(await simbolos.count(), `símbolo repetido em ${rota}`).toBe(1);
     }
   });

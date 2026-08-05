@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Serif, Lexend } from "next/font/google";
+import { Lexend, Newsreader } from "next/font/google";
 import "./globals.css";
 import { JsonLd } from "@/components/site/json-ld";
 import { CabecalhoSite } from "@/components/site/marca";
@@ -16,16 +16,19 @@ import {
 /**
  * Self-host automático: nenhum request a terceiros em runtime.
  *
- * `Instrument_Serif` é estática (só 400) e exige `weight`; a Lexend é variável,
- * então entra SEM `weight` — um único arquivo cobre 400/500/600/700, que é
- * exatamente o intervalo que o sistema usa (docs/DESIGN-V2.md §3.2).
+ * `Newsreader` é variável com EIXO ÓPTICO (`axes: ["opsz"]`): o navegador
+ * escolhe sozinho o corte display nos corpos grandes da manchete
+ * (`font-optical-sizing: auto` é o padrão) — é o corte medido no relatório de
+ * branding (dígito 0,600 em, +55% vs Instrument Serif, `tnum` presente).
+ * A Lexend é variável, então entra SEM `weight` — um único arquivo cobre
+ * 400/500/600/700, exatamente o intervalo que o sistema usa (DESIGN-V2 §3.2).
  * Archivo e IBM Plex Mono saíram: mono não volta como identidade (P7).
  */
-const instrumentSerif = Instrument_Serif({
+const newsreader = Newsreader({
   subsets: ["latin"],
-  weight: "400",
   display: "swap",
-  variable: "--font-instrument-serif",
+  variable: "--font-newsreader",
+  axes: ["opsz"],
 });
 
 const lexend = Lexend({
@@ -79,13 +82,20 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="pt-BR"
-      className={`${instrumentSerif.variable} ${lexend.variable} h-full antialiased`}
-    >
+    <html lang="pt-BR" className={`${newsreader.variable} ${lexend.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
+        {/* Primeiro focável da página (WCAG 2.4.1): invisível até receber foco,
+            quando aparece como botão primário sobre a barra sticky (z acima). */}
+        <a
+          href="#conteudo"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:rounded-plena focus:bg-ameixa focus:px-4 focus:py-2 focus:text-etiqueta focus:font-semibold focus:text-tinta-inversa focus:no-underline"
+        >
+          Pular para o conteúdo
+        </a>
         <CabecalhoSite />
-        {children}
+        <div id="conteudo" tabIndex={-1} className="flex flex-1 flex-col outline-none">
+          {children}
+        </div>
         <Rodape />
         <JsonLd
           dados={{

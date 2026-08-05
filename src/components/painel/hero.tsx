@@ -62,7 +62,7 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
       {/* 3. A manchete. Sem animação de entrada: é o LCP e não pode nascer
              invisível. Os dois números somam 100 e são o mesmo inteiro que o
              resto do site publica. */}
-      <p className="mt-4 max-w-[22ch] font-display text-manchete text-tinta md:max-w-[26ch]">
+      <p className="mt-4 max-w-[15ch] font-display text-manchete text-tinta md:max-w-[17ch]">
         Em 100 eleições parecidas com esta, Lula é eleito em{" "}
         <span data-testid="manchete-lula" className="text-lula numeros">
           <NumeroChance texto={eleitoL} />

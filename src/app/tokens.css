@@ -14,7 +14,7 @@
  *    correspondente — o Recharts e o SVG recebem cor por prop, fora do alcance
  *    do scanner do Tailwind.
  *  - Famílias tipográficas entram por `next/font` no layout raiz
- *    (`--font-instrument-serif`, `--font-lexend`). Proibido `@import` de fonte
+ *    (`--font-newsreader`, `--font-lexend`). Proibido `@import` de fonte
  *    por URL: self-host, zero request a terceiros em runtime.
  *  - Contraste WCAG 2 AA (4,5:1 texto · 3:1 não-texto) é PISO, e vem CALCULADO:
  *    todo par está anotado ao lado do token e tabelado em docs/DESIGN-V2.md §10.
@@ -39,20 +39,30 @@
      ====================================================================== */
   --color-tinta: #211c26; /* texto principal · 16,68:1 placa · 14,25:1 bruma */
   --color-tinta-media: #5c5566; /* texto secundário · 7,13:1 placa · 6,09:1 bruma */
-  --color-tinta-inversa: #faf8fb; /* texto sobre ameixa/tinta · 8,91:1 na ameixa */
+  --color-tinta-inversa: #faf8fb; /* texto sobre ameixa/tinta · 10,97:1 na ameixa */
 
   /* ======================================================================
      3. AMEIXA — a família cromática TERCEIRA da marca (R4/P6)
      Neutra em relação à disputa: não é o vermelho de ninguém nem o azul de
-     ninguém. Todos os degraus dividem a mesma matiz OKLCH (~316°), então
+     ninguém. Todos os degraus dividem a mesma matiz OKLCH (314–316°), então
      hover/pressed são o MESMO tom mais fundo, nunca outra cor.
+     Rebase do branding (logo Didone, DECISOES.md): a rampa ancora na TINTA DO
+     LOGO — `ameixa-forte` É o hex da letra do símbolo — e a identidade desceu
+     de #5a3a66 para #4a2e55 (todo contraste sobe; nenhum par cai).
      ====================================================================== */
-  --color-ameixa: #5a3a66; /* identidade · L 0,404 · 9,41:1 placa · 8,04:1 bruma */
-  --color-ameixa-forte: #452c4e; /* hover de superfície ameixa · inversa 11,54:1 */
-  --color-ameixa-pressa: #33203a; /* pressed · inversa 15,80:1 (não é foco) */
+  --color-ameixa: #4a2e55; /* identidade · L 0,352 · 11,58:1 placa · 9,89:1 bruma */
+  --color-ameixa-forte: #3a2144; /* tinta do LOGO · hover · 14,18:1 placa · inversa 13,43:1 */
+  --color-ameixa-pressa: #2a1733; /* pressed · 16,55:1 placa · inversa 15,67:1 (não é foco) */
   --color-ameixa-clara: #7c5a88; /* traço secundário em gráfico · 5,71:1 na placa */
   --color-ameixa-bruma: #e4dbe9; /* chip/pressed de botão-fantasma · tinta 12,40:1 */
-  --color-ameixa-tenue: #f3eef5; /* hover de botão-fantasma · ameixa 8,23:1 */
+  --color-ameixa-tenue: #f3eef5; /* hover de botão-fantasma · ameixa 10,13:1 */
+
+  /* A AGULHA da marca — âmbar-queimado do símbolo (logo 3.1, DECISOES.md).
+     Uso GRÁFICO e de marca (agulha do logo, acento de destaque): 4,50:1 placa ·
+     3,85:1 bruma · 4,09:1 nicho — ≥3:1 de objeto gráfico em toda superfície
+     clara. NÃO é cor de texto corrido: texto âmbar continua em `--color-atencao`
+     (mesma família quente; a agulha é a voz da marca, a atenção é a do aviso). */
+  --color-agulha: #c2570b;
 
   /* ======================================================================
      4. CANDIDATOS — carmim × naval, recalibrados para o ENXAME
@@ -133,22 +143,27 @@
 
   /* ======================================================================
      7. FOCO — anel único, ameixa, em toda superfície clara
-     3:1 contra placa (9,41), bruma (8,04), ameixa-bruma (6,99), lula-fundo
-     (7,31) e flavio-fundo (7,32). Sobre campo ameixa/tinta, inverte.
+     3:1 contra placa (11,58), bruma (9,89), ameixa-bruma (8,61), lula-fundo
+     (9,00) e flavio-fundo (9,01). Sobre campo ameixa/tinta, inverte.
      ====================================================================== */
-  --color-foco: #5a3a66;
-  --color-foco-inverso: #ffffff; /* 9,41:1 sobre a ameixa */
+  --color-foco: #4a2e55;
+  --color-foco-inverso: #ffffff; /* 11,58:1 sobre a ameixa */
 
   /* ======================================================================
      8. TIPOGRAFIA
-     Display: Instrument Serif 400 — SÓ em corpo grande (manchete, número de
-     placar). Nunca em rótulo, nunca em caixa alta, nunca abaixo de 32px.
+     Display: Newsreader (variável, eixo óptico) — SÓ em corpo grande
+     (manchete, número de placar). Nunca em rótulo, nunca em caixa alta, nunca
+     abaixo de 32px. Troca Instrument Serif → Newsreader no branding
+     (DECISOES.md): a Instrument era condensada demais (dígito 0,386 em) e a
+     Newsreader põe a largura exatamente nos números (dígito 0,600 em no corte
+     display, +55%) com `tnum` de brinde — medição fontTools no relatório de
+     pesquisa. O `font-optical-sizing: auto` escolhe o corte display sozinho
+     nos corpos grandes.
      Texto: Lexend — desenhada para legibilidade, cobre 100% do corpo, dos
      rótulos e dos números tabulares (P7: mono NÃO volta como identidade).
-     As duas famílias entram por next/font na Fase 6.
+     As duas famílias entram por next/font no layout raiz.
      ====================================================================== */
-  --font-display:
-    var(--font-instrument-serif), "Instrument Serif", Georgia, "Times New Roman", serif;
+  --font-display: var(--font-newsreader), "Newsreader", Georgia, "Times New Roman", serif;
   --font-texto:
     var(--font-lexend), "Lexend", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
@@ -158,22 +173,27 @@
   /* ---- Escala fluida 390 → 1140px. Cada passo: valor@390 → valor@1140. ----
      Piso de 13px em TUDO (a v1 chegava a 11px em tick de gráfico); corpo nasce
      em 16px, não em 13px como a v1 (P3/P7). */
-  --text-manchete: clamp(2.5rem, 1.655rem + 3.467vw, 4.125rem); /* 40 → 66 */
-  --text-manchete--line-height: 1.03;
+  /* Tracking da Newsreader: o corte display já nasce compacto — o −0,015em da
+     Instrument viraria apinhamento; −0,005em basta. Leading 1,05: a altura-x
+     baixa da Newsreader respira mais que a da Instrument no mesmo corpo. */
+  --text-manchete: clamp(2.25rem, 1.275rem + 4vw, 4.125rem); /* 36 → 66 */
+  --text-manchete--line-height: 1.05;
   --text-manchete--font-weight: 400;
-  --text-manchete--letter-spacing: -0.015em;
+  --text-manchete--letter-spacing: -0.005em;
 
   --text-manchete-2: clamp(2rem, 1.74rem + 1.067vw, 2.5rem); /* 32 → 40 · placar serif */
   --text-manchete-2--line-height: 1.08;
   --text-manchete-2--font-weight: 400;
-  --text-manchete-2--letter-spacing: -0.01em;
+  --text-manchete-2--letter-spacing: -0.005em;
 
-  /* Wordmark PONTEIRO no cabeçalho: 30 → 36px (MARCA.md §8.2). Único corpo
-     display abaixo de 32px que o sistema autoriza, porque é a marca, não texto. */
-  --text-wordmark: clamp(1.875rem, 1.76rem + 0.48vw, 2.25rem); /* 30 → 36 */
+  /* Wordmark PONTEIRO no cabeçalho: 26 → 32px (MARCA.md §8.2). Único corpo
+     display abaixo de 32px que o sistema autoriza, porque é a marca, não texto.
+     Desceu de 30→36 na troca de fonte: "PONTEIRO" em Newsreader é 45% mais
+     largo (5,45 em vs 3,76) — no corpo antigo tomava a linha inteira a 390. */
+  --text-wordmark: clamp(1.625rem, 1.51rem + 0.48vw, 2rem); /* 26 → 32 */
   --text-wordmark--line-height: 1;
-  --text-wordmark--font-weight: 400;
-  --text-wordmark--letter-spacing: -0.01em;
+  --text-wordmark--font-weight: 500;
+  --text-wordmark--letter-spacing: 0em;
 
   --text-pergunta: clamp(1.3125rem, 1.15rem + 0.667vw, 1.625rem); /* 21 → 26 · h2 */
   --text-pergunta--line-height: 1.25;
@@ -207,7 +227,7 @@
   /* ---- Tracking e leading avulsos ----
      Não existe tracking positivo de caixa alta neste sistema: rótulo em
      CAIXA-ALTA ESPACEJADA é defeito da v1 e está banido (P3). */
-  --tracking-manchete: -0.015em;
+  --tracking-manchete: -0.005em;
   --tracking-numero: -0.01em;
 
   --leading-manchete: 1.03;
@@ -228,6 +248,8 @@
   --spacing-respiro: 1rem; /* 16 — gap entre blocos a 390 */
   --spacing-respiro-md: 1.5rem; /* 24 — gap entre blocos em md+ */
   --spacing-toque: 2.75rem; /* 44 — alvo de toque do produto (ação primária) */
+  --spacing-barra: 3rem; /* 48 — altura da barra de navegação sticky; a faixa de
+                            simulação ancora o `top` dela AQUI (zero nº mágico) */
   --spacing-alvo-min: 1.5rem; /* 24 — piso do WCAG 2.2 SC 2.5.8 (alvo secundário) */
   --spacing-thumb: 1.5rem; /* 24 — diâmetro VISÍVEL do thumb do deslizador */
   --spacing-bolinha: 0.5rem; /* 8 — PISO do diâmetro da bolinha do enxame a 390 */
@@ -370,6 +392,13 @@
        glossário ficava presa dentro do parágrafo animado. */
     transform: none;
   }
+}
+
+/* Âncoras e skip-link aterrissam ABAIXO da barra sticky (--spacing-barra + o
+   filete + respiro): sem isto, a navegação de fragmento entregava o alvo
+   escondido sob a barra (verificação adversarial do branding). */
+html {
+  scroll-padding-top: calc(var(--spacing-barra) + 0.5rem);
 }
 
 /* Foco sempre visível e sempre o mesmo anel (ameixa) nas superfícies claras. */

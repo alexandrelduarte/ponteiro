@@ -340,7 +340,7 @@ prova de origem do desenho. Uma vez aprovado o vetor, ele pode sair de `public/`
 nenhum — é o único arquivo desta lista que a Fase 6 tem liberdade para remover.
 
 Os SVGs não dependem de fonte instalada nem de requisição a terceiros: o wordmark é caminho, não
-texto. **No cabeçalho do site, porém, o wordmark pode ser texto vivo** em Instrument Serif — a
+texto. **No cabeçalho do site, porém, o wordmark pode ser texto vivo** em Newsreader (branding 2026) — a
 fonte já é carregada por `next/font` para a manchete, e texto vivo é selecionável, pesa ~6 KB a
 menos e escala melhor. Os arquivos SVG existem para onde a fonte não é garantida: OG, e-mail,
 imprensa, favicon, terceiros.
@@ -355,32 +355,32 @@ imprensa, favicon, terceiros.
 - **`logo-mono-tinta`** para fundo claro em que a ameixa não pode aparecer: impressão P&B, fax
   do TSE, documento de terceiro, silhueta.
 - **`logo-mono-claro`** para fundo ameixa ou qualquer campo escuro.
-- **`icon.svg`** é ícone de aplicativo, não logo: tem placa de ameixa, anel mais grosso
-  (35,5% do raio, contra 20,2% do mestre), vão mais largo e **sem o vazado da alça**. É uma
-  variante ótica de tamanho pequeno — nunca use `icon.svg` grande nem `simbolo.svg` a 16px.
+- **`icon.svg`** é ícone de aplicativo, não logo: o símbolo colorido sobre PLACA bruma
+  (`#EFECF1`, espelho do token) com raio de 14/64 — a placa garante leitura em aba clara e
+  escura. Nunca use `icon.svg` grande nem `simbolo.svg` puro a 16px.
 
 ### 6.3 Cor e fundo
 
-| Peça                   | Símbolo                         | Wordmark                  |
-| ---------------------- | ------------------------------- | ------------------------- |
-| horizontal · empilhado | `--color-ameixa` `#5A3A66`      | `--color-tinta` `#211C26` |
-| mono tinta             | `#211C26`                       | `#211C26`                 |
-| mono claro             | `#FFFFFF`                       | `#FFFFFF`                 |
-| ícone do app           | `#FFFFFF` sobre placa `#5A3A66` | —                         |
+| Peça                   | Letra do símbolo                     | Agulha                       | Wordmark  |
+| ---------------------- | ------------------------------------ | ---------------------------- | --------- |
+| horizontal · empilhado | `--color-ameixa-forte` `#3A2144`     | `--color-agulha` `#C2570B`   | `#3A2144` |
+| mono tinta             | `#3A2144`                            | `#3A2144`                    | `#3A2144` |
+| mono claro             | `#FAF8FB`                            | `#FAF8FB`                    | `#FAF8FB` |
+| ícone do app           | `#3A2144` sobre placa bruma `#EFECF1`| `#C2570B`                    | —         |
 
-Fundos aprovados para o logo colorido, com o contraste do símbolo medido (piso 3:1, SC 1.4.11):
-bruma `#EFECF1` **8,04:1** · placa `#FFFFFF` **9,41:1** · nicho `#F6F3F7` **8,55:1** ·
-ameixa-tênue `#F3EEF5` **8,23:1** · ameixa-bruma `#E4DBE9` **6,99:1**.
-O wordmark em tinta faz 14,25:1 na bruma e 16,68:1 na placa.
-Do lado escuro, o mono claro faz **9,41:1** sobre a ameixa, 12,19:1 sobre ameixa-forte e
-14,91:1 sobre ameixa-pressa.
+Fundos aprovados para o logo colorido, com os contrastes medidos (piso 3:1, SC 1.4.11 — a
+letra manda; a agulha acompanha): letra `#3A2144` faz **12,11:1** na bruma · **14,18:1** na
+placa · **12,89:1** no nicho · **12,40:1** na ameixa-tênue · **10,54:1** na ameixa-bruma; a
+agulha `#C2570B` faz 3,85 · 4,50 · 4,09 · — · 3,35 nas mesmas superfícies.
+Do lado escuro, o mono claro `#FAF8FB` faz **10,97:1** sobre a ameixa, 13,43:1 sobre
+ameixa-forte e 15,67:1 sobre ameixa-pressa.
 
 **Regra prática:** ameixa sobre ameixa-clara dá 1,65:1 — ou seja, **campo ameixa de qualquer
 grau exige o mono claro**, nunca o logo colorido.
 
 ### 6.4 Tamanhos mínimos
 
-Medidos no gargalo real de cada peça: no travamento é a espessura fina da Instrument Serif;
+Medidos no gargalo real de cada peça: no travamento é a hairline da didone do símbolo (branding 2026);
 no símbolo, o vazado da alça da agulha.
 
 | Peça                   | Mínimo                | Por quê                                                                      |
@@ -484,7 +484,7 @@ Cada uma traz `<title>` para quando for inserida em linha; usada em `<img>`, o t
    vazado da alça e afina o anel a 1,2 px → **anel de 35,5% do raio, vão de 40°, agulha mais
    curta e sem vazado** → medido no Chromium a 16, 20, 32 e 48 px, é a única forma de o símbolo
    continuar lendo como "anel + agulha" na aba do navegador. O mestre tem piso de 28 px.
-4. **O wordmark é contorno, não texto** — `PONTEIRO` em Instrument Serif dependeria da fonte
+4. **O wordmark é contorno, não texto** — `PONTEIRO` em Newsreader dependeria da fonte
    instalada → **glifos convertidos em `path` com kerning e `letter-spacing −0,01em` já
    aplicados** → um SVG de logo tem de ser autossuficiente em e-mail, imprensa e OG. No
    cabeçalho do site, porém, vale texto vivo: a fonte já está carregada e economiza ~6 KB.
@@ -504,3 +504,17 @@ Cada uma traz `<title>` para quando for inserida em linha; usada em `<img>`, o t
    PNG indexado (paleta de 256 entradas da mesma ameixa + `tRNS`)** → o símbolo 2K caiu de
    118 KB para 42 KB e o cartão OG de 50 KB para 37 KB, **sem perder um pixel** (a rotina
    confere a identidade dos dados crus antes de devolver o arquivo).
+
+
+## Adendo — branding 2026 (decisão do dono)
+
+O símbolo original "anel + agulha" foi substituído pelo **P didone com a agulha âmbar**
+(estudo 3.1 da rodada de branding; DECISOES.md). O que muda e o que fica:
+
+- **Símbolo**: letra P serifada de alto contraste em `--color-ameixa-forte` (#3a2144 —
+  a rampa da marca foi ancorada NELE) com a agulha em `--color-agulha` (#c2570b)
+  estourando do bojo. Mestres em `public/brand/`; inline em `src/components/site/marca.tsx`.
+- **Wordmark**: "PONTEIRO" em Newsreader (a nova display do site); no cabeçalho é texto
+  vivo (§6.1 continua valendo), nos mestres é contorno extraído do TTF display.
+- **Salvaguardas intactas**: agulha nunca gira nem reage a dado (§6.6.3); marca uma vez
+  por tela (§6.6.10, e2e); nenhuma cor de candidato na marca (R4).

@@ -172,6 +172,10 @@ export function Revelador({
                       "fixed inset-x-0 bottom-0 z-50 max-h-[85svh] overflow-y-auto",
                       "rounded-t-bloco bg-placa p-bloco text-left shadow-erguido",
                       "md:absolute md:inset-x-auto md:bottom-auto",
+                      // No desktop o painel é ancorado ao DOCUMENTO (rola com o
+                      // conteúdo): fica ABAIXO da barra sticky (z-30) e da faixa
+                      // (z-20) — o z-50 é necessidade do sheet mobile, não daqui.
+                      "md:z-10",
                       "md:w-[22rem] md:max-w-[calc(100vw-2rem)] md:rounded-bloco",
                     ].join(" ")}
                   >

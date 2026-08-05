@@ -444,3 +444,43 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
   os padrões da Anthropic — SECURITY.md prometia o que o CI não fazia).
   `textoDaResposta` ganhou testes (formas hostis inclusas). Custos e runbooks
   do README reescritos para a OpenAI.
+
+## Branding 2026 — logo novo, Newsreader, paleta rebaseada, cabeçalho sticky (ordem do dono)
+
+- **Logo**: 3 rodadas de estudos no Higgsfield (27 propostas, 5 engines; Recraft V4.1
+  vetorial venceu por entregar SVG nativo). Escolha do dono: estudo 3.1 — P didone de
+  alto contraste com AGULHA âmbar estourando do bojo, respondendo à crítica de que o
+  mostrador pequeno sumiria em favicon/avatar. Masters regenerados em `public/brand/`
+  (símbolo, monos, horizontal, empilhado, wordmark em contornos reais da Newsreader via
+  fontTools, com kerning do GPOS); `icon.svg`/`favicon.ico` (1,4 KB, PNG-in-ICO)/
+  `apple-icon.png` novos; og-base.png recomposto com a marca nova.
+- **Display**: Instrument Serif → **Newsreader variável com eixo óptico** (`axes:
+  ["opsz"]`). Motivo medido (relatório de pesquisa, fontTools): dígito 0,386→0,600 em
+  (+55%) exatamente onde mora a queixa "muito narrow"; `tnum` de brinde; DNA de notícia
+  em tela casa com a didone do logo (Besley morreu com o 3.2 slab que não foi escolhido).
+  Lexend fica (par de redação; R7). Recalibragens: manchete 36→66 (piso desceu de 40 —
+  fonte 43% mais larga estourava a dobra de 390, trava de e2e), leading 1,05, tracking
+  −0,005em; wordmark 26→32 peso 500; OG com TTF estático opsz-72 e placar 84px.
+- **Paleta**: rampa ameixa REBASEADA na tinta do logo — `ameixa-forte` #3a2144 É o hex
+  da letra; identidade #5a3a66→#4a2e55; pressa #2a1733; foco acompanha. Todos os pares
+  recalculados (WCAG + OKLCH 314–316°): nenhum cai, todos sobem. Novo token
+  `--color-agulha` #c2570b (âmbar da marca, uso GRÁFICO ≥3:1 em toda superfície; texto
+  âmbar continua em `--color-atencao`). Vermelho/azul dos candidatos INTOCADOS (R4).
+- **Cabeçalho**: duas camadas (proposta da pesquisa §2.2) — marca generosa que rola
+  embora + `BarraNav` sticky de 48px (`--spacing-barra`), fundo bruma chapado, filete
+  sempre e `--shadow-flutua` só descolada (sentinela+IO, transição só de opacity; sem
+  JS fica o filete). SEM hambúrguer (3 rótulos = ~295px numa linha a 390, medido);
+  "Painel" entrou na nav (a volta à home era só o logo); `aria-current="page"` como
+  pílula ameixa-bruma; skip-link primeiro focável; faixa de simulação reancorada
+  (top = barra+8px, z 30→20). E2e novos: sticky, aria-current por rota, uma linha a
+  390, skip-link. Testes atualizados: nav virou landmark irmão do banner; viewBox novo
+  do símbolo; dobra de 390 verificada de volta ao verde.
+- Pós-verificação adversarial do branding (4 lentes, 11 confirmados): âncoras sob a barra
+  → `scroll-padding-top` global ancorado em `--spacing-barra` (skip-link e
+  #explicacao-tecnica aterrissavam escondidos); popover do Revelador ganhou `md:z-10`
+  (ancorado ao documento, rolava POR CIMA da barra; o z-50 é do sheet mobile); caps da
+  manchete do hero recalibrados 22/26ch→15/17ch (o ch da Newsreader é 55% maior — viraram
+  no-op); wordmark.svg com viewBox pelo bbox MEDIDO (cortava o topo do T/E); ícones com
+  placa bruma #EFECF1 (espelho de token, não off-white órfão); DESIGN-V2 §10 e MARCA
+  §6.2/6.3 reescritos com os contrastes novos; anotações residuais da ameixa velha
+  corrigidas em tokens.css.

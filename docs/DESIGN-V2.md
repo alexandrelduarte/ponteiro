@@ -25,7 +25,7 @@ depois mostra o número.**
 | Identidade          | ameixa `#5A3A66` sobre bruma-ameixa `#EFECF1`, placa branca, tinta `#211C26`                             |
 | Candidatos          | carmim Lula `#BE1745` (OKLCH L 0,518) × naval Flávio `#26418B` (L 0,399) — ΔL 0,119                      |
 | Atenção             | âmbar-queimado `#8F5407`, usado como TINTA (nunca como campo cheio)                                      |
-| Tipografia          | Instrument Serif 400 (display, só corpo grande) + Lexend (todo o resto)                                  |
+| Tipografia          | Newsreader variável/opsz (display, só corpo grande; branding 2026) + Lexend (todo o resto)                                  |
 | Layout              | blocos-conversa, raio 24, sem borda; hierarquia por tinta de fundo, não por moldura                      |
 | Elemento-assinatura | **O ENXAME DE 100** — quantile dotplot sobre a régua da diferença, com a coluna do zero chamada "empate" |
 | Motion              | as bolinhas caem e assentam (300 ms, `translateY`+`opacity`, escalonado por coluna)                      |
@@ -129,7 +129,7 @@ Paleta completa, valores e contrastes em `src/app/tokens-v2.css` e §10. As regr
 
 ### 3.2 Tipografia
 
-- `--font-display` = Instrument Serif 400. **Só em corpo grande**: manchete (`--text-manchete`) e
+- `--font-display` = Newsreader (variável, eixo óptico; branding 2026 — antes Instrument Serif). **Só em corpo grande**: manchete (`--text-manchete`) e
   placar serif (`--text-manchete-2`). Nunca em rótulo, nunca em caixa alta, nunca abaixo de 32px.
 - `--font-texto` = Lexend, e é também `--font-sans` (o padrão do documento). Cobre corpo, títulos-
   pergunta, rótulos, botões, tabela e números.
@@ -495,7 +495,7 @@ a marca tomaria partido a cada rodada (R4).
 
 ### 8.2 Wordmark
 
-`PONTEIRO` em **Instrument Serif 400**, corpo 30–36px no cabeçalho, `letter-spacing: -0.01em`, em
+`PONTEIRO` em **Newsreader 500**, corpo 26–32px no cabeçalho, tracking neutro, em
 `--color-tinta`. Tagline logo abaixo em Lexend, `--text-etiqueta`, `--color-ameixa`:
 
 > Para onde apontam as pesquisas.
@@ -525,8 +525,8 @@ JSON-LD, texto de SEO) — nunca como marca.
 1. Trocar o `@import "./tokens.css"` de `globals.css` por `./tokens-v2.css` e **apagar**
    `tokens.css`. Até lá os dois arquivos convivem: os nomes de token da v2 são todos novos, nenhum
    reaproveita nome antigo com valor diferente.
-2. Carregar Instrument Serif (400) e Lexend por `next/font` no layout raiz, expondo
-   `--font-instrument-serif` e `--font-lexend` (é o que `--font-display` e `--font-texto` esperam).
+2. Carregar Newsreader (variável, axes opsz) e Lexend por `next/font` no layout raiz, expondo
+   `--font-newsreader` e `--font-lexend` (é o que `--font-display` e `--font-texto` esperam).
    Self-host obrigatório: zero request a terceiros em runtime.
 3. Reescrever `globals.css`: a base do produto (`body`) passa a ser bruma-ameixa + Lexend; o grão
    de papel e o CSS da tela da urna saem inteiros.
@@ -543,6 +543,12 @@ JSON-LD, texto de SEO) — nunca como marca.
 Calculados, não estimados, com a fórmula de luminância relativa do WCAG 2 (a mesma que audita e
 que a lei cobra; APCA não é norma — P6). Piso: **4,5:1 texto**, **3:1 não-texto (1.4.11)**.
 
+> **Rebase do branding 2026** (DECISOES.md): a rampa ameixa ancorou na tinta do logo
+> (`ameixa` #4a2e55 · `ameixa-forte` #3a2144 · `ameixa-pressa` #2a1733; foco acompanha) e
+> nasceu o token gráfico `agulha` #c2570b (âmbar da marca; ≥3:1 em toda superfície clara:
+> 4,50 placa · 3,85 bruma · 4,09 nicho · 3,35 ameixa-bruma — nunca texto corrido).
+> Valores das tabelas abaixo já refletem o rebase.
+
 ### 10.1 Texto — piso 4,5:1
 
 | Texto           | Sobre           | Contraste     | Uso                             |
@@ -558,13 +564,13 @@ que a lei cobra; APCA não é norma — P6). Piso: **4,5:1 texto**, **3:1 não-t
 | `tinta-media`   | `placa`         | **7,13:1** ✔  | texto secundário                |
 | `tinta-media`   | `bruma`         | **6,09:1** ✔  | linha de tempo, legenda de eixo |
 | `tinta-media`   | `nicho`         | **6,48:1** ✔  | estado desabilitado legível     |
-| `ameixa`        | `placa`         | **9,41:1** ✔  | link, tagline, rótulo de marca  |
-| `ameixa`        | `bruma`         | **8,04:1** ✔  | tagline no cabeçalho            |
-| `ameixa`        | `ameixa-tenue`  | **8,23:1** ✔  | botão-fantasma em hover         |
-| `ameixa`        | `ameixa-bruma`  | **6,99:1** ✔  | botão-fantasma pressed · chip   |
-| `tinta-inversa` | `ameixa`        | **8,91:1** ✔  | botão primário                  |
-| `tinta-inversa` | `ameixa-forte`  | **11,54:1** ✔ | botão primário em hover         |
-| `tinta-inversa` | `ameixa-pressa` | **15,80:1** ✔ | botão primário pressed          |
+| `ameixa`        | `placa`         | **11,58:1** ✔ | link, tagline, rótulo de marca  |
+| `ameixa`        | `bruma`         | **9,89:1** ✔  | tagline no cabeçalho            |
+| `ameixa`        | `ameixa-tenue`  | **10,13:1** ✔ | botão-fantasma em hover         |
+| `ameixa`        | `ameixa-bruma`  | **8,61:1** ✔  | botão-fantasma pressed · chip   |
+| `tinta-inversa` | `ameixa`        | **10,97:1** ✔ | botão primário                  |
+| `tinta-inversa` | `ameixa-forte`  | **13,43:1** ✔ | botão primário em hover         |
+| `tinta-inversa` | `ameixa-pressa` | **15,67:1** ✔ | botão primário pressed          |
 | `lula`          | `placa`         | **6,18:1** ✔  | nome/numeral de Lula            |
 | `lula`          | `bruma`         | **5,28:1** ✔  | nome de Lula fora do bloco      |
 | `lula`          | `lula-fundo`    | **4,80:1** ✔  | nome no nicho de Lula           |

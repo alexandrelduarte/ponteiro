@@ -24,7 +24,7 @@ export function FaixaSimulacao() {
     <div
       role="status"
       aria-live="polite"
-      className="mx-auto w-full max-w-pagina px-goteira md:sticky md:top-2 md:z-30 md:px-goteira-md lg:px-goteira-lg"
+      className="mx-auto w-full max-w-pagina px-goteira md:sticky md:top-[calc(var(--spacing-barra)+0.5rem)] md:z-20 md:px-goteira-md lg:px-goteira-lg"
     >
       <AnimatePresence>
         {simulando ? (

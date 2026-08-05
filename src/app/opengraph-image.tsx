@@ -50,12 +50,12 @@ const BASE_OG = join(process.cwd(), "public", "brand", "og-base.png");
  */
 async function carregarFontes() {
   const [serif, lexend, lexendForte] = await Promise.all([
-    readFile(join(PASTA_FONTES, "InstrumentSerif-400.ttf")),
+    readFile(join(PASTA_FONTES, "Newsreader-400.ttf")),
     readFile(join(PASTA_FONTES, "Lexend-400.ttf")),
     readFile(join(PASTA_FONTES, "Lexend-600.ttf")),
   ]);
   return [
-    { name: "InstrumentSerif", data: serif, weight: 400 as const, style: "normal" as const },
+    { name: "Newsreader", data: serif, weight: 400 as const, style: "normal" as const },
     { name: "Lexend", data: lexend, weight: 400 as const, style: "normal" as const },
     { name: "Lexend", data: lexendForte, weight: 600 as const, style: "normal" as const },
   ];
@@ -114,8 +114,8 @@ export default async function Imagem() {
               display: "flex",
               alignItems: "baseline",
               marginTop: 14,
-              fontFamily: "InstrumentSerif",
-              fontSize: 92,
+              fontFamily: "Newsreader",
+              fontSize: 84,
               color: COR.tinta,
             }}
           >

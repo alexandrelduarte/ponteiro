@@ -23,7 +23,7 @@ import { ROTAS } from "@/app/_lib/site";
 import { Simbolo } from "./simbolo";
 
 const CLASSE_LINK = [
-  "inline-flex min-h-toque items-center rounded-plena px-3",
+  "inline-flex min-h-toque items-center rounded-plena px-2.5 whitespace-nowrap md:px-3",
   "text-etiqueta font-semibold no-underline",
   "transition-colors duration-(--dur-rapida) ease-(--ease-padrao)",
 ].join(" ");
@@ -68,11 +68,11 @@ export function BarraNav() {
             aria-label="PONTEIRO — voltar ao início"
             aria-hidden={!descolada}
             tabIndex={descolada ? 0 : -1}
-            className={`mr-1 inline-flex min-h-toque items-center rounded-campo pr-1 transition-opacity duration-(--dur-rapida) ease-(--ease-padrao) ${
+            className={`inline-flex min-h-toque items-center rounded-campo pr-0.5 transition-opacity duration-(--dur-rapida) ease-(--ease-padrao) ${
               descolada ? "opacity-100" : "pointer-events-none opacity-0"
             }`}
           >
-            <Simbolo className="h-7 w-auto text-ameixa-forte" />
+            <Simbolo className="h-6 w-auto text-ameixa-forte md:h-7" />
           </Link>
           {ROTAS.map((r) => {
             const ativa = pathname === r.href;

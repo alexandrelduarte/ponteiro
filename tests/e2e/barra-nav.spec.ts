@@ -40,6 +40,16 @@ test.describe("barra de navegação", () => {
     expect(new Set(tops).size, `tops distintos: ${tops.join(", ")}`).toBe(1);
     const larguras = await nav.evaluate((el) => ({ scroll: el.scrollWidth, cliente: el.clientWidth }));
     expect(larguras.scroll).toBeLessThanOrEqual(larguras.cliente);
+    // Nenhum rótulo pode quebrar DENTRO da pílula (regressão real pega ao
+    // vivo quando o símbolo entrou na barra e roubou largura a 390).
+    const linhasPorLink = await nav.getByRole("link").evaluateAll((els) =>
+      els.map((el) => {
+        const alcance = document.createRange();
+        alcance.selectNodeContents(el);
+        return [...alcance.getClientRects()].filter((r) => r.width > 0).length;
+      }),
+    );
+    for (const n of linhasPorLink) expect(n).toBeLessThanOrEqual(1);
   });
 
   test("o skip-link é o primeiro focável e move o foco ao conteúdo", async ({ page }) => {

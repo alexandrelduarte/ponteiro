@@ -114,21 +114,24 @@ test.describe("páginas de apoio", () => {
   });
 
   /** §5.7: /metodologia é prosa em coluna de leitura, ZERO cartão decorativo. */
-  test("/metodologia não tem cartão decorativo e respeita a medida de leitura", async ({
-    page,
-  }) => {
+  test("/metodologia usa as placas do sistema e respeita a medida de leitura", async ({ page }) => {
+    // O desenho de coluna única sem placa (§5.7 original) foi REVOGADO pelo
+    // dono na recomposição desktop das páginas institucionais (DECISOES.md):
+    // as placas voltaram — na MESMA gramática do painel e do /historico — e a
+    // prosa vive em duas colunas de leitura DENTRO delas.
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/metodologia");
 
     const placas = await page.locator("main .rounded-bloco").count();
-    expect(placas, "a /metodologia voltou a empilhar placas").toBe(0);
+    expect(placas, "a /metodologia perdeu a casca de placas do sistema").toBeGreaterThanOrEqual(2);
 
+    // A medida de leitura continua valendo para a PROSA (títulos podem ocupar
+    // a coluna do cabeçalho, 34rem): nenhum parágrafo passa de ~58ch.
     const larguras = await page.evaluate(() =>
-      [...document.querySelectorAll("main p, main h1, main h2")]
+      [...document.querySelectorAll("main p")]
         .map((el) => Math.round(el.getBoundingClientRect().width))
         .filter((w) => w > 0),
     );
-    // 512px é `--container-texto`; a folga cobre o arredondamento do zoom.
     expect(Math.max(...larguras)).toBeLessThanOrEqual(520);
   });
 

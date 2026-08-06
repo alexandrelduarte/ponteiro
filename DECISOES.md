@@ -581,3 +581,11 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
   reutiliza o glifo da marca; nenhum número novo (aria reusa a frase carimbada da manchete).
   Vercel Web Analytics ligado (agregado, sem cookie, first-party) — renderizado SÓ na infra
   da Vercel (em next start local o script 404va e derrubava a suíte e2e inteira).
+- Recomposição desktop das páginas institucionais (/metodologia, /quem-somos, /privacidade —
+  ordem do dono: "diagramação péssima, margens estranhas"): o desenho "coluna única de 512px
+  sem placa" (§5.7 original) foi REVOGADO. As três páginas agora falam a gramática do painel:
+  Secao→Bloco (placas), cabeçalho em 2 colunas (34rem | intro) a partir de lg, e a prosa em
+  DUAS colunas de leitura dentro da placa (multicol com `break-inside-avoid-column`; cada
+  coluna ≈508px ≤ medida). O hack `lg:-mx-64` das listas do glossário/fontes morreu com a
+  causa. Trava de e2e atualizada: placas ≥2 + parágrafos ≤520 (títulos podem ter a coluna do
+  cabeçalho). Responsáveis do /quem-somos viraram 2 Nichos lado a lado.

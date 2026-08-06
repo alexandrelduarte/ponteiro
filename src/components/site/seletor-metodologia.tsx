@@ -57,7 +57,7 @@ export function SeletorMetodologia({ children }: { children: ReactNode }) {
   return (
     <>
       <section aria-labelledby="rotulo-modo" className="mt-8">
-        <p id="rotulo-modo" className="text-secao text-tinta">
+        <p id="rotulo-modo" className="max-w-texto text-secao text-tinta">
           Como você quer ler esta página?
         </p>
         <div
@@ -91,7 +91,7 @@ export function SeletorMetodologia({ children }: { children: ReactNode }) {
             </button>
           ))}
         </div>
-        <p className="mt-2 text-micro text-tinta-media">
+        <p className="mt-2 max-w-texto text-micro text-tinta-media">
           A explicação técnica é a mesma que sempre esteve aqui, palavra por palavra. A simples não
           tira nada: só troca as palavras difíceis.
         </p>

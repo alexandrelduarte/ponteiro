@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/blocos";
 import { AcoesPendente } from "@/components/admin/acoes-pendente";
 import { BotaoAtualizar } from "@/components/admin/botao-atualizar";
+import { BotaoReconstituir } from "@/components/admin/botao-reconstituir";
 import { BotaoRemover } from "@/components/admin/botao-remover";
 import { BotaoSair } from "@/components/admin/botao-sair";
 import { FormInclusao } from "@/components/admin/form-inclusao";
@@ -208,6 +209,20 @@ export default async function Admin({
             (R3). O cron já faz isso uma vez por dia; este botão serve para antecipar.
           </p>
           <BotaoAtualizar />
+        </Bloco>
+      </Secao>
+
+      <Secao>
+        <Bloco>
+          <Subtitulo>Histórico reconstituído</Subtitulo>
+          <p className="mt-1 mb-3 max-w-texto text-corpo text-tinta-media">
+            Recalcula os pontos do gráfico de chance ANTERIORES ao primeiro registro ao vivo,
+            rodando o mesmo modelo em cada data passada só com as pesquisas conhecidas até ali.
+            Apaga e regrava <b className="font-semibold text-tinta">apenas os pontos recalculados</b>{" "}
+            — retratos registrados no dia nunca são tocados. Use de novo sempre que uma pesquisa
+            antiga entrar na série: até lá, o tracejado fica desatualizado.
+          </p>
+          <BotaoReconstituir />
         </Bloco>
       </Secao>
 

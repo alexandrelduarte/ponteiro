@@ -16,6 +16,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { ErroAutorizacao, exigirAdmin } from "@/lib/admin/auth";
+import { executarReconstituicao } from "@/lib/reconstituir";
 import { gravarSnapshot } from "@/lib/snapshot";
 import {
   DATA_MINIMA,
@@ -439,5 +440,32 @@ export async function dispararAtualizacao(): Promise<ResultadoAtualizacao> {
     return { ok: true, mensagem, resumo };
   } catch (erro) {
     return falha(erro, "Não foi possível executar a busca.");
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Reconstituição retroativa do /historico                            *
+ * ------------------------------------------------------------------ */
+
+/**
+ * Apaga e regrava APENAS os pontos `retroativo` da série de chance —
+ * retratos registrados no dia nunca são tocados. Idempotente e sem custo de
+ * IA, então não precisa de cooldown. Usar sempre que uma pesquisa ANTIGA
+ * entrar na série: o tracejado fica desatualizado até esta ação rodar.
+ */
+export async function reconstituirHistorico(): Promise<ResultadoAcao> {
+  try {
+    const admin = await exigirAdmin();
+    const resumo = await executarReconstituicao(admin.email);
+    if (!resumo.ok) {
+      return { ok: false, erro: resumo.motivo ?? "Não foi possível reconstituir o histórico." };
+    }
+    revalidatePath("/historico");
+    return {
+      ok: true,
+      mensagem: `${resumo.inseridos} pontos recalculados (${resumo.de} a ${resumo.ate}); ${resumo.apagados} anteriores substituídos.`,
+    };
+  } catch (erro) {
+    return falha(erro, "Não foi possível reconstituir o histórico.");
   }
 }

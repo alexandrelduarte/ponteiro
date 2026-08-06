@@ -52,7 +52,14 @@ export function exigirClienteAdmin(): SupabaseClient {
  */
 export async function registrarAuditoria(entrada: {
   ator: string;
-  acao: "auto_insercao" | "aprovacao" | "rejeicao" | "inclusao_manual" | "edicao" | "remocao";
+  acao:
+    | "auto_insercao"
+    | "aprovacao"
+    | "rejeicao"
+    | "inclusao_manual"
+    | "edicao"
+    | "remocao"
+    | "reconstituicao";
   entidade: string;
   entidadeId?: string | null;
   detalhes?: Record<string, unknown> | null;

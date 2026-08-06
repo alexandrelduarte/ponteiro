@@ -1651,10 +1651,39 @@ _Fora do INVENTÁRIO (superfície criada na produção), incluída para não fic
 
 > Como a chance mudou com o tempo
 
-**`historico.grafico.traduzindo`**
+**`historico.grafico.traduzindo`** _(emendada no carimbo §13 — a frase da "faixa em volta"
+morreu: o gráfico não tem faixa, de propósito)_
 
-> Cada ponto é a chance calculada naquele dia, projetada para o dia da votação. A faixa em volta é
-> a dúvida daquele dia.
+> Cada ponto é a chance projetada para o dia da votação, calculada só com as pesquisas
+> conhecidas até aquela data.
+
+**`historico.grafico.legendaReconstituido`** _(carimbo §13)_
+
+> A linha tracejada foi calculada depois: este painel ainda não existia. Fizemos a mesma conta
+> em cada data passada, usando só as pesquisas conhecidas até ali. A linha cheia é o registro
+> feito no próprio dia, desde {{DATA}}.
+
+**`historico.grafico.contagem`** _(carimbo §13; par {{L}}/{{F}} soma 100 via `parEmCem` — veto
+se descumprido)_
+
+> Vermelho: Lula. Azul: Flávio. {{N_REG}} retratos registrados no dia e {{N_REC}} pontos
+> calculados depois, de {{DE}} a {{ATE}}. Último valor: Lula {{L}} em 100 × Flávio {{F}} em 100.
+
+**`historico.grafico.rotuloFronteira`** _(carimbo §13, verbatim)_
+
+> daqui em diante, registrado no dia
+
+**`historico.grafico.tooltipRetro`** / **`historico.grafico.tooltipRegistrado`** _(carimbo §13)_
+
+> calculado depois, com as pesquisas conhecidas até esta data
+> registrado no dia
+
+**`historico.grafico.ressalvaConhecimento`** _(carimbo §13; mora SOB o gráfico — H4)_
+
+> Na linha tracejada, "conhecida" quer dizer: trabalho de campo encerrado até aquela data. Na
+> época, cada pesquisa só chegou ao público depois do fim do campo — em geral, alguns dias
+> depois. Então a linha tracejada enxerga cada pesquisa um pouco antes do que o público
+> enxergou.
 
 **`historico.linhaTempo.titulo`**
 

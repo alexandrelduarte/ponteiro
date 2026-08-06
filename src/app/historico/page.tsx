@@ -21,6 +21,8 @@ import {
   Vazio,
 } from "@/components/ui/blocos";
 import { GraficoHistorico } from "@/components/historico/grafico";
+import { prepararSerieHistorico } from "@/components/historico/serie";
+import { parEmCem } from "@/components/ui/textos";
 import { getFeedTransparencia, getSerieRuns, type EventoTransparencia } from "@/lib/dados";
 
 export const revalidate = 300;
@@ -53,16 +55,20 @@ function frase(e: EventoTransparencia): string {
 }
 
 export default async function Historico() {
-  const [runs, feed] = await Promise.all([getSerieRuns(), getFeedTransparencia()]);
+  const [runs, feed] = await Promise.all([getSerieRuns(500), getFeedTransparencia()]);
+  const serie = prepararSerieHistorico(runs);
+  const { dados, fronteiraMs, nRegistrados, nReconstituidos } = serie;
 
-  const dados = runs
-    .filter((r) => r.lula !== null && r.flavio !== null)
-    .map((r) => ({
-      x: Date.parse(r.em),
-      l: (r.lula as number) * 100,
-      f: (r.flavio as number) * 100,
-    }))
-    .filter((p) => Number.isFinite(p.x));
+  // Par publicado soma SEMPRE 100, com piso/teto de prosa (H3/H13 — carimbo
+  // §13.4); datas com ano só quando a série cruza ano (VOZ §8).
+  const ultimo = dados[dados.length - 1];
+  const parUltimo = ultimo ? parEmCem((ultimo.l ?? ultimo.lR ?? 0) / 100) : ["–", "–"];
+  const formatoData =
+    dados.length &&
+    formatInTimeZone(dados[0].x, TZ, "yyyy") ===
+      formatInTimeZone(dados[dados.length - 1].x, TZ, "yyyy")
+      ? "dd/MM"
+      : "dd/MM/yyyy";
 
   return (
     <main>
@@ -101,21 +107,49 @@ export default async function Historico() {
           <Cabecalho
             id="titulo-grafico-historico"
             pergunta="Como a chance mudou com o tempo"
-            traduzindo="Cada ponto é a chance calculada naquele dia, projetada para o dia da votação."
+            traduzindo="Cada ponto é a chance projetada para o dia da votação, calculada só com as pesquisas conhecidas até aquela data."
           />
 
           {dados.length >= 2 ? (
             <>
               <div className="mt-4">
-                <GraficoHistorico dados={dados} />
+                <GraficoHistorico dados={dados} fronteiraMs={fronteiraMs} />
               </div>
+              {nReconstituidos > 0 ? (
+                <p className="mt-2 text-micro text-tinta-media">
+                  A linha tracejada foi calculada depois: este painel ainda não existia. Fizemos a
+                  mesma conta em cada data passada, usando só as pesquisas conhecidas até ali.
+                  {fronteiraMs !== null ? (
+                    <>
+                      {" "}
+                      A linha cheia é o registro feito no próprio dia, desde{" "}
+                      {formatInTimeZone(fronteiraMs, TZ, formatoData)}.
+                    </>
+                  ) : null}
+                </p>
+              ) : null}
               <p className="mt-2 text-micro text-tinta-media numeros">
-                Vermelho: Lula. Azul: Flávio. {dados.length} retratos registrados, de{" "}
-                {formatInTimeZone(dados[0].x, TZ, "dd/MM/yyyy")} a{" "}
-                {formatInTimeZone(dados[dados.length - 1].x, TZ, "dd/MM/yyyy")}. Último valor: Lula{" "}
-                {Math.round(dados[dados.length - 1].l)} em 100 × Flávio{" "}
-                {Math.round(dados[dados.length - 1].f)} em 100.
+                Vermelho: Lula. Azul: Flávio. {nRegistrados}{" "}
+                {nRegistrados === 1 ? "retrato registrado" : "retratos registrados"} no dia
+                {nReconstituidos > 0
+                  ? ` e ${nReconstituidos} ${
+                      nReconstituidos === 1 ? "ponto calculado" : "pontos calculados"
+                    } depois`
+                  : ""}
+                , de {formatInTimeZone(dados[0].x, TZ, formatoData)} a{" "}
+                {formatInTimeZone(dados[dados.length - 1].x, TZ, formatoData)}. Último valor: Lula{" "}
+                {parUltimo[0]} em 100 × Flávio {parUltimo[1]} em 100.
               </p>
+              {nReconstituidos > 0 ? (
+                <p className="mt-2 max-w-texto text-micro text-tinta-media">
+                  Na linha tracejada, &ldquo;conhecida&rdquo; quer dizer: trabalho de campo
+                  encerrado até aquela data. Na época, cada pesquisa só chegou ao público depois do
+                  fim do campo — em geral, alguns dias depois. Então a linha tracejada enxerga cada
+                  pesquisa um pouco antes do que o público enxergou. Parte do movimento de um dia
+                  para o outro também vem do calendário: quanto menos tempo falta, menos a corrida
+                  ainda pode andar.
+                </p>
+              ) : null}
             </>
           ) : (
             <div className="mt-4">

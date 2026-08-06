@@ -184,4 +184,22 @@ describe.skipIf(SEM_CREDENCIAIS)("RLS — a chave anônima só lê o que é púb
     const runs = await anon.from("model_runs").select("id").limit(1);
     expect(runs.error).toBeNull();
   });
+
+  it("lê os pontos retroativos (mesma policy), mas não consegue inserir um", async () => {
+    const leitura = await anon
+      .from("model_runs")
+      .select("id,gatilho")
+      .eq("gatilho", "retroativo")
+      .limit(1);
+    expect(leitura.error).toBeNull();
+
+    const escrita = await anon.from("model_runs").insert({
+      executado_em: "2026-01-15T12:00:00Z",
+      gatilho: "retroativo",
+      params: {},
+      n_pesquisas: 1,
+      resultado: {},
+    });
+    expect(escrita.error).not.toBeNull();
+  });
 });

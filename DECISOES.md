@@ -490,3 +490,30 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
   §6.6.10 preservado no que importa: nunca dois símbolos VISÍVEIS — o e2e da regra foi
   reescrito para medir visibilidade real (viewport + opacity computada), não contagem de
   DOM. `Simbolo` extraído para `simbolo.tsx` (evita ciclo marca ⇄ barra-nav).
+
+## Série retroativa no /historico (missão aprovada em plano; cadência DIÁRIA por decisão do dono)
+
+- **O que é**: pontos reconstituídos no gráfico "Como a chance mudou com o tempo" — o modelo
+  determinístico rodado de novo para cada data passada (09:00 BRT, a hora do cron), usando
+  APENAS pesquisas com `campo_fim <= data`. O filtro é OBRIGATÓRIO: o agregado 2ºT não exclui
+  pesquisa futura sozinho (idadeDias tem `Math.max(0,…)` — entraria com peso máximo).
+- **Honestidade**: `gatilho='retroativo'` no banco; TRACEJADO no gráfico (padrão espelho do
+  observado×projetado da home) + ReferenceLine dinâmica no 1º registro ao vivo + tooltip e
+  legenda declarando a origem; "conhecida" = campo encerrado (a divulgação real veio dias
+  depois — ressalva na copy). Nunca se apresenta como registro (H11/H14; precedente
+  DECISOES "sem faixa lilás").
+- **Mecânica**: migration 0004 (CHECKs de gatilho/acao + índice único parcial por
+  executado_em WHERE retroativo — corrida vira 23505, não duplicata); `reconstituir.ts` com
+  núcleo puro (gerarDatasAlvo/reconstituirSerie) + orquestração idempotente (delete dos
+  retroativos → insert em lotes de 50 → auditoria `reconstituicao`); helper
+  `getPesquisasPublicadasDoBanco` SEM fallback de seed (gravar snapshot derivado do seed numa
+  falha de rede reconstituiria uma série que não é a oficial); `getSerieRuns` com select
+  magro `resultado->eleito->dia` + gatilho, limite 500 (diária ≈ 206 retro + ~82 cron até
+  out < 500).
+- **Gatilhos**: rota POST `/api/cron/reconstituir` (Bearer CRON_SECRET, mesmas guardas do
+  cron; fora do vercel.json — disparo deliberado) e botão "Reconstituir histórico" no /admin
+  (exigirAdmin; sem cooldown — idempotente e sem custo de IA). Pesquisa ANTIGA aprovada
+  depois deixa o tracejado desatualizado até re-rodar — o texto do botão avisa.
+- **Costura**: o 1º ponto registrado é duplicado nas séries tracejada e cheia
+  (`connectNulls={false}`) para a emenda ser exata na fronteira; tudo-retroativo (estado
+  transitório) → sem ReferenceLine, tudo tracejado.

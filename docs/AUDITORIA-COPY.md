@@ -1171,3 +1171,69 @@ a página já imprime, e reencontra a faixa de 80% que ela já publica. O que n�
 régua do empate calada.
 
 — _data-scientist, 05/08/2026_
+
+## 13. Adendo — a série retroativa do /historico (tracejado × linha cheia)
+
+Seis chaves novas para o gráfico "Como a chance mudou com o tempo", que passa a ter pontos
+RETROATIVOS: o modelo determinístico re-rodado em cada data passada, usando só as pesquisas com
+`campo_fim <= data`, desenhado TRACEJADO antes da fronteira do primeiro registro ao vivo. Auditei
+contra o código real (`src/components/historico/serie.ts`,
+`src/components/graficos/probabilidade-tempo.tsx`, `src/app/historico/page.tsx`) e contra o seed —
+que **não guarda data de divulgação** de pesquisa nenhuma, só `inicio` e `fim` do campo.
+
+**Contagem: 0 vetadas · 4 com emenda · 2 aprovadas verbatim.** Textos finais na seção V do
+COPY-DECK (chaves `historico.grafico.*`).
+
+### 13.1 A palavra que caiu em três chaves: "recalculado"
+
+Não se recalcula o que nunca foi calculado. Naquelas datas não houve conta nenhuma — o painel não
+existia. "Recalculado depois" insinua que existia um valor original daquela data, depois refeito:
+é exatamente a sugestão de registro histórico que a missão proíbe. Virou **"calculado depois"**,
+e o par com o tooltip do vivo ficou paralelo: **calculado depois × registrado no dia**.
+
+### 13.2 Emendas além do §13.1
+
+- **`traduzindo`** — "…cujo trabalho de campo já tinha terminado naquela data" era FALSA no
+  trecho da linha cheia (pesquisa com campo encerrado mas ainda não aprovada não entrou na conta
+  do dia). "Conhecidas até aquela data" é verdadeira nos dois trechos. A frase antiga da "faixa
+  em volta" morreu junto: o gráfico não tem faixa, de propósito (H14).
+- **`legendaReconstituido`** — 27 palavras viraram três frases; "rodamos o mesmo modelo" virou
+  "fizemos a mesma conta" (§1.3 — e "a mesma" é a afirmação de honestidade que importa).
+- **`contagem`** — o par assimétrico "retratos registrados" × "pontos calculados" é DELIBERADO:
+  "retrato" é vocabulário reservado ao que foi tirado no próprio dia. Não harmonizar.
+- **`ressalvaConhecimento`** — "cada pesquisa só foi divulgada alguns dias depois" era universal
+  e inverificável (o seed não guarda data de divulgação; H8). Afirma-se só o certo por
+  construção ("só chegou ao público depois do fim do campo") com o "alguns dias" rebaixado a
+  típico ("em geral").
+
+### 13.3 Onde mora a ressalva
+
+**Sob o gráfico, no /historico** — H4 ("a dúvida mora na mesma tela do número") e uma razão
+mecânica: legenda e tooltip usam a palavra "conhecidas"; a definição dela não pode morar noutra
+página. A /metodologia pode ganhar a versão técnica EM ADIÇÃO (recomendado, não condição).
+
+### 13.4 Condições de implementação (1–4 são veto se descumpridas)
+
+1. **{{L}}/{{F}} somam 100** na contagem E no tooltip — `parEmCem` (arredonda um, complementa o
+   outro). O arredondamento separado publicaria 83 × 18 = 101.
+2. **H13**: "100 em 100"/"0 em 100" não são publicáveis — piso/teto de prosa do próprio
+   `parEmCem` ("mais de 99", "menos de 1").
+3. **Tracejado só ANTES do primeiro registro ao vivo.** Buraco no meio da série cheia não pode
+   ser preenchido com ponto retroativo sob esta legenda — se um dia se quiser, a legenda volta
+   para auditoria.
+4. **O tracejado é derivado, nunca estocado como verdade**: mudou a lista oficial → recalcular
+   (o botão do /admin existe para isso; o texto dele avisa).
+5. Estados de borda tratados: `fronteiraMs === null` → sem a 3ª frase da legenda e sem rótulo de
+   fronteira; `N_REC = 0` → volta à frase de contagem simples; singular/plural tratados.
+6. Datas em dd/mm quando a série não cruza ano (VOZ §8); com ano quando cruzar.
+
+### 13.5 Nota (não é veto)
+
+No tracejado a linha anda mesmo em semanas sem pesquisa (o calendário encolhe a deriva). A causa
+já tem redação aprovada (§4, `historico.mudouPorQue`, frase do calendário) — reusada verbatim na
+tela do gráfico, junto da ressalva.
+
+### Fecho do §13
+
+Nenhum veto: a arquitetura nasceu honesta — dois traços, fronteira nomeada, tooltip que declara a
+origem de cada ponto, e o código recusa fingir registro quando tudo é reconstituído.

@@ -26,8 +26,10 @@ export interface ResultadoSnapshot {
 /**
  * Torna a saída do modelo segura para `jsonb`: NaN/Infinity viram `null`
  * (JSON não os representa) em vez de estourar a serialização mais tarde.
+ * Exportada porque a reconstituição retroativa (`reconstituir.ts`) grava a
+ * mesma forma de linha e precisa da MESMA régua de serialização.
  */
-function serializavel(valor: unknown): unknown {
+export function serializavel(valor: unknown): unknown {
   if (typeof valor === "number") return Number.isFinite(valor) ? valor : null;
   if (Array.isArray(valor)) return valor.map(serializavel);
   if (valor && typeof valor === "object") {

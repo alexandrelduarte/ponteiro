@@ -71,7 +71,7 @@ export type FonteDados = "banco" | "seed";
 export interface RegistroRun {
   id: string;
   executadoEm: string;
-  gatilho: "cron" | "aprovacao" | "manual" | "deploy";
+  gatilho: "cron" | "aprovacao" | "manual" | "deploy" | "retroativo";
   params: ParamsModelo;
   nPesquisas: number;
   /**
@@ -87,6 +87,8 @@ export interface PontoRun {
   em: string;
   lula: number | null;
   flavio: number | null;
+  /** `retroativo` = recalculado depois (backfill); o resto é registro ao vivo. */
+  origem: "retroativo" | "registrado";
 }
 
 export interface EventoTransparencia {
@@ -274,6 +276,40 @@ export async function getPesquisasPublicadas(): Promise<Pesquisa[]> {
   }
 }
 
+/**
+ * Série publicada LIDA DO BANCO, sem fallback de seed. `null` = indisponível.
+ * Existe para a reconstituição retroativa: gravar snapshots derivados do seed
+ * local durante uma falha de rede seria reconstituir uma série que não é a
+ * oficial — melhor abortar (R8 vale para LEITURA da página, não para escrita).
+ */
+export async function getPesquisasPublicadasDoBanco(): Promise<Pesquisa[] | null> {
+  const supabase = criarClientePublico();
+  if (!supabase) return null;
+  try {
+    const [pesquisas, institutos] = await Promise.all([
+      supabase
+        .from("pesquisas")
+        .select(COLUNAS_PESQUISA)
+        .eq("status", "publicada")
+        .order("campo_fim", { ascending: false })
+        .returns<LinhaPesquisa[]>(),
+      supabase.from("institutos").select("id,nome,aliases").returns<LinhaInstituto[]>(),
+    ]);
+    if (pesquisas.error) throw new Error(pesquisas.error.message);
+    if (!pesquisas.data?.length) return null;
+    const nomes = new Map<string, string>(
+      (institutos.data ?? SEED_INSTITUTOS).map((i) => [i.id, i.nome]),
+    );
+    const convertidas = pesquisas.data
+      .map((l) => linhaParaPesquisa(l, nomes))
+      .filter((p): p is Pesquisa => p !== null);
+    return convertidas.length ? convertidas : null;
+  } catch (erro) {
+    console.error("[dados] getPesquisasPublicadasDoBanco indisponível:", erro);
+    return null;
+  }
+}
+
 function linhaParaRun(linha: {
   id: string;
   executado_em: string;
@@ -282,7 +318,7 @@ function linhaParaRun(linha: {
   n_pesquisas: number;
   resultado: unknown;
 }): RegistroRun | null {
-  const gatilhos = ["cron", "aprovacao", "manual", "deploy"] as const;
+  const gatilhos = ["cron", "aprovacao", "manual", "deploy", "retroativo"] as const;
   const gatilho = gatilhos.find((g) => g === linha.gatilho);
   if (!gatilho) return null;
   const resultado =
@@ -336,22 +372,35 @@ function probabilidadeEleito(resultado: Record<string, unknown>): {
  * Série histórica das probabilidades (gráfico "probabilidade no tempo"),
  * do mais antigo para o mais recente. Lista vazia sem banco.
  */
-export async function getSerieRuns(limite = 180): Promise<PontoRun[]> {
+export async function getSerieRuns(limite = 500): Promise<PontoRun[]> {
   const supabase = criarClientePublico();
   if (!supabase) return [];
   try {
+    // `dia:resultado->eleito->dia` puxa SÓ o par de probabilidades do jsonb:
+    // com o backfill diário a série passa de 300 linhas, e o `resultado`
+    // completo (~10–30 KB cada) tornaria a página cara à toa. O parse continua
+    // defensivo — a forma vem do banco, não do nosso tipo.
     const { data, error } = await supabase
       .from("model_runs")
-      .select("executado_em,resultado")
+      .select("executado_em,gatilho,dia:resultado->eleito->dia")
       .order("executado_em", { ascending: false })
       .limit(Math.min(Math.max(limite, 1), 500))
-      .returns<{ executado_em: string; resultado: unknown }[]>();
+      .returns<{ executado_em: string; gatilho: string; dia: unknown }[]>();
     if (error) throw new Error(error.message);
     return (data ?? [])
-      .filter((l) => l.resultado && typeof l.resultado === "object")
       .map((l) => {
-        const { l: lula, f: flavio } = probabilidadeEleito(l.resultado as Record<string, unknown>);
-        return { em: l.executado_em, lula, flavio };
+        const dia =
+          l.dia && typeof l.dia === "object" && !Array.isArray(l.dia)
+            ? (l.dia as { l?: unknown; f?: unknown })
+            : null;
+        return {
+          em: l.executado_em,
+          lula: dia ? numero(dia.l) : null,
+          flavio: dia ? numero(dia.f) : null,
+          origem: (l.gatilho === "retroativo" ? "retroativo" : "registrado") as
+            | "retroativo"
+            | "registrado",
+        };
       })
       .reverse();
   } catch (erro) {

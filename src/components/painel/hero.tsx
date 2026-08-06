@@ -16,12 +16,14 @@
  *
  * Tudo aqui sai pronto do HTML do servidor. Nenhum número espera JavaScript.
  */
+import { useState } from "react";
 import { Nicho, Bloco, Aviso, Colunas } from "@/components/ui/blocos";
 import { Termo } from "@/components/ui/glossario";
 import { Contagem } from "@/components/ui/movimento";
 import { abs1, direcaoVies, faixaVeredito, parEmCem } from "@/components/ui/textos";
 import { fmt, fmtSinal } from "@/lib/modelo";
 import { Enxame, montarEnxame } from "./enxame";
+import { Medidor } from "./medidor";
 import { EXPLICA_FRESCOR, type SeloFrescor } from "./frescor";
 import { usePainel } from "./estado";
 
@@ -44,6 +46,10 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
   const nFlavio = String(layout.nFlavio);
 
   const institutos = new Set(pesquisas.map((p) => p.instituto)).size;
+  /* A aba do gráfico do hero: "cenários" (enxame, padrão e SSR) × "ponteiro"
+     (medidor). O enxame nunca sai do DOM — só é ocultado — para o HTML do
+     servidor continuar carregando o elemento-assinatura (e2e do hero sem JS). */
+  const [verHero, setVerHero] = useState<"cenarios" | "ponteiro">("cenarios");
   const lider = M.eleito.dia.l >= 0.5 ? "Lula" : "Flávio";
   const faixa = faixaVeredito(Math.max(M.eleito.dia.l, M.eleito.dia.f));
 
@@ -62,7 +68,7 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
       {/* 3. A manchete. Sem animação de entrada: é o LCP e não pode nascer
              invisível. Os dois números somam 100 e são o mesmo inteiro que o
              resto do site publica. */}
-      <p className="mt-4 max-w-[15ch] font-display text-manchete text-tinta md:max-w-[17ch]">
+      <p className="mt-4 font-display text-manchete text-tinta">
         Em 100 eleições parecidas com esta, Lula é eleito em{" "}
         <span data-testid="manchete-lula" className="text-lula numeros">
           <NumeroChance texto={eleitoL} />
@@ -90,13 +96,53 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
              quando o viewport crescia (18px a 768 → 16px a 1440). O
              elemento-assinatura não pode ser o menor da página. A faixa morta
              não volta: quem chega à borda direita agora é o próprio desenho. */}
-      <Bloco className="mt-4">
-        <Enxame
-          layout={layout}
-          escala="hero"
-          idTeste="enxame"
-          rotuloAcessivel={`Cem bolinhas, uma por cenário da decisão de 25 de outubro: ${nLula} caem do lado de Lula e ${nFlavio} do lado de Flávio.`}
-        />
+      <Bloco className="relative mt-4">
+        {/* Seletor de forma SOBREPOSTO no canto (zero altura nova a 390 — a
+            dobra travada por e2e não se move). Rótulos de interface, não copy
+            editorial; o padrão dos chips segmentados é o do produto. */}
+        <div
+          role="group"
+          aria-label="Forma de ver o resultado"
+          className="absolute top-3 right-3 z-10 flex gap-0.5 rounded-plena bg-nicho p-0.5"
+        >
+          {(
+            [
+              ["cenarios", "cenários"],
+              ["ponteiro", "ponteiro"],
+            ] as const
+          ).map(([chave, rotulo]) => (
+            <button
+              key={chave}
+              type="button"
+              aria-pressed={verHero === chave}
+              onClick={() => setVerHero(chave)}
+              className={`inline-flex min-h-8 items-center rounded-plena px-2.5 text-micro font-semibold transition-colors duration-(--dur-rapida) ease-(--ease-padrao) ${
+                verHero === chave
+                  ? "bg-ameixa-bruma text-tinta"
+                  : "text-tinta-media hover:text-tinta"
+              }`}
+            >
+              {rotulo}
+            </button>
+          ))}
+        </div>
+
+        <div className={verHero === "cenarios" ? undefined : "hidden"}>
+          <Enxame
+            layout={layout}
+            escala="hero"
+            idTeste="enxame"
+            rotuloAcessivel={`Cem bolinhas, uma por cenário da decisão de 25 de outubro: ${nLula} caem do lado de Lula e ${nFlavio} do lado de Flávio.`}
+          />
+        </div>
+        {verHero === "ponteiro" ? (
+          <div className="pt-8 md:pt-0">
+            <Medidor
+              valorLula={Math.round(M.eleito.dia.l * 100)}
+              rotuloAcessivel={`Em 100 eleições parecidas com esta, Lula é eleito em ${eleitoL} e Flávio em ${eleitoF}.`}
+            />
+          </div>
+        ) : null}
 
         {/* 5 e 6, lado a lado a partir de lg — e NA MESMA ORDEM DO DOM.
                A micro-legenda e o "isto não é previsão" são as duas frases que
@@ -113,7 +159,10 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
                  veredito desce para baixo da linha do horizonte.
                  Os fechos condicionais por líder ficaram APOSENTADOS: duas
                  fontes para o mesmo fato foi como o 83 ↔ 82 nasceu. */}
-          <p data-testid="legenda-enxame" className="max-w-texto text-corpo text-tinta-media">
+          <p
+            data-testid="legenda-enxame"
+            className={`max-w-texto text-corpo text-tinta-media ${verHero === "ponteiro" ? "hidden" : ""}`}
+          >
             Cada bolinha é um resultado possível: nenhuma é o resultado —{" "}
             <b className="font-semibold text-tinta">até outubro isso ainda pode mudar</b>. Aqui, só
             a decisão de 25 de outubro: {nLula} do lado de Lula, {nFlavio} do lado de Flávio. Em{" "}

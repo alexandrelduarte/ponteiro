@@ -67,10 +67,7 @@ export async function POST(requisicao: Request) {
       return NextResponse.json({ erro: "corpo inválido" }, { status: 422, headers: SEM_CACHE });
     }
 
-    const resumo = await executarReconstituicao(
-      "cron",
-      analisado.data.cadencia ?? CADENCIA_PADRAO,
-    );
+    const resumo = await executarReconstituicao("cron", analisado.data.cadencia ?? CADENCIA_PADRAO);
     if (!resumo.ok) {
       return NextResponse.json({ erro: resumo.motivo }, { status: 500, headers: SEM_CACHE });
     }

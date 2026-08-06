@@ -19,7 +19,6 @@ import { Simbolo } from "./simbolo";
 
 export { Simbolo };
 
-
 /**
  * Cabeçalho em DUAS CAMADAS (pesquisa de branding §2.2, DECISOES.md):
  * a camada de MARCA é generosa e rola embora com a página; a NAVEGAÇÃO é a

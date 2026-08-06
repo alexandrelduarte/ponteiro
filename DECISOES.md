@@ -455,7 +455,7 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
   fontTools, com kerning do GPOS); `icon.svg`/`favicon.ico` (1,4 KB, PNG-in-ICO)/
   `apple-icon.png` novos; og-base.png recomposto com a marca nova.
 - **Display**: Instrument Serif → **Newsreader variável com eixo óptico** (`axes:
-  ["opsz"]`). Motivo medido (relatório de pesquisa, fontTools): dígito 0,386→0,600 em
+["opsz"]`). Motivo medido (relatório de pesquisa, fontTools): dígito 0,386→0,600 em
   (+55%) exatamente onde mora a queixa "muito narrow"; `tnum` de brinde; DNA de notícia
   em tela casa com a didone do logo (Besley morreu com o 3.2 slab que não foi escolhido).
   Lexend fica (par de redação; R7). Recalibragens: manchete 36→66 (piso desceu de 40 —
@@ -544,3 +544,40 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
   de correções (conteúdo pessoal: nomes como querem ser exibidos, e-mail de contato
   dedicado); depósito da marca no INPI (sistema atributivo — sem INPI o TRADEMARKS é aviso
   moral); revisão por advogado(a) eleitoralista antes do período crítico.
+
+## Redesenho das bandas do cenário-base (cor = direção + magnitude)
+
+- **Contexto**: o dono do produto reprovou o infográfico "De quanto pode ser a diferença no
+  fim" ("muito ruim, melhorar cores ou pensar outro modelo") — quatro bandas no mesmo lilás
+  indistinguíveis, contorno de tinta preta na banda modal, rótulo "empate" flutuando solto e
+  legenda numa linha corrida sem ligação com as faixas.
+- **Decisão**: a barra 100% empilhada FICA; a cor passa a ser do DADO — direção pela família
+  do candidato (naval à esquerda da régua, carmim à direita), magnitude por degrau de rampa
+  de fundo. Dois tokens novos em `tokens.css` §4 (`--color-lula-fundo-2` #f8bcc0 e
+  `--color-lula-fundo-3` #f4a0a7): matiz do carmim (h ≈ 14°), ΔL adjacente 0,068/0,060,
+  contrastes calculados e anotados no arquivo. O teto de escuridão da rampa é o ANEL da
+  banda modal — contorno de 2px na cor do candidato, que precisa de ≥3:1 de objeto gráfico
+  sobre qualquer degrau em que a modal caia (pior caso 3,07:1, fundo-3 × carmim). Modal =
+  anel + chip "o mais provável" ancorado no centro dela (clamp em rem contra vazamento a
+  390); "empate" vira traço de 3px contínuo com a régua de tinta + rótulo encostado (troca
+  de lado se a fronteira passar de 70%); legenda ancorada por grid proporcional às bandas em
+  sm+, lista vertical com amostra de cor abaixo disso. Vão entre bandas: 2px de placa; fio
+  `--color-contorno` desenha o limite da barra (fundos claros não seguram a forma sozinhos).
+- **Porquê assim**: opacidade composta é banida e não existia degrau intermediário; criar
+  rampa com contraste calculado é o caminho que o próprio tokens.css prevê ("par novo só
+  entra com o número calculado junto"). Não é ênfase editorial num desfecho (R4/H9): é rampa
+  sequencial do dado, e ela só tem degraus do lado que o modelo bina — rampa naval NÃO foi
+  criada porque nenhuma banda de magnitude existe do lado Flávio hoje (token sem uso
+  violaria R7; a condição de entrada está anotada no token). Nenhuma string auditada foi
+  reescrita — apenas reorganizada (o chip usa as mesmas palavras "o mais provável"; o
+  sufixo " — o mais provável" continua na legenda, que é o que o leitor de tela recebe).
+- Missão one-shot (divulgação): manchete do hero SOLTA da medida (ordem do dono — ocupa a
+  largura do bloco; o teto de 15/17ch criado na verificação do branding caiu por decisão
+  expressa). Hero ganhou ABAS no gráfico: "cenários" (enxame, padrão e SSR — e2e do hero sem
+  JS intacto) × "ponteiro" (Medidor semicircular, ideia do Pedro): seletor SOBREPOSTO no
+  canto (zero altura nova a 390 — a dobra travada não se move), medidor com lados
+  naval/carmim, zona central lilás "metade a metade", agulha em TINTA NEUTRA e estática
+  (nada anima dado). SALVAGUARDA §6.6.3 preservada: o medidor é linguagem de gráfico, não
+  reutiliza o glifo da marca; nenhum número novo (aria reusa a frase carimbada da manchete).
+  Vercel Web Analytics ligado (agregado, sem cookie, first-party) — renderizado SÓ na infra
+  da Vercel (em next start local o script 404va e derrubava a suíte e2e inteira).

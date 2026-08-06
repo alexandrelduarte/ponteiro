@@ -398,8 +398,7 @@ export async function getSerieRuns(limite = 500): Promise<PontoRun[]> {
           lula: dia ? numero(dia.l) : null,
           flavio: dia ? numero(dia.f) : null,
           origem: (l.gatilho === "retroativo" ? "retroativo" : "registrado") as
-            | "retroativo"
-            | "registrado",
+            "retroativo" | "registrado",
         };
       })
       .reverse();

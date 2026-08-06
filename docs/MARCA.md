@@ -361,12 +361,12 @@ imprensa, favicon, terceiros.
 
 ### 6.3 Cor e fundo
 
-| Peça                   | Letra do símbolo                     | Agulha                       | Wordmark  |
-| ---------------------- | ------------------------------------ | ---------------------------- | --------- |
-| horizontal · empilhado | `--color-ameixa-forte` `#3A2144`     | `--color-agulha` `#C2570B`   | `#3A2144` |
-| mono tinta             | `#3A2144`                            | `#3A2144`                    | `#3A2144` |
-| mono claro             | `#FAF8FB`                            | `#FAF8FB`                    | `#FAF8FB` |
-| ícone do app           | `#3A2144` sobre placa bruma `#EFECF1`| `#C2570B`                    | —         |
+| Peça                   | Letra do símbolo                      | Agulha                     | Wordmark  |
+| ---------------------- | ------------------------------------- | -------------------------- | --------- |
+| horizontal · empilhado | `--color-ameixa-forte` `#3A2144`      | `--color-agulha` `#C2570B` | `#3A2144` |
+| mono tinta             | `#3A2144`                             | `#3A2144`                  | `#3A2144` |
+| mono claro             | `#FAF8FB`                             | `#FAF8FB`                  | `#FAF8FB` |
+| ícone do app           | `#3A2144` sobre placa bruma `#EFECF1` | `#C2570B`                  | —         |
 
 Fundos aprovados para o logo colorido, com os contrastes medidos (piso 3:1, SC 1.4.11 — a
 letra manda; a agulha acompanha): letra `#3A2144` faz **12,11:1** na bruma · **14,18:1** na
@@ -504,7 +504,6 @@ Cada uma traz `<title>` para quando for inserida em linha; usada em `<img>`, o t
    PNG indexado (paleta de 256 entradas da mesma ameixa + `tRNS`)** → o símbolo 2K caiu de
    118 KB para 42 KB e o cartão OG de 50 KB para 37 KB, **sem perder um pixel** (a rotina
    confere a identidade dos dados crus antes de devolver o arquivo).
-
 
 ## Adendo — branding 2026 (decisão do dono)
 

@@ -218,9 +218,10 @@ export default async function Admin({
           <p className="mt-1 mb-3 max-w-texto text-corpo text-tinta-media">
             Recalcula os pontos do gráfico de chance ANTERIORES ao primeiro registro ao vivo,
             rodando o mesmo modelo em cada data passada só com as pesquisas conhecidas até ali.
-            Apaga e regrava <b className="font-semibold text-tinta">apenas os pontos recalculados</b>{" "}
-            — retratos registrados no dia nunca são tocados. Use de novo sempre que uma pesquisa
-            antiga entrar na série: até lá, o tracejado fica desatualizado.
+            Apaga e regrava{" "}
+            <b className="font-semibold text-tinta">apenas os pontos recalculados</b> — retratos
+            registrados no dia nunca são tocados. Use de novo sempre que uma pesquisa antiga entrar
+            na série: até lá, o tracejado fica desatualizado.
           </p>
           <BotaoReconstituir />
         </Bloco>

@@ -60,7 +60,9 @@ function Dica({ active, payload }: PropsDica) {
         <span className="text-flavio">Flávio: {fTxt} em 100</span>
       </div>
       <div className="mt-1 text-tinta-media">
-        {pt.retro ? "calculado depois, com as pesquisas conhecidas até esta data" : "registrado no dia"}
+        {pt.retro
+          ? "calculado depois, com as pesquisas conhecidas até esta data"
+          : "registrado no dia"}
       </div>
     </MolduraDica>
   );

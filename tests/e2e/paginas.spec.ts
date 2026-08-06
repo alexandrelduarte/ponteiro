@@ -137,17 +137,18 @@ test.describe("páginas de apoio", () => {
     // §6.6.10 vale para o que se VÊ: no topo só o do cabeçalho; rolado, o do
     // cabeçalho sai de cena e o da barra assume (decisão do dono, DECISOES.md).
     const visiveis = (page: import("@playwright/test").Page) =>
-      page.locator('svg[viewBox="548 228 1240 1416"]').evaluateAll((els) =>
-        els.filter((el) => {
-          const r = el.getBoundingClientRect();
-          const dentro = r.bottom > 0 && r.top < window.innerHeight;
-          let no: Element | null = el;
-          while (no instanceof Element) {
-            if (Number(getComputedStyle(no).opacity) === 0) return false;
-            no = no.parentElement;
-          }
-          return dentro;
-        }).length,
+      page.locator('svg[viewBox="548 228 1240 1416"]').evaluateAll(
+        (els) =>
+          els.filter((el) => {
+            const r = el.getBoundingClientRect();
+            const dentro = r.bottom > 0 && r.top < window.innerHeight;
+            let no: Element | null = el;
+            while (no instanceof Element) {
+              if (Number(getComputedStyle(no).opacity) === 0) return false;
+              no = no.parentElement;
+            }
+            return dentro;
+          }).length,
       );
     for (const rota of ["/", "/historico", "/metodologia"]) {
       await page.goto(rota);

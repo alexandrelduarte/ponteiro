@@ -23,7 +23,7 @@
  * público de atualização.
  */
 import { LinkInterno } from "@/components/ui/blocos";
-import { ROTAS } from "@/app/_lib/site";
+import { ROTAS, ROTAS_INSTITUCIONAIS } from "@/app/_lib/site";
 
 export function Rodape() {
   return (
@@ -74,12 +74,24 @@ export function Rodape() {
           <b className="font-semibold">25/10/2026</b>.
         </p>
 
-        <nav aria-label="Todas as páginas" className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
-          {ROTAS.map((r) => (
-            <LinkInterno key={r.href} href={r.href} className="text-corpo font-semibold">
-              {r.titulo}
-            </LinkInterno>
-          ))}
+        <nav aria-label="Todas as páginas" className="mt-4">
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
+            {ROTAS.map((r) => (
+              <LinkInterno key={r.href} href={r.href} className="text-corpo font-semibold">
+                {r.titulo}
+              </LinkInterno>
+            ))}
+          </div>
+          {/* Institucionais: fora da barra fixa por medida (três itens), então
+              a porta de entrada é aqui — em `text-micro`, discretas de
+              propósito, mas em toda página pública. */}
+          <div className="mt-1 flex flex-wrap gap-x-6 gap-y-1">
+            {ROTAS_INSTITUCIONAIS.map((r) => (
+              <LinkInterno key={r.href} href={r.href} className="text-micro">
+                {r.titulo}
+              </LinkInterno>
+            ))}
+          </div>
         </nav>
       </div>
     </footer>

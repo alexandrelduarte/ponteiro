@@ -34,3 +34,13 @@ export const ROTAS = [
   { href: "/historico", titulo: "O que já mudou", prioridade: 0.7 },
   { href: "/metodologia", titulo: "Metodologia", prioridade: 0.6 },
 ] as const;
+
+/**
+ * Rotas institucionais — quem faz o site e a política de privacidade.
+ * FORA de `ROTAS` de propósito: a barra fixa tem três itens por medida
+ * (DESIGN-V2), então estas páginas vivem só no rodapé e no sitemap.
+ */
+export const ROTAS_INSTITUCIONAIS = [
+  { href: "/quem-somos", titulo: "Quem faz o PONTEIRO", prioridade: 0.3 },
+  { href: "/privacidade", titulo: "Privacidade", prioridade: 0.3 },
+] as const;

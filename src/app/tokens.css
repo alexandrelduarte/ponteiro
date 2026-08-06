@@ -78,6 +78,26 @@
   --color-flavio: #26418b; /* naval · L 0,399 · 9,50:1 placa · 8,11:1 bruma */
   --color-flavio-fundo: #dde3f2; /* chip de valor · L 0,916 · tinta 12,98:1 */
 
+  /* Rampa de MAGNITUDE do carmim — os degraus 2 e 3 do fundo, para as bandas
+     "por quanto" do cenário-base (cenario-base.tsx; DECISOES.md). É rampa
+     SEQUENCIAL do DADO (uma matiz, clareza caindo e croma subindo com a faixa
+     de diferença), não ênfase editorial: a banda existe só do lado que o
+     modelo bina. Medido (OKLCH · WCAG 2, mesmo script da Fase 7):
+       lula-fundo    #f7dce4 → degrau 1, já existia · L 0,919 C 0,032
+       lula-fundo-2  #f8bcc0 · L 0,851 C 0,069 h 14° · tinta sobre 10,28:1 ·
+                     anel carmim 3,81:1 · 1,62:1 placa
+       lula-fundo-3  #f4a0a7 · L 0,791 C 0,100 h 14° · tinta sobre 8,29:1 ·
+                     anel carmim 3,07:1 · 2,01:1 placa
+     ΔL adjacente 0,068 e 0,060 (piso 0,06 de rampa ordinal). O teto de
+     escuridão é o ANEL: o degrau mais fundo ainda recebe contorno carmim
+     (#be1745) com ≥3:1 de objeto gráfico quando a banda modal cair nele.
+     Preenchimento claro nunca informa sozinho — rótulo com direção+magnitude
+     acompanha cada banda (a régua de tinta separa as direções). Rampa naval
+     equivalente só entra no dia em que o modelo binar magnitudes do lado
+     Flávio (hoje ele não bina; criar tokens sem uso violaria R7). */
+  --color-lula-fundo-2: #f8bcc0;
+  --color-lula-fundo-3: #f4a0a7;
+
   /* ======================================================================
      4b. DEMAIS CANDIDATOS — a escala NEUTRA de exibição (Fase 7, B1)
      Carmim e naval são de Lula e de Flávio. Os outros sete nomes testados no

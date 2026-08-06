@@ -8,16 +8,22 @@
  * que o leitor deixou nas réguas. "Mais provável" não é "certo", e o texto diz
  * isso antes de qualquer número.
  *
- * A barra de bandas é monocromática no lilás da dúvida, com a banda modal em
- * ameixa (ameixa é o produto falando, não um lado) e a régua do empate exatamente
- * na fronteira entre "Flávio na frente" e "Lula por até 5": é a mesma gramática
- * do enxame, deitada. Cada pedaço carrega o rótulo e o número ao lado — a cor
- * nunca informa sozinha.
+ * A barra de bandas veste a cor do DADO (redesenho aprovado pelo dono — a
+ * versão monocromática foi reprovada; DECISOES.md): direção = família do
+ * candidato (naval à esquerda da régua, carmim à direita), magnitude = degrau
+ * da rampa de fundo (§4 de tokens.css — lula-fundo → fundo-2 → fundo-3, ΔL
+ * medido). Não é ênfase editorial num desfecho (R4/H9): é rampa sequencial do
+ * próprio dado, e ela só tem degraus do lado que o modelo bina. A banda modal
+ * é marcada por canal de FORMA — contorno de 2px na cor do candidato + chip
+ * "o mais provável" ancorado nela — nunca só por cor. A régua do empate é a
+ * mesma do enxame, deitada, na fronteira entre "Flávio na frente" e "Lula por
+ * até 5". Cada banda tem rótulo e número ancorados NELA (grid proporcional em
+ * sm+; lista com amostra de cor a 390) — a cor nunca informa sozinha.
  *
  * Condição do despacho (AUDITORIA §9.3): o título "do jeito que as pesquisas
  * medem" fica na MESMA dobra dos chips, nunca colapsado.
  */
-import { useMemo } from "react";
+import { useMemo, type CSSProperties } from "react";
 import { Bloco, Cabecalho, Colunas, Detalhe, Nicho, Subtitulo } from "@/components/ui/blocos";
 import { Termo } from "@/components/ui/glossario";
 import { emCem, inteiroEmCem } from "@/components/ui/textos";
@@ -31,6 +37,54 @@ const ROTULO_BANDA = [
   "Lula por 5 a 10",
   "Lula por mais de 10",
 ];
+
+/**
+ * Cor de cada banda, alinhada 1:1 com ROTULO_BANDA: direção = família do
+ * candidato, magnitude = degrau da rampa de fundo (tokens.css §4, contrastes
+ * calculados lá). `anel` é o contorno da banda modal — na cor do candidato,
+ * nunca em tinta: ≥3:1 sobre o próprio fundo em todos os degraus (7,39:1 no
+ * naval; 4,80 · 3,81 · 3,07:1 nos três carmins). Strings completas para o
+ * scanner do Tailwind.
+ */
+const ESTILO_BANDA = [
+  {
+    fundo: "bg-flavio-fundo",
+    borda: "border-flavio",
+    anel: "shadow-[inset_0_0_0_2px_var(--color-flavio)]",
+  },
+  {
+    fundo: "bg-lula-fundo",
+    borda: "border-lula",
+    anel: "shadow-[inset_0_0_0_2px_var(--color-lula)]",
+  },
+  {
+    fundo: "bg-lula-fundo-2",
+    borda: "border-lula",
+    anel: "shadow-[inset_0_0_0_2px_var(--color-lula)]",
+  },
+  {
+    fundo: "bg-lula-fundo-3",
+    borda: "border-lula",
+    anel: "shadow-[inset_0_0_0_2px_var(--color-lula)]",
+  },
+] as const;
+
+/** Amostra da legenda: o fundo da banda com a borda forte do lado (≥3:1 na placa). */
+function AmostraBanda({ indice, className }: { indice: number; className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={[
+        "inline-block h-2.5 w-2.5 shrink-0 rounded-[3px] border",
+        ESTILO_BANDA[indice].fundo,
+        ESTILO_BANDA[indice].borda,
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    />
+  );
+}
 
 export function CenarioBase() {
   const { M, params } = usePainel();
@@ -48,7 +102,17 @@ export function CenarioBase() {
   const pV2 = emCem(cen.pV2);
   const pV2Abs = inteiroEmCem(M.p2Tacontece * cen.pV2);
   const p1Direto = inteiroEmCem(cen.pDireto);
-  const larguraModal = cen.bandas.indexOf(cen.modal);
+
+  /* Geometria das bandas: índice da modal, fronteira da régua do empate e o
+     centro da banda modal (âncora do chip), tudo em % da largura da barra. */
+  const idxModal = cen.bandas.indexOf(cen.modal);
+  const fronteira = Math.max(cen.bandas[0].p * 100, 0);
+  const antesDaModal = cen.bandas.slice(0, idxModal).reduce((soma, banda) => soma + banda.p, 0);
+  const centroModal = (antesDaModal + cen.modal.p / 2) * 100;
+  const empateNaDireita = fronteira > 70;
+  const colunasBandas = cen.bandas
+    .map((b) => `minmax(0, ${Math.max(b.p, 0.001).toFixed(4)}fr)`)
+    .join(" ");
 
   return (
     <Bloco rotuladoPor="titulo-cenario-base">
@@ -108,27 +172,54 @@ export function CenarioBase() {
           De quanto pode ser a diferença no fim, do jeito que as pesquisas medem
         </Subtitulo>
 
-        {/* A régua, rotulada — ela aparecia aqui sem nome nenhum, e é a mesma
-            do enxame. */}
-        <p className="relative mt-3 h-5 text-micro text-tinta-media">
+        {/* O chip da banda modal, ancorado no CENTRO dela. O clamp em rem
+            impede o chip de vazar da placa a 390 (vazamento aqui viraria
+            rolagem horizontal da página). aria-hidden: a mesma informação
+            está na legenda (" — o mais provável"), que o leitor de tela já
+            recebe — o chip é reforço visual, não conteúdo novo. */}
+        <div aria-hidden="true" className="relative mt-3 h-7">
           <span
-            className="absolute -translate-x-1/2 font-semibold whitespace-nowrap text-tinta"
-            style={{ left: `${Math.max(cen.bandas[0].p * 100, 0)}%` }}
+            className={[
+              "absolute bottom-0 -translate-x-1/2 rounded-plena border-2 bg-placa px-2.5 py-0.5",
+              "text-micro font-semibold whitespace-nowrap text-tinta",
+              ESTILO_BANDA[idxModal].borda,
+            ].join(" ")}
+            style={{ left: `clamp(3.75rem, ${centroModal}%, calc(100% - 3.75rem))` }}
+          >
+            o mais provável
+          </span>
+        </div>
+
+        {/* O rótulo "empate" ENCOSTADO na régua: o traço de 3px do rótulo tem
+            o mesmo x e a mesma largura da régua de tinta dentro da barra — um
+            traço contínuo, não um texto flutuando. Se a fronteira migrar para
+            a ponta direita (réguas do leitor), o rótulo troca de lado. */}
+        <p className="relative mt-1 h-5 text-micro">
+          <span
+            className={[
+              "absolute inset-y-0 flex items-center font-semibold whitespace-nowrap text-tinta",
+              empateNaDireita
+                ? "-translate-x-full border-r-[3px] border-tinta pr-1.5"
+                : "border-l-[3px] border-tinta pl-1.5",
+            ].join(" ")}
+            style={{
+              left: empateNaDireita ? `calc(${fronteira}% + 1.5px)` : `calc(${fronteira}% - 1.5px)`,
+            }}
           >
             empate
           </span>
         </p>
 
-        {/* Quatro pedaços CONTÍGUOS: eles somam 100, e a folga de 3px entre
-            eles quebrava justamente a leitura de proporção. O que separa um do
-            outro é um filete da cor da placa, de 1px, que não rouba largura
-            perceptível.
-            Todos no MESMO lilás da dúvida: dar campo ameixa cheio só ao pedaço
-            modal punha ênfase visual num desfecho e não no outro (R4/H9). O
-            modal é marcado por contorno de tinta — canal de forma, não de cor
-            — e nomeado na lista logo abaixo. */}
+        {/* Quatro bandas CONTÍGUAS (somam 100): a DIREÇÃO é a família de cor
+            do candidato e a posição contra a régua; a MAGNITUDE é o degrau da
+            rampa de fundo (tokens.css §4). O que separa uma banda da outra é
+            um vão de placa de 2px — vão, não traço. O fio de contorno desenha
+            o limite da barra: fundo claro não segura a forma sozinho contra a
+            placa (mesma doutrina da faixa da dúvida, §6 dos tokens). A banda
+            modal ganha o anel de 2px na cor do candidato — canal de forma por
+            cima da cor, nunca tinta preta. */}
         <div
-          className="relative flex h-7 w-full overflow-hidden rounded-plena"
+          className="relative flex h-8 w-full overflow-hidden rounded-plena border border-contorno"
           role="img"
           aria-label={cen.bandas
             .map((b, i) => `${ROTULO_BANDA[i]}: ${emCem(b.p)} em 100`)
@@ -138,8 +229,9 @@ export function CenarioBase() {
             <div
               key={ROTULO_BANDA[i]}
               className={[
-                "h-full border-r border-placa bg-faixa last:border-r-0",
-                i === larguraModal ? "shadow-[inset_0_0_0_2px_var(--color-tinta)]" : "",
+                "h-full border-r-2 border-placa last:border-r-0",
+                ESTILO_BANDA[i].fundo,
+                i === idxModal ? ESTILO_BANDA[i].anel : "",
               ].join(" ")}
               style={{ width: `${Math.max(b.p * 100, 0)}%` }}
             />
@@ -150,17 +242,33 @@ export function CenarioBase() {
           <span
             aria-hidden="true"
             className="absolute inset-y-0 w-[3px] -translate-x-1/2 bg-tinta"
-            style={{ left: `${Math.max(cen.bandas[0].p * 100, 0)}%` }}
+            style={{ left: `${fronteira}%` }}
           />
         </div>
 
-        <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-micro text-tinta-media">
+        {/* Legenda ANCORADA: em sm+ o grid repete as proporções das bandas e
+            cada rótulo cai debaixo do seu pedaço; a 390 vira lista vertical.
+            Nas duas formas a amostra de cor liga o rótulo à banda — e o texto
+            continua dizendo direção e magnitude com todas as letras. */}
+        <ul
+          className={[
+            "mt-2 grid grid-cols-1 gap-y-1.5 text-micro text-tinta-media",
+            "sm:gap-y-1 sm:[grid-template-columns:var(--colunas-bandas)]",
+          ].join(" ")}
+          style={{ "--colunas-bandas": colunasBandas } as CSSProperties}
+        >
           {cen.bandas.map((b, i) => (
-            <li key={ROTULO_BANDA[i]} className="numeros">
-              {ROTULO_BANDA[i]}: <b className="font-semibold text-tinta">{emCem(b.p)} em 100</b>
-              {i === larguraModal ? (
-                <span className="font-semibold text-tinta"> — o mais provável</span>
-              ) : null}
+            <li
+              key={ROTULO_BANDA[i]}
+              className="numeros flex items-start gap-1.5 sm:min-w-0 sm:pr-3"
+            >
+              <AmostraBanda indice={i} className="mt-1" />
+              <span className="min-w-0">
+                {ROTULO_BANDA[i]}: <b className="font-semibold text-tinta">{emCem(b.p)} em 100</b>
+                {i === idxModal ? (
+                  <span className="font-semibold text-tinta"> — o mais provável</span>
+                ) : null}
+              </span>
             </li>
           ))}
         </ul>

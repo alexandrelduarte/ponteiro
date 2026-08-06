@@ -25,7 +25,7 @@ depois mostra o número.**
 | Identidade          | ameixa `#5A3A66` sobre bruma-ameixa `#EFECF1`, placa branca, tinta `#211C26`                             |
 | Candidatos          | carmim Lula `#BE1745` (OKLCH L 0,518) × naval Flávio `#26418B` (L 0,399) — ΔL 0,119                      |
 | Atenção             | âmbar-queimado `#8F5407`, usado como TINTA (nunca como campo cheio)                                      |
-| Tipografia          | Newsreader variável/opsz (display, só corpo grande; branding 2026) + Lexend (todo o resto)                                  |
+| Tipografia          | Newsreader variável/opsz (display, só corpo grande; branding 2026) + Lexend (todo o resto)               |
 | Layout              | blocos-conversa, raio 24, sem borda; hierarquia por tinta de fundo, não por moldura                      |
 | Elemento-assinatura | **O ENXAME DE 100** — quantile dotplot sobre a régua da diferença, com a coluna do zero chamada "empate" |
 | Motion              | as bolinhas caem e assentam (300 ms, `translateY`+`opacity`, escalonado por coluna)                      |

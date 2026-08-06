@@ -24,7 +24,9 @@ test.describe("barra de navegação", () => {
       ["/metodologia", "Metodologia"],
     ] as const) {
       await page.goto(rota);
-      const ativa = page.getByRole("navigation", { name: "Páginas do site" }).locator("[aria-current='page']");
+      const ativa = page
+        .getByRole("navigation", { name: "Páginas do site" })
+        .locator("[aria-current='page']");
       await expect(ativa).toHaveText(rotulo);
       expect(await ativa.count()).toBe(1);
     }
@@ -38,7 +40,10 @@ test.describe("barra de navegação", () => {
       .getByRole("link")
       .evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)));
     expect(new Set(tops).size, `tops distintos: ${tops.join(", ")}`).toBe(1);
-    const larguras = await nav.evaluate((el) => ({ scroll: el.scrollWidth, cliente: el.clientWidth }));
+    const larguras = await nav.evaluate((el) => ({
+      scroll: el.scrollWidth,
+      cliente: el.clientWidth,
+    }));
     expect(larguras.scroll).toBeLessThanOrEqual(larguras.cliente);
     // Nenhum rótulo pode quebrar DENTRO da pílula (regressão real pega ao
     // vivo quando o símbolo entrou na barra e roubou largura a 390).

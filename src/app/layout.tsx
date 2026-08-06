@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Lexend, Newsreader } from "next/font/google";
 import "./globals.css";
@@ -97,6 +98,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           {children}
         </div>
         <Rodape />
+        {/* Medição de audiência AGREGADA e SEM COOKIE (Vercel Web Analytics):
+            first-party (/_vercel/insights, dentro da CSP), nenhum visitante é
+            identificado individualmente. Declarado em /privacidade.
+            Só na infraestrutura da Vercel: em `next start` local o script não
+            existe (404 de console que derrubava a suíte e2e inteira). */}
+        {process.env.VERCEL ? <Analytics /> : null}
         <JsonLd
           dados={{
             "@context": "https://schema.org",

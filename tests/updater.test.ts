@@ -332,9 +332,7 @@ describe("textoDaResposta (parser do formato OpenAI Responses)", () => {
   });
 
   it("resposta sem message (só raciocínio/buscas) vira string vazia", () => {
-    expect(
-      textoDaResposta([{ type: "reasoning" }, { type: "web_search_call" }]),
-    ).toBe("");
+    expect(textoDaResposta([{ type: "reasoning" }, { type: "web_search_call" }])).toBe("");
   });
 
   it("formas hostis não derrubam: não-array, itens nulos, content errado", () => {

@@ -50,4 +50,20 @@ test.describe("barra de navegação", () => {
     await page.keyboard.press("Enter");
     await expect(page.locator("#conteudo")).toBeFocused();
   });
+
+  test("o símbolo entra na barra quando ela descola — e volta a sumir no topo", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const simboloBarra = page
+      .getByRole("navigation", { name: "Páginas do site" })
+      .locator("a[href='/']")
+      .first();
+    await expect(simboloBarra).toHaveAttribute("aria-hidden", "true");
+    await page.evaluate(() => window.scrollTo(0, 1200));
+    await expect(simboloBarra).not.toHaveAttribute("aria-hidden", "true");
+    await expect(simboloBarra).toHaveAccessibleName(/PONTEIRO/);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(simboloBarra).toHaveAttribute("aria-hidden", "true");
+  });
 });

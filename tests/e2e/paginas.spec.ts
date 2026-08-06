@@ -132,12 +132,29 @@ test.describe("páginas de apoio", () => {
     expect(Math.max(...larguras)).toBeLessThanOrEqual(520);
   });
 
-  test("o símbolo da marca aparece uma vez por tela", async ({ page }) => {
+  test("no máximo UM símbolo da marca visível por tela (handoff do bastão)", async ({ page }) => {
+    // O símbolo existe 2× no DOM (cabeçalho de marca + barra sticky), mas
+    // §6.6.10 vale para o que se VÊ: no topo só o do cabeçalho; rolado, o do
+    // cabeçalho sai de cena e o da barra assume (decisão do dono, DECISOES.md).
+    const visiveis = (page: import("@playwright/test").Page) =>
+      page.locator('svg[viewBox="548 228 1240 1416"]').evaluateAll((els) =>
+        els.filter((el) => {
+          const r = el.getBoundingClientRect();
+          const dentro = r.bottom > 0 && r.top < window.innerHeight;
+          let no: Element | null = el;
+          while (no instanceof Element) {
+            if (Number(getComputedStyle(no).opacity) === 0) return false;
+            no = no.parentElement;
+          }
+          return dentro;
+        }).length,
+      );
     for (const rota of ["/", "/historico", "/metodologia"]) {
       await page.goto(rota);
-      // O símbolo é o único SVG com este viewBox; MARCA.md §6.6.10.
-      const simbolos = page.locator('svg[viewBox="548 228 1240 1416"]');
-      expect(await simbolos.count(), `símbolo repetido em ${rota}`).toBe(1);
+      expect(await visiveis(page), `no topo de ${rota}`).toBe(1);
+      await page.evaluate(() => window.scrollTo(0, 1200));
+      await page.waitForTimeout(250);
+      expect(await visiveis(page), `rolado em ${rota}`).toBe(1);
     }
   });
 });

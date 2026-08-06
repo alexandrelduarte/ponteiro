@@ -484,3 +484,9 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
   placa bruma #EFECF1 (espelho de token, não off-white órfão); DESIGN-V2 §10 e MARCA
   §6.2/6.3 reescritos com os contrastes novos; anotações residuais da ameixa velha
   corrigidas em tokens.css.
+- Símbolo na barra sticky (pedido do dono): o "bastão da marca" — o símbolo aparece na
+  barra APENAS quando ela descola (o cabeçalho de marca já rolou embora), com transição
+  só de opacity, aria-hidden/tabIndex −1 enquanto invisível, e link de volta ao início.
+  §6.6.10 preservado no que importa: nunca dois símbolos VISÍVEIS — o e2e da regra foi
+  reescrito para medir visibilidade real (viewport + opacity computada), não contagem de
+  DOM. `Simbolo` extraído para `simbolo.tsx` (evita ciclo marca ⇄ barra-nav).

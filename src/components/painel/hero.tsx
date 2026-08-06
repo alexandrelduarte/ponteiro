@@ -166,7 +166,10 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
             Cada bolinha é um resultado possível: nenhuma é o resultado —{" "}
             <b className="font-semibold text-tinta">até outubro isso ainda pode mudar</b>. Aqui, só
             a decisão de 25 de outubro: {nLula} do lado de Lula, {nFlavio} do lado de Flávio.{" "}
-            <b className="font-semibold text-tinta">
+            {/* A 390 o negrito alargava a legenda e estourava a dobra travada —
+                o destaque da ponte é ganho de DESKTOP (onde o tropeço 84×82
+                nasce do bater de olho); no piso, o texto segue como sempre. */}
+            <b className="font-normal text-tinta-media md:font-semibold md:text-tinta">
               Em {p1tDef} de cada 100 cenários não há 2º turno; esses entram na frase de cima, que
               dá {eleitoL} e {eleitoF}.
             </b>

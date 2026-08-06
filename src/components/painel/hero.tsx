@@ -165,9 +165,11 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
           >
             Cada bolinha é um resultado possível: nenhuma é o resultado —{" "}
             <b className="font-semibold text-tinta">até outubro isso ainda pode mudar</b>. Aqui, só
-            a decisão de 25 de outubro: {nLula} do lado de Lula, {nFlavio} do lado de Flávio. Em{" "}
-            {p1tDef} de cada 100 cenários não há 2º turno; esses entram na frase de cima, que dá{" "}
-            {eleitoL} e {eleitoF}.
+            a decisão de 25 de outubro: {nLula} do lado de Lula, {nFlavio} do lado de Flávio.{" "}
+            <b className="font-semibold text-tinta">
+              Em {p1tDef} de cada 100 cenários não há 2º turno; esses entram na frase de cima, que
+              dá {eleitoL} e {eleitoF}.
+            </b>
           </p>
 
           {/* 6. "Não é previsão" — nunca some a 390px (H4), e §5.1 pede os seis

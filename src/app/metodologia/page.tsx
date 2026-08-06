@@ -311,6 +311,9 @@ export default async function Metodologia() {
                     pesquisa de {fmtData(p.inicio)}–{fmtData(p.fim)}/2026
                   </span>
                   <span className="text-tinta-media">{registroTse(p.tse)}</span>
+                  {p.contratante ? (
+                    <span className="text-tinta-media">contratante: {p.contratante}</span>
+                  ) : null}
                 </li>
               ))}
             </ul>

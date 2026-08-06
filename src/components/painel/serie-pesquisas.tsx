@@ -104,6 +104,10 @@ function DetalheRegistro({ l, rotulo }: { l: LinhaModelo; rotulo?: string }) {
         {inteiroBr(l.n)} pessoas ouvidas · folga da medida de {fmt(l.moe)} pontos · registro no TSE{" "}
         {registroTse(l.tse)} · peso na média de hoje: {fmt(l.w, 2)}.
       </p>
+      {/* Contratante: item obrigatório de divulgação (Res.-TSE 23.600, art. 10,
+          "se for o caso, de quem contratou") — o dado sempre existiu no seed;
+          faltava renderizar (auditoria de conformidade, DECISOES.md). */}
+      {l.contratante ? <p className="mt-1">Contratante: {l.contratante}.</p> : null}
       {/* O 1º turno desceu da tabela para cá junto com as outras colunas
           secundárias: ele é ficha da pesquisa, não a resposta da seção. */}
       <p className="mt-3 numeros">
@@ -118,6 +122,11 @@ function DetalheRegistro({ l, rotulo }: { l: LinhaModelo; rotulo?: string }) {
           <LinkExterno href={l.fonte}>{ACOES.verFonte}</LinkExterno>
         </p>
       ) : null}
+      <p className="mt-1">
+        <LinkExterno href="https://www.tse.jus.br/eleicoes/pesquisa-eleitorais/consulta-as-pesquisas-registradas">
+          Conferir o registro no site do TSE
+        </LinkExterno>
+      </p>
     </Revelador>
   );
 }

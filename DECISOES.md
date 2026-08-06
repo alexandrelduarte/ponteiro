@@ -517,3 +517,30 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
 - **Costura**: o 1º ponto registrado é duplicado nas séries tracejada e cheia
   (`connectNulls={false}`) para a emenda ser exata na fronteira; tudo-retroativo (estado
   transitório) → sem ReferenceLine, tudo tracejado.
+
+## Auditoria de conformidade eleitoral/legal (3 frentes + 16 alegações verificadas em fonte oficial)
+
+- **Veredito**: a operação atual NÃO configura crime nem infração eleitoral. Registro (Lei
+  9.504 art. 33) é dever de quem REALIZA a pesquisa; republicar pesquisa registrada citando
+  o registro não exige registro próprio; o crime do §4º é divulgação FRAUDULENTA (dolo);
+  a multa do §3º (até R$ 106 mil) alcança o divulgador de pesquisa SEM registro — por isso o
+  gate humano confere o registro antes de publicar (R3 é também blindagem legal). Norma
+  vigente 2026: Res.-TSE 23.600/2019 com Res. 23.747/2026; sem regra específica para
+  agregadores/modelos. ADI 3.741/STF: divulgação livre até o dia da eleição (boca de urna só
+  após 17h — o coletor nunca incorpora coleta do próprio dia).
+- **Correções de conformidade aplicadas**: contratante agora VISÍVEL na folha de detalhe de
+  cada pesquisa e na lista da /metodologia (art. 10: item obrigatório de divulgação; o dado
+  sempre existiu, faltava renderizar) + link "conferir o registro no site do TSE" em cada
+  folha. Pendências registradas: nível de confiança por pesquisa (art. 10) exige coleta
+  manual no PesqEle — item aberto; completar o nº de registro da dataf-mar; trocar fontes
+  Yahoo/AOL por publicação original.
+- **Open source como blindagem**: repo público + LICENSE **AGPL-3.0** (fork que rodar
+  modificado é obrigado a publicar o fonte — §13 — adulteração silenciosa do modelo é
+  impossível de esconder) + TRADEMARKS.md (nome/logo/domínio NÃO licenciados, AGPL §7e).
+  MIT rejeitada (silente sobre marca, sem copyleft de rede).
+- **Decisão estrutural permanente: o site NUNCA terá comentários/UGC** — evita por
+  construção o regime de responsabilidade por conteúdo de terceiros pós-Tema 987/STF.
+- **Pendências institucionais (dependem dos donos)**: /quem-somos + /privacidade + política
+  de correções (conteúdo pessoal: nomes como querem ser exibidos, e-mail de contato
+  dedicado); depósito da marca no INPI (sistema atributivo — sem INPI o TRADEMARKS é aviso
+  moral); revisão por advogado(a) eleitoralista antes do período crítico.

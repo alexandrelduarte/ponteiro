@@ -333,3 +333,17 @@ node scripts/qa/screenshots.mjs 5  # prints de todas as seções em 390/768/1440
 | `DECISOES.md`                     | toda decisão ambígua: contexto → decisão → porquê                |
 | `docs/INVENTARIO.md`              | checklist de paridade com o protótipo                            |
 | `docs/DESIGN.md`                  | sistema de design ("boletim de urna")                            |
+
+## Licença, marca e transparência
+
+- **Código**: [AGPL-3.0](LICENSE). Quem rodar versão modificada como serviço é obrigado a
+  publicar o fonte modificado (§13) — a adulteração silenciosa do modelo é impossível de
+  esconder por construção.
+- **Marca**: o nome PONTEIRO, o logo e o domínio NÃO são licenciados — ver
+  [TRADEMARKS.md](TRADEMARKS.md).
+- **Conformidade eleitoral**: o site só republica pesquisas REGISTRADAS no TSE (Lei
+  9.504/1997, art. 33; Res.-TSE 23.600/2019 com Res. 23.747/2026), sempre com número de
+  registro, instituto, contratante, período de campo, amostra e margem — e o modelo
+  probabilístico é rotulado em toda superfície como cálculo próprio, **não pesquisa, não
+  previsão**. Não há dever legal de registro para quem REPUBLICA pesquisa registrada (a
+  obrigação do art. 33 é de quem REALIZA).

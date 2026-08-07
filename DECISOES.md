@@ -615,3 +615,23 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
 - **/embed**: route handler puro (HTML autocontido ~2 KB, zero JS), frequência via parEmCem,
   atribuição-ressalva inseparável do número (§14.5.4); é a ÚNICA rota emoldurável — o header
   global (X-Frame-Options DENY) passou a excluir só ela.
+
+## Bloco "Quando saem as próximas pesquisas?" (home, ordem do dono)
+
+- Duas fontes que o bloco NUNCA mistura: ritmo por instituto (estimativa da nossa própria
+  base) e calendário oficial (datas de lei — art. 11 e 36 da 9.504 + turnos), com contagem
+  de dias em America/Sao_Paulo e linhas que somem sozinhas quando a data passa.
+- **Veto de cálculo do carimbo (§15.1) acatado**: a mediana da série inteira publicava
+  "Quaest — próxima 13/10" (depois do 1º turno) porque o intervalo de 148 dias de janeiro
+  envenenava a conta. Regra vigente: mediana dos intervalos iniciados na JANELA DE 120 DIAS;
+  elegível = 2+ pesquisas na janela; com 1 intervalo entra a variante "a anterior saiu N
+  dias antes" (padrão de um dado não é padrão); estimativa depois de 25/10 não é publicada.
+- **Tradução registrada (VOZ §3)**: "ritmo" = mediana dos intervalos na janela. O que
+  "ritmo" NÃO pode dizer: que existe compromisso, agenda ou regularidade garantida. A
+  palavra "mediana" é banida em superfície (§5.1) — a conta completa vive na /metodologia
+  (entrada técnica nova).
+- Passar da estimada NÃO é anomalia (é o esperado em metade das esperas, por definição de
+  mediana) — por isso a copy diz "pelo ritmo, uma nova pode sair a qualquer momento", nunca
+  "vinha publicando" (imperfeito que insinua quebra).
+- Automação: puro sobre (pesquisas, hojeMs) + ISR 300 — o bloco envelhece sozinho; pesquisa
+  nova aprovada → serieMudou já revalida a home → ritmos recalculam.

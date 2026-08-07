@@ -20,6 +20,7 @@ import { Suspense } from "react";
 import { PARAMS_PADRAO } from "@/data/constantes";
 import { getFrescor, getPesquisasPublicadas } from "@/lib/dados";
 import { rodarModelo } from "@/lib/modelo";
+import { computarProximas } from "@/lib/proximas";
 import { Secao } from "@/components/ui/blocos";
 import { JsonLd } from "@/components/site/json-ld";
 import { CenarioBase } from "@/components/painel/cenario-base";
@@ -31,6 +32,7 @@ import { FaixaSimulacao } from "@/components/painel/faixa-simulacao";
 import { Frente } from "@/components/painel/frente";
 import { Hero } from "@/components/painel/hero";
 import { MetodologiaResumo } from "@/components/painel/metodologia-resumo";
+import { ProximasPesquisas } from "@/components/painel/proximas";
 import { OutrosCandidatos } from "@/components/painel/outros-candidatos";
 import { PainelProvider } from "@/components/painel/estado";
 import { Parametros } from "@/components/painel/parametros";
@@ -109,6 +111,10 @@ export default async function Painel() {
 
           <Secao>
             <MetodologiaResumo />
+          </Secao>
+
+          <Secao>
+            <ProximasPesquisas proximas={computarProximas(pesquisas, hojeMs)} />
           </Secao>
         </PainelProvider>
       </main>

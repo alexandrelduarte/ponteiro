@@ -34,6 +34,8 @@ export interface Pesquisa {
   t2: Placar;
   /** URL da fonte; null quando indisponível */
   fonte: string | null;
+  /** URL pública da ficha (/pesquisas/[slug]) — apresentação; o modelo ignora. */
+  slug?: string;
   /** marcações de origem usadas pela UI de simulação */
   usuario?: boolean;
   auto?: boolean;

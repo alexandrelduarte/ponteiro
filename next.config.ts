@@ -141,7 +141,10 @@ const nextConfig: NextConfig = {
   // Não anuncia a stack para quem varre a internet atrás de versão vulnerável.
   poweredByHeader: false,
   async headers() {
-    return [{ source: "/:path*", headers: cabecalhosSeguranca }];
+    // /embed é a ÚNICA rota que pode ser emoldurada (widget de imprensa):
+    // ela define os próprios cabeçalhos no route handler (CSP com
+    // frame-ancestors *). Todo o resto mantém X-Frame-Options DENY.
+    return [{ source: "/((?!embed$).*)", headers: cabecalhosSeguranca }];
   },
 };
 

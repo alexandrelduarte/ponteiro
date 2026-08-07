@@ -14,6 +14,7 @@
  */
 import type { ParamsModelo, Pesquisa, Placar } from "@/data/tipos";
 import pesquisasSeedJson from "@/data/pesquisas.seed.json";
+import { slugInstituto, slugPesquisa } from "@/lib/slug";
 import institutosSeedJson from "@/data/institutos.seed.json";
 import { criarClientePublico, supabaseConfigurado } from "@/lib/supabase/publico";
 
@@ -43,6 +44,18 @@ const SEED_INSTITUTOS = institutosSeedJson as unknown as {
   aliases: string[];
 }[];
 
+/** nome (ou alias) do instituto → id estável, para o slug do seed. */
+const ID_POR_NOME = new Map<string, string>(
+  SEED_INSTITUTOS.flatMap((i) => [
+    [i.nome, i.id] as const,
+    ...i.aliases.map((a) => [a, i.id] as const),
+  ]),
+);
+
+function institutoIdDoNome(nome: string): string {
+  return ID_POR_NOME.get(nome) ?? slugInstituto(nome);
+}
+
 /** Seed local tipado como `Pesquisa[]` (cópia defensiva a cada chamada). */
 export function pesquisasDoSeed(): Pesquisa[] {
   return SEED_PESQUISAS.map((p) => ({
@@ -58,6 +71,7 @@ export function pesquisasDoSeed(): Pesquisa[] {
     ...(p.outros1 ? { outros1: { ...p.outros1 } } : {}),
     t2: { lula: p.t2.lula, flavio: p.t2.flavio, bnns: p.t2.bnns },
     fonte: p.fonte,
+    slug: slugPesquisa(institutoIdDoNome(p.instituto), p.fim),
   }));
 }
 
@@ -227,6 +241,7 @@ function linhaParaPesquisa(linha: LinhaPesquisa, nomes: Map<string, string>): Pe
     ...(outros1 ? { outros1 } : {}),
     t2: { lula: l2, flavio: f2, bnns: numero(linha.t2_bnns) },
     fonte: linha.fonte_url,
+    slug: slugPesquisa(linha.instituto_id, linha.campo_fim),
     ...(linha.origem === "auto" ? { auto: true as const } : {}),
   };
 }
@@ -274,6 +289,72 @@ export async function getPesquisasPublicadas(): Promise<Pesquisa[]> {
     console.error("[dados] getPesquisasPublicadas caiu para o seed:", erro);
     return pesquisasDoSeed();
   }
+}
+
+/** Ficha pública de uma pesquisa — o insumo de /pesquisas/[slug] e do sitemap. */
+export interface FichaPesquisa {
+  pesquisa: Pesquisa;
+  institutoId: string;
+  slug: string;
+  /** quando entrou na série oficial — o lastmod VERDADEIRO da ficha */
+  publicadoEm: string | null;
+  criadoEm: string | null;
+}
+
+function fichaDoSeed(p: Pesquisa): FichaPesquisa {
+  const slug = p.slug ?? slugPesquisa(institutoIdDoNome(p.instituto), p.fim);
+  return {
+    pesquisa: p,
+    institutoId: slug.slice(0, -11),
+    slug,
+    publicadoEm: null,
+    criadoEm: null,
+  };
+}
+
+/** Todas as fichas publicadas (banco → seed em fallback, R8), fim desc. */
+export async function getFichasPesquisas(): Promise<FichaPesquisa[]> {
+  const supabase = criarClientePublico();
+  if (!supabase) return pesquisasDoSeed().map(fichaDoSeed);
+  try {
+    const [pesquisas, institutos] = await Promise.all([
+      supabase
+        .from("pesquisas")
+        .select(COLUNAS_PESQUISA)
+        .eq("status", "publicada")
+        .order("campo_fim", { ascending: false })
+        .returns<LinhaPesquisa[]>(),
+      supabase.from("institutos").select("id,nome,aliases").returns<LinhaInstituto[]>(),
+    ]);
+    if (pesquisas.error) throw new Error(pesquisas.error.message);
+    if (!pesquisas.data?.length) return pesquisasDoSeed().map(fichaDoSeed);
+    const nomes = new Map<string, string>(
+      (institutos.data ?? SEED_INSTITUTOS).map((i) => [i.id, i.nome]),
+    );
+    const fichas = pesquisas.data
+      .map((l): FichaPesquisa | null => {
+        const p = linhaParaPesquisa(l, nomes);
+        if (!p) return null;
+        return {
+          pesquisa: p,
+          institutoId: l.instituto_id,
+          slug: slugPesquisa(l.instituto_id, l.campo_fim),
+          publicadoEm: l.publicado_em ?? null,
+          criadoEm: l.criado_em ?? null,
+        };
+      })
+      .filter((f): f is FichaPesquisa => f !== null);
+    return fichas.length ? fichas : pesquisasDoSeed().map(fichaDoSeed);
+  } catch (erro) {
+    console.error("[dados] getFichasPesquisas caiu para o seed:", erro);
+    return pesquisasDoSeed().map(fichaDoSeed);
+  }
+}
+
+/** Ficha por slug — `null` quando não existe (vira 404 na rota). */
+export async function getFichaPorSlug(slug: string): Promise<FichaPesquisa | null> {
+  const fichas = await getFichasPesquisas();
+  return fichas.find((f) => f.slug === slug) ?? null;
 }
 
 /**

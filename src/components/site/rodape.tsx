@@ -23,7 +23,7 @@
  * público de atualização.
  */
 import { LinkInterno } from "@/components/ui/blocos";
-import { ROTAS, ROTAS_INSTITUCIONAIS } from "@/app/_lib/site";
+import { ROTA_PESQUISAS, ROTAS, ROTAS_INSTITUCIONAIS } from "@/app/_lib/site";
 
 export function Rodape() {
   return (
@@ -76,7 +76,7 @@ export function Rodape() {
 
         <nav aria-label="Todas as páginas" className="mt-4">
           <div className="flex flex-wrap gap-x-6 gap-y-2">
-            {ROTAS.map((r) => (
+            {[...ROTAS, ROTA_PESQUISAS].map((r) => (
               <LinkInterno key={r.href} href={r.href} className="text-corpo font-semibold">
                 {r.titulo}
               </LinkInterno>

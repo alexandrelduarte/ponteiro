@@ -11,11 +11,11 @@ import { describe, expect, it, vi } from "vitest";
 // `server-only` lança fora do bundler do Next; aqui ele é só um marcador.
 vi.mock("server-only", () => ({}));
 
+import { slugInstituto } from "@/lib/slug";
 import {
   dataValida,
   extrairArrayJSON,
   processarRespostaIA,
-  slugInstituto,
   textoDaResposta,
   type ContextoBusca,
 } from "@/lib/updater";

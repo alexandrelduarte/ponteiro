@@ -33,6 +33,11 @@ export const metadata: Metadata = {
     "instituto, as duas chances (hoje e no dia da votação), a classificação dos cenários, as " +
     "limitações conhecidas e todas as fontes.",
   alternates: { canonical: "/metodologia" },
+  openGraph: {
+    title: "Metodologia",
+    url: "/metodologia",
+  },
+  twitter: { title: "Metodologia" },
 };
 
 /** Só visível no modo "explicação simples". */
@@ -325,7 +330,14 @@ export default async function Metodologia() {
                     key={p.id}
                     className="flex min-h-toque flex-wrap items-center gap-x-4 gap-y-0.5 py-1"
                   >
-                    {p.fonte ? (
+                    {p.slug ? (
+                      <LinkInterno
+                        href={`/pesquisas/${p.slug}`}
+                        className="text-micro whitespace-nowrap"
+                      >
+                        {p.instituto}
+                      </LinkInterno>
+                    ) : p.fonte ? (
                       <LinkExterno href={p.fonte} className="whitespace-nowrap">
                         {p.instituto}
                       </LinkExterno>

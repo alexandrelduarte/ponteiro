@@ -44,18 +44,17 @@ export const metadata: Metadata = {
   description: DESCRICAO_PADRAO,
   applicationName: NOME_SITE,
   generator: "Next.js",
-  keywords: [
-    "PONTEIRO",
-    "pesquisas eleitorais",
-    "eleições 2026",
-    "presidente 2026",
-    "agregador de pesquisas",
-    "Lula",
-    "Flávio Bolsonaro",
-    "TSE",
-    "intenção de voto",
-  ],
   authors: [{ name: NOME_SITE }],
+  ...(process.env.GOOGLE_SITE_VERIFICATION || process.env.MSVALIDATE
+    ? {
+        verification: {
+          ...(process.env.GOOGLE_SITE_VERIFICATION
+            ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+            : {}),
+          ...(process.env.MSVALIDATE ? { other: { "msvalidate.01": process.env.MSVALIDATE } } : {}),
+        },
+      }
+    : {}),
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
@@ -107,13 +106,26 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <JsonLd
           dados={{
             "@context": "https://schema.org",
+            "@type": "Organization",
+            "@id": `${URL_SITE}#org`,
+            name: NOME_SITE,
+            url: URL_SITE,
+            logo: `${URL_SITE}/brand/simbolo-512.png`,
+            sameAs: ["https://github.com/alexandrelduarte/ponteiro"],
+            description: NOME_DESCRITIVO,
+          }}
+        />
+        <JsonLd
+          dados={{
+            "@context": "https://schema.org",
             "@type": "WebSite",
             name: NOME_SITE,
             alternateName: NOME_DESCRITIVO,
             slogan: TAGLINE,
-            url: `${URL_SITE}/`,
+            url: URL_SITE,
             inLanguage: "pt-BR",
             description: DESCRICAO_PADRAO,
+            publisher: { "@id": `${URL_SITE}#org` },
           }}
         />
       </body>

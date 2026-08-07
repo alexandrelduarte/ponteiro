@@ -21,7 +21,7 @@ export const TAGLINE = "Para onde apontam as pesquisas.";
 /** Só para metadado e busca — nunca renderizado como texto de tela. */
 export const NOME_DESCRITIVO = "Agregador de pesquisas presidenciais 2026";
 
-export const TITULO_PADRAO = "PONTEIRO — Lula × Flávio Bolsonaro";
+export const TITULO_PADRAO = "Pesquisas Presidente 2026: Lula × Flávio Bolsonaro — PONTEIRO";
 
 export const DESCRICAO_PADRAO =
   "PONTEIRO: para onde apontam as pesquisas registradas no TSE para a eleição presidencial " +
@@ -40,6 +40,13 @@ export const ROTAS = [
  * FORA de `ROTAS` de propósito: a barra fixa tem três itens por medida
  * (DESIGN-V2), então estas páginas vivem só no rodapé e no sitemap.
  */
+/** Diretório das fichas por pesquisa — rodapé + sitemap (a barra fixa tem 3 itens por medida). */
+export const ROTA_PESQUISAS = {
+  href: "/pesquisas",
+  titulo: "As pesquisas, uma a uma",
+  prioridade: 0.5,
+} as const;
+
 export const ROTAS_INSTITUCIONAIS = [
   { href: "/quem-somos", titulo: "Quem faz o PONTEIRO", prioridade: 0.3 },
   { href: "/privacidade", titulo: "Privacidade", prioridade: 0.3 },

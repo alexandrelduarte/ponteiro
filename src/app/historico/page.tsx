@@ -35,6 +35,11 @@ export const metadata: Metadata = {
     "Como a chance de cada candidato se moveu ao longo do tempo e o registro público de tudo " +
     "que entrou ou saiu da lista de pesquisas — a prova de que os números não são ajustados a gosto.",
   alternates: { canonical: "/historico" },
+  openGraph: {
+    title: "O que já mudou",
+    url: "/historico",
+  },
+  twitter: { title: "O que já mudou" },
 };
 
 const texto = (v: unknown): string | null =>
@@ -180,7 +185,9 @@ export default async function Historico() {
                 {feed.map((e) => (
                   <li key={e.id} className="flex flex-wrap gap-x-3 border-t border-filete pt-2">
                     <span className="text-micro whitespace-nowrap text-tinta-media numeros">
-                      {formatInTimeZone(Date.parse(e.em), TZ, "dd/MM/yyyy HH:mm")}
+                      <time dateTime={e.em}>
+                        {formatInTimeZone(Date.parse(e.em), TZ, "dd/MM/yyyy HH:mm")}
+                      </time>
                     </span>
                     <span className="text-corpo text-tinta">{frase(e)}</span>
                   </li>

@@ -20,6 +20,11 @@ export const metadata: Metadata = {
     "existe: medição de audiência agregada e sem cookie, logs de infraestrutura e um cookie " +
     "de sessão só para os administradores — com base legal e canal para exercer seus direitos.",
   alternates: { canonical: "/privacidade" },
+  openGraph: {
+    title: "Privacidade",
+    url: "/privacidade",
+  },
+  twitter: { title: "Privacidade" },
 };
 
 const REPO = "https://github.com/alexandrelduarte/ponteiro";
@@ -136,8 +141,8 @@ export default function Privacidade() {
             <SecaoProsa id="pessoas-publicas" titulo="Conteúdo sobre pessoas públicas">
               <p>
                 O site publica números de candidatos à Presidência, a partir de pesquisas
-                registradas no TSE. Esse tratamento tem <b className={B}>fim jornalístico</b>{" "}
-                (art. 4º, II, &ldquo;a&rdquo;, da LGPD) e, por isso, fica fora do escopo material da lei.
+                registradas no TSE. Esse tratamento tem <b className={B}>fim jornalístico</b> (art.
+                4º, II, &ldquo;a&rdquo;, da LGPD) e, por isso, fica fora do escopo material da lei.
               </p>
             </SecaoProsa>
 

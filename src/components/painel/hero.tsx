@@ -315,7 +315,11 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
             className={`text-micro ${selo.alerta ? "text-atencao" : "text-tinta-media"}`}
           >
             <span aria-hidden="true">{selo.alerta ? "⚠ " : "✓ "}</span>
-            {selo.texto}
+            {selo.verificadoEmIso ? (
+              <time dateTime={selo.verificadoEmIso}>{selo.texto}</time>
+            ) : (
+              selo.texto
+            )}
           </p>
           <p className="mt-1 text-micro text-tinta-media">{EXPLICA_FRESCOR}</p>
         </div>

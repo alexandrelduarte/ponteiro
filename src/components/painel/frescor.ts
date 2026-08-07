@@ -14,6 +14,8 @@ const TZ = "America/Sao_Paulo";
 const DIA_MS = 864e5;
 
 export interface SeloFrescor {
+  /** ISO da última verificação — vira `datetime` legível por máquina no hero. */
+  verificadoEmIso?: string;
   texto: string;
   /** verificação com mais de 48h (ou ausente) → tinta de atenção */
   alerta: boolean;
@@ -72,5 +74,9 @@ export function montarSelo(frescor: Frescor, agoraMs: number): SeloFrescor {
     partes.push(`última pesquisa incluída em ${ddmm(frescor.ultimaPesquisaFim)}`);
   }
 
-  return { texto: partes.join(" · "), alerta };
+  return {
+    texto: partes.join(" · "),
+    alerta,
+    ...(frescor.verificadoEm ? { verificadoEmIso: frescor.verificadoEm } : {}),
+  };
 }

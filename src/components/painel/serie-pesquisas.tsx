@@ -29,6 +29,7 @@ import {
   Detalhe,
   LINHA_TABELA,
   LinkExterno,
+  LinkInterno,
   Pergunta,
   Resposta,
   Traduzindo,
@@ -127,6 +128,11 @@ function DetalheRegistro({ l, rotulo }: { l: LinhaModelo; rotulo?: string }) {
           Conferir o registro no site do TSE
         </LinkExterno>
       </p>
+      {l.slug ? (
+        <p className="mt-1">
+          <LinkInterno href={`/pesquisas/${l.slug}`}>Ver a página desta pesquisa</LinkInterno>
+        </p>
+      ) : null}
     </Revelador>
   );
 }

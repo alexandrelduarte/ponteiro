@@ -589,3 +589,29 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
   coluna ≈508px ≤ medida). O hack `lg:-mx-64` das listas do glossário/fontes morreu com a
   causa. Trava de e2e atualizada: placas ≥2 + parágrafos ≤520 (títulos podem ter a coluna do
   cabeçalho). Responsáveis do /quem-somos viraram 2 Nichos lado a lado.
+
+## Missão SEO/GEO (plano aprovado; decisões do dono: bots de IA liberados + widget embed)
+
+- **On-page**: og:url/title/description POR página (antes todas as rotas declaravam a home);
+  title da home ganhou o termo de busca ("Pesquisas Presidente 2026: …"); canonical/sitemap/
+  JSON-LD unificados numa grafia; meta keywords removida (morta desde 2009); `<time datetime>`
+  no selo de frescor e no feed do /historico; Organization autônoma no JSON-LD (logo, sameAs
+  GitHub) + WebSite.publisher + Dataset com license CC-BY-4.0 e citation.
+- **robots.ts**: política "aberto de verdade" DECLARADA — 16 bots de IA nomeados (busca e
+  treino), decisão expressa do dono; /api/resumo aberto dentro do /api/ fechado (regra mais
+  longa vence).
+- **/pesquisas/[slug]**: slug = instituto_id + campo_fim (espelho da UNIQUE do banco; TSE
+  descartado — nullable e com "/"); as 13 do seed usam a MESMA regra (id humano continua
+  interno); fichas com procedência completa, 1ºT com outros candidatos por extenso, posição
+  na média e comparação pareada com a anterior do mesmo instituto (link entre irmãs). Copy
+  nova carimbada (AUDITORIA §14: 1 veto — o fator 2 do empate pela 3ª vez — e mapeamento
+  vinculante {{DIF_MEDIA}}→margem, nunca margemAj). ClaimReview rejeitado de propósito (não
+  somos fact-checker; rich result enganoso).
+- **Descoberta**: sitemap async com lastmod REAL (publicado_em; seed = fim do campo);
+  IndexNow (chave em env, fire-and-forget) disparado por serieMudou, que agora também
+  revalida /metodologia, /pesquisas, as fichas e o sitemap.
+- **GEO**: llms.txt (fatos estáveis + como citar) e /api/resumo (JSON público com a MESMA
+  leitura do painel, mesma cadência — verdade mecânica exigida pelo carimbo §14.5.5).
+- **/embed**: route handler puro (HTML autocontido ~2 KB, zero JS), frequência via parEmCem,
+  atribuição-ressalva inseparável do número (§14.5.4); é a ÚNICA rota emoldurável — o header
+  global (X-Frame-Options DENY) passou a excluir só ela.

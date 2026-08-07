@@ -47,7 +47,9 @@ test.describe("páginas de apoio", () => {
 
     const sitemap = await request.get("/sitemap.xml");
     expect(sitemap.status()).toBe(200);
-    expect(await sitemap.text()).toContain("/metodologia");
+    const corpoSitemap = await sitemap.text();
+    expect(corpoSitemap).toContain("/metodologia");
+    expect(corpoSitemap).toContain("/pesquisas/atlasintel-2026-07-27");
   });
 
   test("a imagem de compartilhamento é gerada", async ({ request }) => {
@@ -160,5 +162,53 @@ test.describe("páginas de apoio", () => {
       await page.waitForTimeout(250);
       expect(await visiveis(page), `rolado em ${rota}`).toBe(1);
     }
+  });
+
+  test("a ficha de uma pesquisa carrega com procedência e ressalva na dobra", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/pesquisas/atlasintel-2026-07-27");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("AtlasIntel");
+    await expect(page.getByText("Registro no TSE", { exact: false }).first()).toBeVisible();
+    // H4/§14.5.3: a ressalva mora na MESMA tela dos números, sem colapso.
+    const ressalva = page.getByText("não é previsão do resultado", { exact: false });
+    await expect(ressalva).toBeVisible();
+    const caixa = await ressalva.boundingBox();
+    expect(caixa!.y, "ressalva abaixo da dobra de 844").toBeLessThan(844);
+    // sem rolagem lateral
+    const larguras = await page.evaluate(() => ({
+      scroll: document.documentElement.scrollWidth,
+      janela: window.innerWidth,
+    }));
+    expect(larguras.scroll).toBeLessThanOrEqual(larguras.janela);
+  });
+
+  test("o índice /pesquisas lista as 13 do seed com link para cada ficha", async ({ page }) => {
+    await page.goto("/pesquisas");
+    const links = page.locator('a[href^="/pesquisas/"]');
+    expect(await links.count()).toBeGreaterThanOrEqual(13);
+  });
+
+  test("o /embed serve o número com atribuição inseparável e pode ser emoldurado", async ({
+    request,
+  }) => {
+    const r = await request.get("/embed");
+    expect(r.status()).toBe(200);
+    const html = await r.text();
+    expect(html).toContain("PONTEIRO · oponteiro.com.br — não é previsão");
+    expect(html).toContain("Em 100 eleições parecidas com esta");
+    expect(r.headers()["content-security-policy"]).toContain("frame-ancestors *");
+    expect(r.headers()["x-frame-options"]).toBeUndefined();
+  });
+
+  test("llms.txt e /api/resumo respondem com a leitura citável", async ({ request }) => {
+    const llms = await request.get("/llms.txt");
+    expect(llms.status()).toBe(200);
+    expect(await llms.text()).toContain("CC-BY-4.0");
+    const resumo = await request.get("/api/resumo");
+    expect(resumo.status()).toBe(200);
+    const json = await resumo.json();
+    expect(json.naoEPrevisao).toBe(true);
+    expect(json.leitura).toContain("Em 100 eleições parecidas com esta");
+    expect(Number(json.eleito.lula) + Number(json.eleito.flavio)).toBe(100);
   });
 });

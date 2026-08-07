@@ -17,6 +17,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { ErroAutorizacao, exigirAdmin } from "@/lib/admin/auth";
 import { executarReconstituicao } from "@/lib/reconstituir";
+import { pingIndexNow } from "@/lib/seo";
+import { slugPesquisa } from "@/lib/slug";
 import { gravarSnapshot } from "@/lib/snapshot";
 import {
   DATA_MINIMA,
@@ -118,11 +120,24 @@ function falha(erro: unknown, padrao: string): { ok: false; erro: string } {
 }
 
 /** Revalida as rotas que mostram a série e regrava o snapshot. */
-async function serieMudou(): Promise<void> {
+async function serieMudou(slugAfetado?: string): Promise<void> {
   revalidatePath("/");
   revalidatePath("/historico");
   revalidatePath("/admin");
+  // A série mudou ⇒ tudo que a lista/depende muda junto: a lista da
+  // /metodologia, o índice e TODAS as fichas (peso/posição/tendência são
+  // relativos à série), e o sitemap (lastmod real).
+  revalidatePath("/metodologia");
+  revalidatePath("/pesquisas");
+  revalidatePath("/pesquisas/[slug]", "page");
+  revalidatePath("/sitemap.xml");
   await gravarSnapshot("aprovacao");
+  await pingIndexNow([
+    "/",
+    "/historico",
+    "/pesquisas",
+    ...(slugAfetado ? [`/pesquisas/${slugAfetado}`] : []),
+  ]);
 }
 
 /* ------------------------------------------------------------------ *
@@ -159,7 +174,7 @@ export async function aprovarPesquisa(id: string): Promise<ResultadoAcao> {
       detalhes: detalhesPublicaveis(data),
     });
 
-    await serieMudou();
+    await serieMudou(slugPesquisa(data.instituto_id, data.campo_fim));
     return { ok: true, mensagem: "Pesquisa publicada na série oficial." };
   } catch (erro) {
     return falha(erro, "Não foi possível aprovar a pesquisa.");
@@ -335,7 +350,7 @@ export async function incluirManual(form: FormData | EntradaManual): Promise<Res
       },
     });
 
-    await serieMudou();
+    await serieMudou(slugPesquisa(data.instituto_id, data.campo_fim));
     return { ok: true, mensagem: `Pesquisa de ${aceita.institutoNome} incluída na série.` };
   } catch (erro) {
     return falha(erro, "Não foi possível incluir a pesquisa.");
@@ -381,7 +396,7 @@ export async function removerPesquisa(id: string, motivo?: string): Promise<Resu
         detalhes: { tipo: "definitiva", motivo: motivoLimpo, registro: detalhesPublicaveis(atual) },
       });
 
-      await serieMudou();
+      await serieMudou(slugPesquisa(atual.instituto_id, atual.campo_fim));
       return {
         ok: true,
         mensagem: "Pesquisa removida da série (registro preservado na auditoria).",

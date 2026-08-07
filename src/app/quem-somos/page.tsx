@@ -19,6 +19,11 @@ export const metadata: Metadata = {
     "vínculos), o compromisso de neutralidade, como reportar um erro e como pedir direito de " +
     "resposta.",
   alternates: { canonical: "/quem-somos" },
+  openGraph: {
+    title: "Quem faz o PONTEIRO",
+    url: "/quem-somos",
+  },
+  twitter: { title: "Quem faz o PONTEIRO" },
 };
 
 const REPO = "https://github.com/alexandrelduarte/ponteiro";
@@ -154,6 +159,30 @@ export default function QuemSomos() {
               <p>
                 Pesquisa <b className={B}>suspensa ou cassada pela Justiça Eleitoral</b> sai do ar
                 em até 24 horas depois de tomarmos conhecimento da decisão.
+              </p>
+            </SecaoProsa>
+
+            <SecaoProsa id="imprensa" titulo="Para imprensa e sites">
+              {/* Carimbada §14 (imprensa.intro) */}
+              <p>
+                O número do painel pode ser incorporado em qualquer página, de graça, com a
+                atribuição &ldquo;PONTEIRO · oponteiro.com.br&rdquo;. Os dados são abertos
+                (CC-BY-4.0): cite a fonte e o link. O widget mostra o mesmo número do painel,
+                atualizado junto com ele.
+              </p>
+              <p className="rounded-nicho bg-nicho p-3 text-micro">
+                <code>
+                  {
+                    '<iframe src="https://oponteiro.com.br/embed" title="PONTEIRO — para onde apontam as pesquisas" width="100%" height="120" style="border:0" loading="lazy"></iframe>'
+                  }
+                </code>
+              </p>
+              <p>
+                Para citar o número em texto ou apuração automática, o endereço estável é{" "}
+                <LinkExterno href="https://oponteiro.com.br/api/resumo">
+                  oponteiro.com.br/api/resumo
+                </LinkExterno>{" "}
+                (JSON, atualizado junto com o painel).
               </p>
             </SecaoProsa>
 

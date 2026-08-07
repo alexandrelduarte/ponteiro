@@ -8,7 +8,7 @@ import { chromium } from "@playwright/test";
 import { AxeBuilder } from "@axe-core/playwright";
 
 const BASE = "http://localhost:3101";
-const PAGINAS = ["/", "/historico", "/metodologia", "/admin"];
+const PAGINAS = ["/", "/historico", "/metodologia", "/admin", "/pesquisas", "/pesquisas/atlasintel-2026-07-27", "/quem-somos", "/privacidade"];
 const VIEWPORTS = [
   { width: 390, height: 844 },
   { width: 1440, height: 900 },

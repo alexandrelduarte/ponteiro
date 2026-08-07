@@ -16,6 +16,7 @@
 import "server-only";
 import { z } from "zod";
 import { montarPromptBusca } from "@/data/constantes";
+import { slugInstituto } from "@/lib/slug";
 import { criarClienteAdmin, registrarAuditoria } from "@/lib/supabase/admin";
 
 /* ------------------------------------------------------------------ *
@@ -116,18 +117,6 @@ export function dataValida(s: string): boolean {
   const [a, m, d] = s.split("-").map(Number);
   const dt = new Date(Date.UTC(a, m - 1, d));
   return dt.getUTCFullYear() === a && dt.getUTCMonth() === m - 1 && dt.getUTCDate() === d;
-}
-
-/** Slug estável para instituto novo. String vazia = nome inutilizável. */
-export function slugInstituto(nome: string): string {
-  return nome
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 40)
-    .replace(/-+$/g, "");
 }
 
 /** Chave de comparação de nomes de instituto (acento/pontuação/caixa). */

@@ -1,24 +1,2327 @@
 [
   {
-    "id": "atlas-jul",
+    "id": "futura-2026-10-15",
+    "instituto": "Futura",
+    "contratante": "Próprio instituto (100% Cidades, segundo o Poder360)",
+    "inicio": "2026-10-14",
+    "fim": "2026-10-15",
+    "n": 2000,
+    "moe": 2.2,
+    "tse": "BR-03764/2026",
+    "t1": null,
+    "t2": {
+      "lula": 47.5,
+      "flavio": 49.0,
+      "bnns": 3.6
+    },
+    "fonte": "https://www.correiobraziliense.com.br/politica/2026/10/7522095-lula-reduz-vantagem-de-flavio-bolsonaro-e-se-aproxima-de-empate-no-2-turno.html"
+  },
+  {
+    "id": "mda-2026-10-15",
+    "instituto": "MDA",
+    "contratante": "CNT",
+    "inicio": "2026-10-13",
+    "fim": "2026-10-15",
+    "n": 2014,
+    "moe": 2.2,
+    "tse": "BR-00652/2026",
+    "t1": null,
+    "t2": {
+      "lula": 45.9,
+      "flavio": 46.8,
+      "bnns": 7.3
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/cnt-mda-presidente-outubro-2026-segundo-turno/"
+  },
+  {
+    "id": "poderdata-2026-10-15",
+    "instituto": "PoderData",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-10-13",
+    "fim": "2026-10-15",
+    "n": 3000,
+    "moe": 1.8,
+    "tse": "BR-04258/2026",
+    "t1": null,
+    "t2": {
+      "lula": 47,
+      "flavio": 47,
+      "bnns": 6
+    },
+    "fonte": "https://jovempan.com.br/politica/pesquisa-poder-data-aya-flavio-bolsonaro-lula/"
+  },
+  {
+    "id": "datafolha-2026-10-14",
+    "instituto": "Datafolha",
+    "contratante": "Folha de S.Paulo",
+    "inicio": "2026-10-13",
+    "fim": "2026-10-14",
+    "n": 2520,
+    "moe": 2,
+    "tse": "BR-00466/2026",
+    "t1": null,
+    "t2": {
+      "lula": 45,
+      "flavio": 47,
+      "bnns": 8
+    },
+    "fonte": "https://www.poder360.com.br/poder-eleicoes-2026/datafolha-confirma-poderdata-aya-e-da-flavio-com-51-e-lula-com-49/"
+  },
+  {
+    "id": "indexa-2026-10-14",
+    "instituto": "Indexa",
+    "contratante": "Agência Estado",
+    "inicio": "2026-10-13",
+    "fim": "2026-10-14",
+    "n": 2000,
+    "moe": 2.2,
+    "tse": "BR-04629/2026",
+    "t1": null,
+    "t2": {
+      "lula": 42,
+      "flavio": 44,
+      "bnns": 14
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/indexa-broadcast-presidente-outubro-2026-segundo-turno/"
+  },
+  {
+    "id": "palver-2026-10-13",
+    "instituto": "Palver",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-10-10",
+    "fim": "2026-10-13",
+    "n": 5000,
+    "moe": 2.3,
+    "tse": "BR-08028/2026",
+    "t1": null,
+    "t2": {
+      "lula": 49,
+      "flavio": 50,
+      "bnns": 1
+    },
+    "fonte": "https://www.poder360.com.br/poder-pesquisas/flavio-tem-50-e-lula-tem-49-a-10-dias-do-2o-turno-diz-palver/"
+  },
+  {
+    "id": "quaest-2026-10-13",
+    "instituto": "Genial/Quaest",
+    "contratante": "Grupo Globo",
+    "inicio": "2026-10-10",
+    "fim": "2026-10-13",
+    "n": 2154,
+    "moe": 2,
+    "tse": "BR-08729/2026",
+    "t1": null,
+    "t2": {
+      "lula": 44,
+      "flavio": 46,
+      "bnns": 10
+    },
+    "fonte": "https://www.poder360.com.br/poder-eleicoes-2026/flavio-tem-46-e-lula-tem-44-no-2o-turno-diz-quaest/"
+  },
+  {
+    "id": "poderdata-2026-10-12",
+    "instituto": "PoderData",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-10-10",
+    "fim": "2026-10-12",
+    "n": 3000,
+    "moe": 1.8,
+    "tse": "BR-01209/2026",
+    "t1": null,
+    "t2": {
+      "lula": 46,
+      "flavio": 48,
+      "bnns": 7
+    },
+    "fonte": "https://jovempan.com.br/politica/poderdata-aya-flavio-chega-a-48-no-2o-turno-lula-alcanca-46/"
+  },
+  {
+    "id": "nexus-2026-10-12",
+    "instituto": "Nexus",
+    "contratante": "Banco BTG Pactual",
+    "inicio": "2026-10-10",
+    "fim": "2026-10-12",
+    "n": 2002,
+    "moe": 2,
+    "tse": "BR-07997/2026",
+    "t1": null,
+    "t2": {
+      "lula": 45,
+      "flavio": 48,
+      "bnns": 7
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/nexus-btg-pactual-presidente-outubro-2026-segundo-turno/"
+  },
+  {
+    "id": "gerp-2026-10-12",
+    "instituto": "Gerp",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-10-08",
+    "fim": "2026-10-12",
+    "n": 2400,
+    "moe": 2,
+    "tse": "BR-07877/2026",
+    "t1": null,
+    "t2": {
+      "lula": 44,
+      "flavio": 53,
+      "bnns": 4
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/gerp-presidente-outubro-2026-segundo-turno/"
+  },
+  {
+    "id": "futura-2026-10-10",
+    "instituto": "Futura",
+    "contratante": "100% Cidades",
+    "inicio": "2026-10-07",
+    "fim": "2026-10-10",
+    "n": 2000,
+    "moe": 2.2,
+    "tse": "BR-00650/2026",
+    "t1": null,
+    "t2": {
+      "lula": 46.6,
+      "flavio": 50.0,
+      "bnns": 3.4
+    },
+    "fonte": "https://www.poder360.com.br/poder-eleicoes-2026/flavio-tem-518-contra-482-de-lula-diz-futura/"
+  },
+  {
+    "id": "datatrends-2026-10-09",
+    "instituto": "DataTrends",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-10-07",
+    "fim": "2026-10-09",
+    "n": 2000,
+    "moe": 2.19,
+    "tse": "BR-03576/2026",
+    "t1": null,
+    "t2": {
+      "lula": 44,
+      "flavio": 50,
+      "bnns": 7
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/10/pesquisa-datatrends-nacional-11out2026.pdf"
+  },
+  {
+    "id": "ipespe-2026-10-08",
+    "instituto": "Ipespe",
+    "contratante": "Próprio instituto (Abrapel)",
+    "inicio": "2026-10-06",
+    "fim": "2026-10-08",
+    "n": 1500,
+    "moe": 2.6,
+    "tse": "BR-00933/2026",
+    "t1": null,
+    "t2": {
+      "lula": 44,
+      "flavio": 49,
+      "bnns": 8
+    },
+    "fonte": "https://exame.com/brasil/pesquisa-presidente-2o-turno-flavio-bolsonaro-tem-49-e-lula-44-diz-ipespe/"
+  },
+  {
+    "id": "atlasintel-2026-10-08",
     "instituto": "AtlasIntel",
     "contratante": "Próprio instituto / Bloomberg",
-    "inicio": "2026-07-22",
-    "fim": "2026-07-27",
-    "n": 5021,
-    "moe": 1.0,
-    "tse": "BR-08602/2026",
-    "t1": { "lula": 44.9, "flavio": 35.8, "bnns": 1.6 },
-    "outros1": {
-      "Renan Santos": 7.8,
-      "Ronaldo Caiado": 3.1,
-      "Romeu Zema": 2.8,
-      "Samara Martins": 2.1,
-      "Augusto Cury": 1.6,
-      "Cabo Daciolo": 0.1
+    "inicio": "2026-10-03",
+    "fim": "2026-10-08",
+    "n": 5026,
+    "moe": 1,
+    "tse": "BR-03663/2026",
+    "t1": null,
+    "t2": {
+      "lula": 45.7,
+      "flavio": 51.1,
+      "bnns": 3.2
     },
-    "t2": { "lula": 49.2, "flavio": 42.9, "bnns": 7.9 },
-    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/atlasintel-presidente-julho-2026-2/"
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/atlasintel-presidente-outubro-2026-segundo-turno/"
+  },
+  {
+    "id": "datafolha-2026-10-07",
+    "instituto": "Datafolha",
+    "contratante": "Folha de S.Paulo e Grupo Globo",
+    "inicio": "2026-10-06",
+    "fim": "2026-10-07",
+    "n": 2520,
+    "moe": 2,
+    "tse": "BR-02949/2026",
+    "t1": null,
+    "t2": {
+      "lula": 45,
+      "flavio": 49,
+      "bnns": 6
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/datafolha-presidente-outubro-2026-segundo-turno/"
+  },
+  {
+    "id": "poderdata-2026-10-07",
+    "instituto": "PoderData",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-10-05",
+    "fim": "2026-10-07",
+    "n": 3000,
+    "moe": 1.8,
+    "tse": "BR-08134/2026",
+    "t1": null,
+    "t2": {
+      "lula": 44,
+      "flavio": 49,
+      "bnns": 7
+    },
+    "fonte": "https://jovempan.com.br/politica/poderdata-aya-flavio-bolsonaro-tem-49-contra-44-de-lula-no-2o-turno/"
+  },
+  {
+    "id": "voxbrasil-2026-10-07",
+    "instituto": "Vox Brasil",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-10-05",
+    "fim": "2026-10-07",
+    "n": 2100,
+    "moe": 2.15,
+    "tse": "BR-09623/2026",
+    "t1": null,
+    "t2": {
+      "lula": 44.2,
+      "flavio": 42.7,
+      "bnns": 13.1
+    },
+    "fonte": "https://exame.com/brasil/pesquisa-vox-brasil-lula-tem-442-e-flavio-bolsonaro-427-no-2o-turno/"
+  },
+  {
+    "id": "quaest-2026-10-03",
+    "instituto": "Genial/Quaest",
+    "contratante": "Grupo Globo",
+    "inicio": "2026-10-02",
+    "fim": "2026-10-03",
+    "n": 3702,
+    "moe": 2,
+    "tse": "BR-02197/2026",
+    "t1": {
+      "lula": 40,
+      "flavio": 38,
+      "bnns": 13
+    },
+    "outros1": {
+      "Augusto Cury": 3,
+      "Ronaldo Caiado": 3,
+      "Renan Santos": 3,
+      "Romeu Zema": 0
+    },
+    "t2": {
+      "lula": 42,
+      "flavio": 44,
+      "bnns": 14
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/10/Pesquisa-Quaest_-Lula-tem-46-e-Flavio-Bolsonaro-45-_-G1.pdf"
+  },
+  {
+    "id": "palver-2026-10-03",
+    "instituto": "Palver",
+    "contratante": "não informado na fonte",
+    "inicio": "2026-09-30",
+    "fim": "2026-10-03",
+    "n": 5000,
+    "moe": 2.4,
+    "tse": "BR-00198/2026",
+    "t1": {
+      "lula": 43,
+      "flavio": 47,
+      "bnns": null
+    },
+    "outros1": {
+      "Renan Santos": 7,
+      "Augusto Cury": 1,
+      "Ronaldo Caiado": 1,
+      "Romeu Zema": 0
+    },
+    "t2": {
+      "lula": 44,
+      "flavio": 49,
+      "bnns": 7
+    },
+    "fonte": "https://terrabrasilnoticias.com/?p=496089"
+  },
+  {
+    "id": "futura-2026-10-03",
+    "instituto": "Futura",
+    "contratante": "Próprio instituto (100% Cidades)",
+    "inicio": "2026-10-02",
+    "fim": "2026-10-03",
+    "n": 2000,
+    "moe": 2.2,
+    "tse": "BR-02431/2026",
+    "t1": {
+      "lula": 40.5,
+      "flavio": 42.5,
+      "bnns": null
+    },
+    "outros1": {
+      "Augusto Cury": 3.9,
+      "Ronaldo Caiado": 3.7,
+      "Renan Santos": 2.6,
+      "Romeu Zema": 0.8
+    },
+    "t2": {
+      "lula": 45.1,
+      "flavio": 48,
+      "bnns": 6.9
+    },
+    "fonte": "https://www.moneytimes.com.br/pesquisa-futura-flavio-bolsonaro-tem-425-e-lula-405-no-primeiro-turno-gaep/"
+  },
+  {
+    "id": "datafolha-2026-10-03",
+    "instituto": "Datafolha",
+    "contratante": "Folha de S.Paulo e Grupo Globo",
+    "inicio": "2026-10-03",
+    "fim": "2026-10-03",
+    "n": 4006,
+    "moe": 2,
+    "tse": "BR-01708/2026",
+    "t1": {
+      "lula": 42,
+      "flavio": 40,
+      "bnns": 7
+    },
+    "outros1": {
+      "Ronaldo Caiado": 4,
+      "Renan Santos": 3,
+      "Augusto Cury": 3,
+      "Romeu Zema": 0,
+      "Samara Martins": 0,
+      "Rui Costa Pimenta": 0,
+      "Edmilson Costa": 0,
+      "Wilson Grassi": 0,
+      "Clariana Barão": 0,
+      "Hertz Dias": 0
+    },
+    "t2": {
+      "lula": 47,
+      "flavio": 46,
+      "bnns": 8
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/10/datafolha-presidente-outubro-2.pdf"
+  },
+  {
+    "id": "poderdata-2026-10-02",
+    "instituto": "PoderData",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-09-30",
+    "fim": "2026-10-02",
+    "n": 4000,
+    "moe": 1.5,
+    "tse": "BR-03519/2026",
+    "t1": {
+      "lula": 42,
+      "flavio": 41,
+      "bnns": 6
+    },
+    "outros1": {
+      "Augusto Cury": 3,
+      "Renan Santos": 3,
+      "Ronaldo Caiado": 2,
+      "Rui Costa Pimenta": 1,
+      "Romeu Zema": 1,
+      "Samara Martins": 0,
+      "Hertz Dias": 0,
+      "Clariana Barão": 0,
+      "Leonardo Avalanche": 0,
+      "Wilson Grassi": 0,
+      "Edmilson Costa": 0
+    },
+    "t2": {
+      "lula": 46,
+      "flavio": 46,
+      "bnns": 8
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/10/Relatorio-PoderData-Eleitoral-3out26-1.pdf"
+  },
+  {
+    "id": "mda-2026-10-02",
+    "instituto": "MDA",
+    "contratante": "CNT",
+    "inicio": "2026-09-30",
+    "fim": "2026-10-02",
+    "n": 2002,
+    "moe": 2.2,
+    "tse": "BR-04756/2026",
+    "t1": {
+      "lula": 43.1,
+      "flavio": 38.1,
+      "bnns": 9.7
+    },
+    "outros1": {
+      "Augusto Cury": 3.2,
+      "Ronaldo Caiado": 3.0,
+      "Renan Santos": 1.5,
+      "Romeu Zema": 0.8,
+      "Outros (somados)": 0.5
+    },
+    "t2": {
+      "lula": 47.3,
+      "flavio": 43.1,
+      "bnns": 9.5
+    },
+    "fonte": "https://tvtnews.com.br/pesquisa-cnt-mda-na-vespera-da-eleicao-1-turno/"
+  },
+  {
+    "id": "gerp-2026-10-02",
+    "instituto": "Gerp",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-09-30",
+    "fim": "2026-10-02",
+    "n": 2400,
+    "moe": 2,
+    "tse": "BR-00509/2026",
+    "t1": {
+      "lula": 41,
+      "flavio": 43,
+      "bnns": 5
+    },
+    "outros1": {
+      "Augusto Cury": 4,
+      "Ronaldo Caiado": 3,
+      "Renan Santos": 2,
+      "Samara Martins": 1,
+      "Edmilson Costa": 0,
+      "Rui Costa Pimenta": 0,
+      "Romeu Zema": 0,
+      "Leonardo Avalanche": 0,
+      "Hertz Dias": 0,
+      "Wilson Grassi": 0,
+      "Clariana Barão": 0
+    },
+    "t2": {
+      "lula": 44,
+      "flavio": 49,
+      "bnns": 7
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/10/presidente-gerp-nacional-outubro-1.pdf"
+  },
+  {
+    "id": "atlasintel-2026-10-02",
+    "instituto": "AtlasIntel",
+    "contratante": "Bloomberg",
+    "inicio": "2026-09-27",
+    "fim": "2026-10-02",
+    "n": 4945,
+    "moe": 1,
+    "tse": "BR-00999/2026",
+    "t1": {
+      "lula": 46.7,
+      "flavio": 43.8,
+      "bnns": 0.6
+    },
+    "outros1": {
+      "Renan Santos": 4.6,
+      "Augusto Cury": 2.1,
+      "Ronaldo Caiado": 1.4,
+      "Outros (somados)": 0.9
+    },
+    "t2": {
+      "lula": 47.6,
+      "flavio": 47.4,
+      "bnns": null
+    },
+    "fonte": "https://www.diariodepernambuco.com.br/politica/2026/10/11725710-atlasintel-lula-tem-47-e-flavio-bolsonaro-441-de-votos-validos-no-primeiro-turno.html"
+  },
+  {
+    "id": "voxbrasil-2026-10-01",
+    "instituto": "Vox Brasil",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-09-29",
+    "fim": "2026-10-01",
+    "n": 2100,
+    "moe": 2.15,
+    "tse": "BR-00148/2026",
+    "t1": {
+      "lula": 40.4,
+      "flavio": 41.2,
+      "bnns": 10.2
+    },
+    "outros1": {
+      "Ronaldo Caiado": 3.3,
+      "Renan Santos": 2.2,
+      "Romeu Zema": 1.3,
+      "Augusto Cury": 1.2,
+      "Edmilson Costa": 0.2,
+      "Wilson Grassi": 0,
+      "Leonardo Avalanche": 0,
+      "Clariana Barão": 0,
+      "Rui Costa Pimenta": 0,
+      "Hertz Dias": 0,
+      "Samara Martins": 0
+    },
+    "t2": {
+      "lula": 45.2,
+      "flavio": 48.2,
+      "bnns": 6.6
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/10/RELATORIO-VOX-BRASIL-NACIONAL-8-02-10-2026-1-1.pdf"
+  },
+  {
+    "id": "datafolha-2026-10-01",
+    "instituto": "Datafolha",
+    "contratante": "Folha de S.Paulo e Grupo Globo",
+    "inicio": "2026-09-29",
+    "fim": "2026-10-01",
+    "n": 2506,
+    "moe": 2,
+    "tse": "BR-08039/2026",
+    "t1": {
+      "lula": 42,
+      "flavio": 38,
+      "bnns": 7
+    },
+    "outros1": {
+      "Augusto Cury": 4,
+      "Ronaldo Caiado": 3,
+      "Renan Santos": 3,
+      "Romeu Zema": 1,
+      "Samara Martins": 1,
+      "Wilson Grassi": 1
+    },
+    "t2": {
+      "lula": 48,
+      "flavio": 45,
+      "bnns": 7
+    },
+    "fonte": "https://tribunadejundiai.com.br/politica/eleicoes-2026/datafolha-lula-tem-42-e-flavio-bolsonaro-38-a-tres-dias-do-primeiro-turno/"
+  },
+  {
+    "id": "rtbd-2026-09-30",
+    "instituto": "Real Time Big Data",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-09-26",
+    "fim": "2026-09-30",
+    "n": 2000,
+    "moe": 2,
+    "tse": "BR-09503/2026",
+    "t1": {
+      "lula": 43,
+      "flavio": 39,
+      "bnns": 6
+    },
+    "outros1": {
+      "Renan Santos": 4,
+      "Augusto Cury": 3,
+      "Ronaldo Caiado": 3,
+      "Romeu Zema": 1,
+      "Outros (somados)": 1
+    },
+    "t2": {
+      "lula": 45,
+      "flavio": 46,
+      "bnns": 9
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/10/Presidencial-BR-09503-2026-Out26.pdf"
+  },
+  {
+    "id": "indexa-2026-09-29",
+    "instituto": "Indexa",
+    "contratante": "Agência Estado",
+    "inicio": "2026-09-27",
+    "fim": "2026-09-29",
+    "n": 2000,
+    "moe": 2.2,
+    "tse": "BR-00698/2026",
+    "t1": {
+      "lula": 39,
+      "flavio": 34,
+      "bnns": 15
+    },
+    "outros1": {
+      "Ronaldo Caiado": 4,
+      "Augusto Cury": 4,
+      "Renan Santos": 3,
+      "Romeu Zema": 1,
+      "Edmilson Costa": 0,
+      "Hertz Dias": 0,
+      "Rui Costa Pimenta": 0,
+      "Clariana Barão": 0,
+      "Samara Martins": 0,
+      "Wilson Grassi": 0,
+      "Leonardo Avalanche": 0
+    },
+    "t2": {
+      "lula": 43,
+      "flavio": 42,
+      "bnns": 15
+    },
+    "fonte": "https://www.tribunapr.com.br/noticias/brasil/indexa-lula-lidera-1o-turno-empata-com-flavio-2o-turno/"
+  },
+  {
+    "id": "futura-2026-09-29",
+    "instituto": "Futura",
+    "contratante": "Apex",
+    "inicio": "2026-09-25",
+    "fim": "2026-09-29",
+    "n": 2000,
+    "moe": 2.2,
+    "tse": "BR-01122/2026",
+    "t1": {
+      "lula": 39.4,
+      "flavio": 42.2,
+      "bnns": 5.0
+    },
+    "outros1": {
+      "Ronaldo Caiado": 4.0,
+      "Augusto Cury": 3.8,
+      "Renan Santos": 3.2,
+      "Romeu Zema": 1.6,
+      "Edmilson Costa": 0.2,
+      "Samara Martins": 0.2,
+      "Leonardo Avalanche": 0.1,
+      "Rui Costa Pimenta": 0.1,
+      "Wilson Grassi": 0.1,
+      "Hertz Dias": 0.1
+    },
+    "t2": {
+      "lula": 43.5,
+      "flavio": 49.0,
+      "bnns": 7.5
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/09/futuracidadeparticipacoesBR-30set2026.pdf"
+  },
+  {
+    "id": "voxbrasil-2026-09-28",
+    "instituto": "Vox Brasil",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-09-26",
+    "fim": "2026-09-28",
+    "n": 2100,
+    "moe": 2.15,
+    "tse": "BR-00895/2026",
+    "t1": {
+      "lula": 41.1,
+      "flavio": 37.8,
+      "bnns": 10.3
+    },
+    "outros1": {
+      "Ronaldo Caiado": 3.8,
+      "Renan Santos": 2.7,
+      "Augusto Cury": 2.2,
+      "Romeu Zema": 1.8,
+      "Edmilson Costa + Wilson Grassi (somados)": 0.3
+    },
+    "t2": {
+      "lula": 44.7,
+      "flavio": 45.2,
+      "bnns": null
+    },
+    "fonte": "https://exame.com/brasil/pesquisa-vox-brasil-lula-tem-411-e-flavio-bolsonaro-378-no-1o-turno/"
+  },
+  {
+    "id": "ideia-2026-09-28",
+    "instituto": "Ideia",
+    "contratante": "Meio",
+    "inicio": "2026-09-25",
+    "fim": "2026-09-28",
+    "n": 2000,
+    "moe": 2.2,
+    "tse": "BR-08706/2026",
+    "t1": {
+      "lula": 39.4,
+      "flavio": 38.4,
+      "bnns": 2.2
+    },
+    "outros1": {
+      "Augusto Cury": 6.7,
+      "Renan Santos": 4.5,
+      "Ronaldo Caiado": 4.4,
+      "Romeu Zema": 3.5,
+      "Samara Martins": 0.4,
+      "Clariana Barão": 0.3,
+      "Hertz Dias": 0.3,
+      "Wilson Grassi": 0.1,
+      "Leonardo Avalanche": 0.1,
+      "Rui Costa Pimenta": 0.1,
+      "Edmilson Costa": 0.1
+    },
+    "t2": {
+      "lula": 48.5,
+      "flavio": 48.0,
+      "bnns": 3.6
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/09/Pesquisa-Meio_Ideia-Setembro2_Imprensa.pdf"
+  },
+  {
+    "id": "gerp-2026-09-28",
+    "instituto": "Gerp",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-09-24",
+    "fim": "2026-09-28",
+    "n": 2400,
+    "moe": 2,
+    "tse": "BR-03929/2026",
+    "t1": {
+      "lula": 40,
+      "flavio": 42,
+      "bnns": null
+    },
+    "outros1": {
+      "Augusto Cury": 5,
+      "Ronaldo Caiado": 3,
+      "Renan Santos": 3,
+      "Romeu Zema": 1
+    },
+    "t2": {
+      "lula": 43,
+      "flavio": 50,
+      "bnns": 6
+    },
+    "fonte": "https://www.tribunapr.com.br/eleicoes/2026/flavio-supera-lula-em-novas-simulacoes-de-1o-e-2-turnos/"
+  },
+  {
+    "id": "quaest-2026-09-27",
+    "instituto": "Genial/Quaest",
+    "contratante": "Grupo Globo",
+    "inicio": "2026-09-24",
+    "fim": "2026-09-27",
+    "n": 2004,
+    "moe": 2,
+    "tse": "BR-06520/2026",
+    "t1": {
+      "lula": 39,
+      "flavio": 34,
+      "bnns": 15
+    },
+    "outros1": {
+      "Augusto Cury": 4,
+      "Ronaldo Caiado": 4,
+      "Renan Santos": 3,
+      "Romeu Zema": 1,
+      "Samara Martins": 0,
+      "Clariana Barão": 0,
+      "Edmilson Costa": 0,
+      "Hertz Dias": 0,
+      "Rui Costa Pimenta": 0,
+      "Wilson Grassi": 0,
+      "Leonardo Avalanche": 0
+    },
+    "t2": {
+      "lula": 42,
+      "flavio": 42,
+      "bnns": 16
+    },
+    "fonte": "https://portaldeprefeitura.com.br/bastidores-da-politica/pesquisa-quaest-lula-tem-39-e-flavio-bolsonaro-34-no-1o-turno/632993/"
+  },
+  {
+    "id": "palver-2026-09-27",
+    "instituto": "Palver",
+    "contratante": "não informado na fonte",
+    "inicio": "2026-09-24",
+    "fim": "2026-09-27",
+    "n": 5000,
+    "moe": 2.4,
+    "tse": "BR-02990/2026",
+    "t1": {
+      "lula": 44,
+      "flavio": 44,
+      "bnns": 2
+    },
+    "outros1": {
+      "Renan Santos": 8,
+      "Augusto Cury": 1,
+      "Ronaldo Caiado": 1,
+      "Romeu Zema": 1,
+      "Outros (somados)": 0
+    },
+    "t2": {
+      "lula": 45,
+      "flavio": 47,
+      "bnns": 8
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/09/pesquisa-presidencial-palver-setembro.pdf"
+  },
+  {
+    "id": "nexus-2026-09-27",
+    "instituto": "Nexus",
+    "contratante": "Banco BTG Pactual",
+    "inicio": "2026-09-25",
+    "fim": "2026-09-27",
+    "n": 2000,
+    "moe": 2,
+    "tse": "BR-07557/2026",
+    "t1": {
+      "lula": 42,
+      "flavio": 37,
+      "bnns": 5
+    },
+    "outros1": {
+      "Augusto Cury": 5,
+      "Ronaldo Caiado": 5,
+      "Renan Santos": 4,
+      "Romeu Zema": 1,
+      "Samara Martins": 1,
+      "Rui Costa Pimenta": 0,
+      "Hertz Dias": 0,
+      "Edmilson Costa": 0,
+      "Wilson Grassi": 0,
+      "Clariana Barão": 0,
+      "Leonardo Avalanche": 0
+    },
+    "t2": {
+      "lula": 46,
+      "flavio": 44,
+      "bnns": 9
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/09/Pesquisa-presidencial-BTG-Nexus-28-set-2026.pdf"
+  },
+  {
+    "id": "rtbd-2026-09-23",
+    "instituto": "Real Time Big Data",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-09-19",
+    "fim": "2026-09-23",
+    "n": 2000,
+    "moe": 2,
+    "tse": "BR-04202/2026",
+    "t1": {
+      "lula": 41,
+      "flavio": 37,
+      "bnns": 6
+    },
+    "outros1": {
+      "Augusto Cury": 6,
+      "Renan Santos": 6,
+      "Ronaldo Caiado": 2,
+      "Romeu Zema": 1,
+      "Outros": 1
+    },
+    "t2": {
+      "lula": 44,
+      "flavio": 45,
+      "bnns": 11
+    },
+    "fonte": "https://www.cnnbrasil.com.br/eleicoes/real-time-big-data-lula-tem-41-no-1o-turno-flavio-37/"
+  },
+  {
+    "id": "poderdata-2026-09-23",
+    "instituto": "PoderData",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-09-20",
+    "fim": "2026-09-23",
+    "n": 3000,
+    "moe": 1.8,
+    "tse": "BR-01739/2026",
+    "t1": {
+      "lula": 41,
+      "flavio": 39,
+      "bnns": 6
+    },
+    "outros1": {
+      "Augusto Cury": 6,
+      "Renan Santos": 3,
+      "Ronaldo Caiado": 2,
+      "Romeu Zema": 1,
+      "Samara Martins": 1,
+      "Rui Costa Pimenta": 1,
+      "Clariana Barão": 1
+    },
+    "t2": {
+      "lula": 45,
+      "flavio": 46,
+      "bnns": 9
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/09/Relatorio-PoderData-Eleitoral-23set26-final.pdf"
+  },
+  {
+    "id": "palver-2026-09-23",
+    "instituto": "Palver",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-09-20",
+    "fim": "2026-09-23",
+    "n": 5000,
+    "moe": 2.5,
+    "tse": "BR-09587/2026",
+    "t1": {
+      "lula": 43,
+      "flavio": 43,
+      "bnns": 2
+    },
+    "outros1": {
+      "Renan Santos": 8,
+      "Augusto Cury": 2,
+      "Ronaldo Caiado": 1,
+      "Romeu Zema": 1,
+      "Outros": 1
+    },
+    "t2": {
+      "lula": 45,
+      "flavio": 48,
+      "bnns": 7
+    },
+    "fonte": "https://trademap.com.br/noticias/news-8341927"
+  },
+  {
+    "id": "futura-2026-09-23",
+    "instituto": "Futura",
+    "contratante": "100% Cidades",
+    "inicio": "2026-09-19",
+    "fim": "2026-09-23",
+    "n": 2000,
+    "moe": 2.2,
+    "tse": "BR-05268/2026",
+    "t1": {
+      "lula": 38.4,
+      "flavio": 40.4,
+      "bnns": 5.3
+    },
+    "outros1": {
+      "Ronaldo Caiado": 5.7,
+      "Augusto Cury": 5.6,
+      "Renan Santos": 2.4,
+      "Romeu Zema": 0.9,
+      "Samara Martins": 0.5,
+      "Rui Costa Pimenta": 0.3,
+      "Leonardo Avalanche": 0.2,
+      "Edmilson Costa": 0.1,
+      "Hertz Dias": 0.1
+    },
+    "t2": {
+      "lula": 43.7,
+      "flavio": 49.4,
+      "bnns": 6.9
+    },
+    "fonte": "https://trademap.com.br/noticias/news-8341751"
+  },
+  {
+    "id": "datafolha-2026-09-23",
+    "instituto": "Datafolha",
+    "contratante": "Folha de S.Paulo e Grupo Globo",
+    "inicio": "2026-09-22",
+    "fim": "2026-09-23",
+    "n": 2002,
+    "moe": 2,
+    "tse": "BR-00304/2026",
+    "t1": {
+      "lula": 40,
+      "flavio": 36,
+      "bnns": 7
+    },
+    "outros1": {
+      "Augusto Cury": 5,
+      "Ronaldo Caiado": 4,
+      "Renan Santos": 3,
+      "Romeu Zema": 1,
+      "Samara Martins": 1
+    },
+    "t2": {
+      "lula": 47,
+      "flavio": 45,
+      "bnns": 8
+    },
+    "fonte": "https://www.tribunapr.com.br/noticias/brasil/quatro-pontos-separam-lula-flavio-em-pesquisa-presidente/"
+  },
+  {
+    "id": "atlasintel-2026-09-22",
+    "instituto": "AtlasIntel",
+    "contratante": "Próprio instituto / Bloomberg",
+    "inicio": "2026-09-17",
+    "fim": "2026-09-22",
+    "n": 5015,
+    "moe": 1,
+    "tse": "BR-04739/2026",
+    "t1": {
+      "lula": 45.8,
+      "flavio": 43.4,
+      "bnns": 1.2
+    },
+    "outros1": {
+      "Renan Santos": 4.5,
+      "Augusto Cury": 2.1,
+      "Ronaldo Caiado": 1.3,
+      "Romeu Zema": 0.9,
+      "Outros": 0.8
+    },
+    "t2": {
+      "lula": 47.7,
+      "flavio": 47.4,
+      "bnns": 4.9
+    },
+    "fonte": "https://tvtnews.com.br/atlas-nova-pesquisa-para-presidente-23-09/"
+  },
+  {
+    "id": "quaest-2026-09-20",
+    "instituto": "Genial/Quaest",
+    "contratante": "Grupo Globo",
+    "inicio": "2026-09-17",
+    "fim": "2026-09-20",
+    "n": 2004,
+    "moe": 2,
+    "tse": "BR-06004/2026",
+    "t1": {
+      "lula": 37,
+      "flavio": 33,
+      "bnns": 15
+    },
+    "outros1": {
+      "Augusto Cury": 6,
+      "Ronaldo Caiado": 4,
+      "Renan Santos": 3,
+      "Romeu Zema": 1,
+      "Samara Martins": 1
+    },
+    "t2": {
+      "lula": 41,
+      "flavio": 42,
+      "bnns": 17
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/quaest-presidente-setembro-2026-4/"
+  },
+  {
+    "id": "nexus-2026-09-20",
+    "instituto": "Nexus",
+    "contratante": "Banco BTG Pactual",
+    "inicio": "2026-09-18",
+    "fim": "2026-09-20",
+    "n": 2006,
+    "moe": 2,
+    "tse": "BR-00485/2026",
+    "t1": {
+      "lula": 40,
+      "flavio": 37,
+      "bnns": 6
+    },
+    "outros1": {
+      "Augusto Cury": 6,
+      "Ronaldo Caiado": 5,
+      "Renan Santos": 3,
+      "Romeu Zema": 1,
+      "Samara Martins": 1
+    },
+    "t2": {
+      "lula": 46,
+      "flavio": 45,
+      "bnns": 8
+    },
+    "fonte": "https://www.moneytimes.com.br/pesquisa-btg-pactual-nexus-21-de-setembro-gaep/"
+  },
+  {
+    "id": "palver-2026-09-18",
+    "instituto": "Palver",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-09-15",
+    "fim": "2026-09-18",
+    "n": 5000,
+    "moe": 2.8,
+    "tse": "BR-00860/2026",
+    "t1": {
+      "lula": 41,
+      "flavio": 42,
+      "bnns": 2
+    },
+    "outros1": {
+      "Renan Santos": 11,
+      "Augusto Cury": 2,
+      "Ronaldo Caiado": 1,
+      "Outros": 1
+    },
+    "t2": {
+      "lula": 43,
+      "flavio": 47,
+      "bnns": 10
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/palver-presidente-setembro-2026/"
+  },
+  {
+    "id": "poderdata-2026-09-16",
+    "instituto": "PoderData",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-09-13",
+    "fim": "2026-09-16",
+    "n": 3000,
+    "moe": 1.8,
+    "tse": "BR-00360/2026",
+    "t1": {
+      "lula": 37,
+      "flavio": 36,
+      "bnns": 6
+    },
+    "outros1": {
+      "Augusto Cury": 8,
+      "Renan Santos": 3,
+      "Ronaldo Caiado": 3,
+      "Hertz Dias": 2,
+      "Romeu Zema": 1,
+      "Rui Costa Pimenta": 1,
+      "Samara Martins": 1,
+      "Clariana Barão": 1,
+      "Pablo Marçal": 1
+    },
+    "t2": {
+      "lula": 44,
+      "flavio": 46,
+      "bnns": 10
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/09/Relatorio-PoderData-Eleitoral-16set26.pdf"
+  },
+  {
+    "id": "gerp-2026-09-16",
+    "instituto": "Gerp",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-09-14",
+    "fim": "2026-09-16",
+    "n": 2400,
+    "moe": 2,
+    "tse": "BR-00535/2026",
+    "t1": {
+      "lula": 37,
+      "flavio": 40,
+      "bnns": 8
+    },
+    "outros1": {
+      "Augusto Cury": 7,
+      "Ronaldo Caiado": 3,
+      "Renan Santos": 2,
+      "Romeu Zema": 1,
+      "Pablo Marçal": 1
+    },
+    "t2": {
+      "lula": 43,
+      "flavio": 50,
+      "bnns": 7
+    },
+    "fonte": "https://www.tribunapr.com.br/noticias/brasil/flavio-bolsonaro-tem-50-contra-43-de-lula-2-turno-pesquisa/"
+  },
+  {
+    "id": "datafolha-2026-09-16",
+    "instituto": "Datafolha",
+    "contratante": "Folha de S.Paulo e Grupo Globo",
+    "inicio": "2026-09-15",
+    "fim": "2026-09-16",
+    "n": 2002,
+    "moe": 2,
+    "tse": "BR-04029/2026",
+    "t1": {
+      "lula": 39,
+      "flavio": 36,
+      "bnns": 9
+    },
+    "outros1": {
+      "Augusto Cury": 6,
+      "Ronaldo Caiado": 4,
+      "Renan Santos": 3,
+      "Romeu Zema": 2,
+      "Samara Martins": 1,
+      "Rui Costa Pimenta": 1
+    },
+    "t2": {
+      "lula": 46,
+      "flavio": 44,
+      "bnns": 9
+    },
+    "fonte": "https://mais.opovo.com.br/jornal/politica/2026/09/18/datafolha-lula-tem-39-contra-36-de-flavio-bolsonaro-no-1-turno.html"
+  },
+  {
+    "id": "atlasintel-2026-09-16",
+    "instituto": "AtlasIntel",
+    "contratante": "Próprio instituto / Bloomberg",
+    "inicio": "2026-09-11",
+    "fim": "2026-09-16",
+    "n": 5018,
+    "moe": 1,
+    "tse": "BR-06221/2026",
+    "t1": {
+      "lula": 44.1,
+      "flavio": 41.7,
+      "bnns": 2.1
+    },
+    "outros1": {
+      "Renan Santos": 5.1,
+      "Augusto Cury": 3.5,
+      "Ronaldo Caiado": 1.7,
+      "Romeu Zema": 1.1,
+      "Samara Martins": 0.7
+    },
+    "t2": {
+      "lula": 46.8,
+      "flavio": 47.2,
+      "bnns": 6.0
+    },
+    "fonte": "https://www.moneytimes.com.br/pesquisa-atlasintel-bloomberg-17-de-setembro-gaep/"
+  },
+  {
+    "id": "futura-2026-09-15",
+    "instituto": "Futura",
+    "contratante": "Próprio instituto (100% Cidades)",
+    "inicio": "2026-09-11",
+    "fim": "2026-09-15",
+    "n": 2000,
+    "moe": 2.2,
+    "tse": "BR-00749/2026",
+    "t1": {
+      "lula": 38.3,
+      "flavio": 37.7,
+      "bnns": 6.1
+    },
+    "outros1": {
+      "Augusto Cury": 6.5,
+      "Ronaldo Caiado": 4.5,
+      "Renan Santos": 3.4,
+      "Pablo Marçal": 1.9,
+      "Romeu Zema": 1,
+      "Samara Martins": 0.2,
+      "Clariana Barão": 0.1,
+      "Edmilson Costa": 0.1,
+      "Wilson Grassi": 0.1
+    },
+    "t2": {
+      "lula": 43.7,
+      "flavio": 48.1,
+      "bnns": 8.2
+    },
+    "fonte": "https://www.cnnbrasil.com.br/eleicoes/futura-lula-tem-383-no-1o-turno-flavio-377/"
+  },
+  {
+    "id": "quaest-2026-09-13",
+    "instituto": "Genial/Quaest",
+    "contratante": "Grupo Globo",
+    "inicio": "2026-09-10",
+    "fim": "2026-09-13",
+    "n": 2004,
+    "moe": 2,
+    "tse": "BR-03607/2026",
+    "t1": {
+      "lula": 36,
+      "flavio": 31,
+      "bnns": 17
+    },
+    "outros1": {
+      "Augusto Cury": 7,
+      "Renan Santos": 4,
+      "Ronaldo Caiado": 4,
+      "Romeu Zema": 1
+    },
+    "t2": {
+      "lula": 40,
+      "flavio": 42,
+      "bnns": 18
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/quaest-presidente-setembro-2026-3/"
+  },
+  {
+    "id": "nexus-2026-09-13",
+    "instituto": "Nexus",
+    "contratante": "Banco BTG Pactual",
+    "inicio": "2026-09-11",
+    "fim": "2026-09-13",
+    "n": 2003,
+    "moe": 2,
+    "tse": "BR-04076/2026",
+    "t1": {
+      "lula": 42,
+      "flavio": 37,
+      "bnns": 6
+    },
+    "outros1": {
+      "Augusto Cury": 6,
+      "Ronaldo Caiado": 5,
+      "Renan Santos": 2,
+      "Romeu Zema": 1,
+      "Outros": 1
+    },
+    "t2": {
+      "lula": 47,
+      "flavio": 46,
+      "bnns": 7
+    },
+    "fonte": "https://www.folhape.com.br/politica/no-1o-turno-lula-sobe-para-42-e-flavio-bolsonaro-cai-a-37-mostra/512346/"
+  },
+  {
+    "id": "mda-2026-09-13",
+    "instituto": "MDA",
+    "contratante": "CNT",
+    "inicio": "2026-09-09",
+    "fim": "2026-09-13",
+    "n": 2002,
+    "moe": 2.2,
+    "tse": "BR-06902/2026",
+    "t1": {
+      "lula": 40.5,
+      "flavio": 30.4,
+      "bnns": 13.5
+    },
+    "outros1": {
+      "Augusto Cury": 6,
+      "Ronaldo Caiado": 3,
+      "Renan Santos": 2.7,
+      "Pablo Marçal": 1.8,
+      "Romeu Zema": 1,
+      "Outros": 1.1
+    },
+    "t2": {
+      "lula": 47.3,
+      "flavio": 40,
+      "bnns": 12.7
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/cnt-mda-presidente-setembro-2026/"
+  },
+  {
+    "id": "indexa-2026-09-13",
+    "instituto": "Indexa",
+    "contratante": "Agência Estado",
+    "inicio": "2026-09-10",
+    "fim": "2026-09-13",
+    "n": 2000,
+    "moe": 2.2,
+    "tse": "BR-03482/2026",
+    "t1": {
+      "lula": 38,
+      "flavio": 34,
+      "bnns": 14
+    },
+    "outros1": {
+      "Augusto Cury": 6,
+      "Ronaldo Caiado": 4,
+      "Renan Santos": 3,
+      "Romeu Zema": 1
+    },
+    "t2": {
+      "lula": 43,
+      "flavio": 42,
+      "bnns": 15
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/indexa-broadcast-presidente-setembro-2026/"
+  },
+  {
+    "id": "datafolha-2026-09-10",
+    "instituto": "Datafolha",
+    "contratante": "Folha de S.Paulo e Grupo Globo",
+    "inicio": "2026-09-08",
+    "fim": "2026-09-10",
+    "n": 2002,
+    "moe": 2,
+    "tse": "BR-01833/2026",
+    "t1": {
+      "lula": 39,
+      "flavio": 35,
+      "bnns": 10
+    },
+    "outros1": {
+      "Augusto Cury": 6,
+      "Ronaldo Caiado": 4,
+      "Renan Santos": 3,
+      "Romeu Zema": 2,
+      "Samara Martins": 1,
+      "Rui Costa Pimenta": 1,
+      "Edmilson Costa": 1,
+      "Clariana Barão": 1,
+      "Hertz Dias": 0,
+      "Veterinário Wilson Grassi": 0
+    },
+    "t2": {
+      "lula": 46,
+      "flavio": 44,
+      "bnns": 9
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/datafolha-presidente-setembro-2026-2/"
+  },
+  {
+    "id": "poderdata-2026-09-09",
+    "instituto": "PoderData",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-09-06",
+    "fim": "2026-09-09",
+    "n": 3000,
+    "moe": 1.8,
+    "tse": "BR-04914/2026",
+    "t1": {
+      "lula": 38,
+      "flavio": 36,
+      "bnns": 4
+    },
+    "outros1": {
+      "Augusto Cury": 10,
+      "Renan Santos": 3,
+      "Ronaldo Caiado": 2,
+      "Pablo Marçal": 2,
+      "Hertz Dias": 1,
+      "Romeu Zema": 1,
+      "Rui Costa Pimenta": 1,
+      "Edmilson Costa": 1,
+      "Clariana Barão": 0,
+      "Samara Martins": 0,
+      "Veterinário Wilson Grassi": 0
+    },
+    "t2": {
+      "lula": 45,
+      "flavio": 47,
+      "bnns": 8
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/09/Relatorio-PoderData-Eleitoral-9set26-1.pdf"
+  },
+  {
+    "id": "atlasintel-2026-09-09",
+    "instituto": "AtlasIntel",
+    "contratante": "Próprio instituto / Bloomberg",
+    "inicio": "2026-09-04",
+    "fim": "2026-09-09",
+    "n": 5000,
+    "moe": 1,
+    "tse": "BR-01452/2026",
+    "t1": {
+      "lula": 43.0,
+      "flavio": 37.4,
+      "bnns": 1.0
+    },
+    "outros1": {
+      "Augusto Cury": 6.6,
+      "Renan Santos": 6.5,
+      "Romeu Zema": 2.1,
+      "Ronaldo Caiado": 1.1,
+      "Samara Martins": 1.0,
+      "Pablo Marçal": 1.0,
+      "Clariana Barão": 0.3,
+      "Rui Costa Pimenta": 0.0,
+      "Veterinário Wilson Grassi": 0.0
+    },
+    "t2": {
+      "lula": 46.2,
+      "flavio": 46.4,
+      "bnns": 7.4
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/atlasintel-presidente-setembro-2026/"
+  },
+  {
+    "id": "gerp-2026-09-08",
+    "instituto": "Gerp",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-09-03",
+    "fim": "2026-09-08",
+    "n": 2400,
+    "moe": 2,
+    "tse": "BR-00251/2026",
+    "t1": {
+      "lula": 34,
+      "flavio": 37,
+      "bnns": 12
+    },
+    "outros1": {
+      "Augusto Cury": 6,
+      "Ronaldo Caiado": 5,
+      "Renan Santos": 4,
+      "Pablo Marçal": 2,
+      "Romeu Zema": 1,
+      "Samara Martins": 0,
+      "Rui Costa Pimenta": 0,
+      "Hertz Dias": 0,
+      "Clariana Barão": 0
+    },
+    "t2": {
+      "lula": 40,
+      "flavio": 47,
+      "bnns": 14
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/gerp-presidente-setembro-2026/"
+  },
+  {
+    "id": "palver-2026-09-07",
+    "instituto": "Palver",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-09-04",
+    "fim": "2026-09-07",
+    "n": 5000,
+    "moe": 2.6,
+    "tse": "BR-06100/2026",
+    "t1": {
+      "lula": 41,
+      "flavio": 40,
+      "bnns": 2
+    },
+    "outros1": {
+      "Renan Santos": 9,
+      "Augusto Cury": 5,
+      "Outros": 2
+    },
+    "t2": {
+      "lula": 44,
+      "flavio": 47,
+      "bnns": 9
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/09/pesquisa-Palver-presidente-24set2026_compressed.pdf"
+  },
+  {
+    "id": "nexus-2026-09-07",
+    "instituto": "Nexus",
+    "contratante": "Banco BTG Pactual",
+    "inicio": "2026-09-04",
+    "fim": "2026-09-07",
+    "n": 2002,
+    "moe": 2,
+    "tse": "BR-06790/2026",
+    "t1": {
+      "lula": 39,
+      "flavio": 35,
+      "bnns": 5
+    },
+    "outros1": {
+      "Augusto Cury": 9,
+      "Ronaldo Caiado": 4,
+      "Renan Santos": 4,
+      "Romeu Zema": 1,
+      "Samara Martins": 1,
+      "Rui Costa Pimenta": 1
+    },
+    "t2": {
+      "lula": 45,
+      "flavio": 46,
+      "bnns": 9
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/nexus-btg-pactual-presidente-setembro-2026/"
+  },
+  {
+    "id": "ideia-2026-09-07",
+    "instituto": "Ideia",
+    "contratante": "Meio",
+    "inicio": "2026-09-04",
+    "fim": "2026-09-07",
+    "n": 1500,
+    "moe": 2.5,
+    "tse": "BR-07935/2026",
+    "t1": {
+      "lula": 38.4,
+      "flavio": 37.3,
+      "bnns": 5.3
+    },
+    "outros1": {
+      "Augusto Cury": 6.6,
+      "Renan Santos": 4.0,
+      "Ronaldo Caiado": 4.0,
+      "Romeu Zema": 1.5,
+      "Pablo Marçal": 1.5,
+      "Samara Martins": 0.7,
+      "Rui Costa Pimenta": 0.4,
+      "Veterinário Wilson Grassi": 0.2,
+      "Hertz Dias": 0.1,
+      "Clariana Barão": 0.1,
+      "Edmilson Costa": 0.1
+    },
+    "t2": {
+      "lula": 46,
+      "flavio": 46,
+      "bnns": 8
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/09/Pesquisa-Meio_Ideia-Setembro-IMPRENSA.pdf"
+  },
+  {
+    "id": "poderdata-2026-09-02",
+    "instituto": "PoderData",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-08-30",
+    "fim": "2026-09-02",
+    "n": 3000,
+    "moe": 1.8,
+    "tse": "BR-07561/2026",
+    "t1": {
+      "lula": 37,
+      "flavio": 34,
+      "bnns": 7
+    },
+    "outros1": {
+      "Augusto Cury": 10,
+      "Renan Santos": 3,
+      "Ronaldo Caiado": 2,
+      "Pablo Marçal": 2,
+      "Hertz Dias": 2,
+      "Romeu Zema": 1,
+      "Edmilson Costa": 1,
+      "Samara Martins": 1,
+      "Clariana Barão": 1,
+      "Rui Costa Pimenta": 1,
+      "Veterinário Wilson Grassi": 0
+    },
+    "t2": {
+      "lula": 44,
+      "flavio": 45,
+      "bnns": 11
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/09/Relatorio-PoderData-Eleitoral-2set26.pdf"
+  },
+  {
+    "id": "datafolha-2026-09-02",
+    "instituto": "Datafolha",
+    "contratante": "Folha de S.Paulo e Grupo Globo",
+    "inicio": "2026-09-01",
+    "fim": "2026-09-02",
+    "n": 2002,
+    "moe": 2,
+    "tse": "BR-03669/2026",
+    "t1": {
+      "lula": 38,
+      "flavio": 33,
+      "bnns": 9
+    },
+    "outros1": {
+      "Augusto Cury": 8,
+      "Ronaldo Caiado": 4,
+      "Renan Santos": 3,
+      "Romeu Zema": 2,
+      "Samara Martins": 1,
+      "Edmilson Costa": 1,
+      "Rui Costa Pimenta": 1,
+      "Veterinário Wilson Grassi": 0,
+      "Clariana Barão": 0,
+      "Hertz Dias": 0
+    },
+    "t2": {
+      "lula": 46,
+      "flavio": 44,
+      "bnns": 11
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/datafolha-presidente-setembro-2026/"
+  },
+  {
+    "id": "quaest-2026-09-01",
+    "instituto": "Genial/Quaest",
+    "contratante": "Grupo Globo",
+    "inicio": "2026-08-30",
+    "fim": "2026-09-01",
+    "n": 2004,
+    "moe": 2,
+    "tse": "BR-07065/2026",
+    "t1": {
+      "lula": 37,
+      "flavio": 29,
+      "bnns": 18
+    },
+    "outros1": {
+      "Augusto Cury": 10,
+      "Renan Santos": 3,
+      "Ronaldo Caiado": 1,
+      "Romeu Zema": 1,
+      "Samara Martins": 1
+    },
+    "t2": {
+      "lula": 42,
+      "flavio": 41,
+      "bnns": 17
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/quaest-presidente-setembro-2026/"
+  },
+  {
+    "id": "futura-2026-09-01",
+    "instituto": "Futura",
+    "contratante": "Apex",
+    "inicio": "2026-08-27",
+    "fim": "2026-09-01",
+    "n": 2000,
+    "moe": 2.2,
+    "tse": "BR-02793/2026",
+    "t1": {
+      "lula": 38.7,
+      "flavio": 33.6,
+      "bnns": 6.1
+    },
+    "outros1": {
+      "Augusto Cury": 9.9,
+      "Ronaldo Caiado": 3.5,
+      "Renan Santos": 2.8,
+      "Pablo Marçal": 2.7,
+      "Romeu Zema": 1.6,
+      "Samara Martins": 0.4,
+      "Rui Costa Pimenta": 0.3,
+      "Veterinário Wilson Grassi": 0.3,
+      "Hertz Dias": 0.1
+    },
+    "t2": {
+      "lula": 45.6,
+      "flavio": 45.2,
+      "bnns": 9.2
+    },
+    "fonte": "https://static.poder360.com.br/uploads/2026/09/pesquisaFutura-nacional-presidente-3set2026.pdf"
+  },
+  {
+    "id": "rtbd-2026-08-31",
+    "instituto": "Real Time Big Data",
+    "contratante": "não informado na fonte",
+    "inicio": "2026-08-27",
+    "fim": "2026-08-31",
+    "n": 2000,
+    "moe": 2.0,
+    "tse": "BR-03490/2026",
+    "t1": {
+      "lula": 38,
+      "flavio": 30,
+      "bnns": 6
+    },
+    "outros1": {
+      "Augusto Cury": 11,
+      "Renan Santos": 7,
+      "Ronaldo Caiado": 4,
+      "Romeu Zema": 2,
+      "Outros": 2
+    },
+    "t2": {
+      "lula": 44,
+      "flavio": 44,
+      "bnns": 12
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/real-time-big-data-presidente-setembro-2026/"
+  },
+  {
+    "id": "atlasintel-2026-08-30",
+    "instituto": "AtlasIntel",
+    "contratante": "Próprio instituto / Bloomberg",
+    "inicio": "2026-08-25",
+    "fim": "2026-08-30",
+    "n": 5014,
+    "moe": 1.0,
+    "tse": "BR-07972/2026",
+    "t1": {
+      "lula": 43.4,
+      "flavio": 33.7,
+      "bnns": 0.3
+    },
+    "outros1": {
+      "Augusto Cury": 7.8,
+      "Renan Santos": 7.6,
+      "Ronaldo Caiado": 3.3,
+      "Pablo Marçal": 1.9,
+      "Romeu Zema": 1.0,
+      "Samara Martins": 0.9,
+      "Rui Costa Pimenta": 0.1,
+      "Wilson Grassi": 0.1
+    },
+    "t2": {
+      "lula": 47.1,
+      "flavio": 42.6,
+      "bnns": 10.3
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/atlasintel-presidente-agosto-2026/"
+  },
+  {
+    "id": "nexus-2026-08-30",
+    "instituto": "Nexus",
+    "contratante": "Banco BTG Pactual",
+    "inicio": "2026-08-28",
+    "fim": "2026-08-30",
+    "n": 2005,
+    "moe": 2.0,
+    "tse": "BR-08900/2026",
+    "t1": {
+      "lula": 39,
+      "flavio": 33,
+      "bnns": 6
+    },
+    "outros1": {
+      "Augusto Cury": 11,
+      "Ronaldo Caiado": 5,
+      "Renan Santos": 3,
+      "Romeu Zema": 1,
+      "Samara Martins": 1
+    },
+    "t2": {
+      "lula": 46,
+      "flavio": 45,
+      "bnns": 9
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/nexus-btg-pactual-presidente-agosto-2026-5/"
+  },
+  {
+    "id": "voxbrasil-2026-08-27",
+    "instituto": "Vox Brasil",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-08-25",
+    "fim": "2026-08-27",
+    "n": 2100,
+    "moe": 2.15,
+    "tse": "BR-05519/2026",
+    "t1": {
+      "lula": 37.1,
+      "flavio": 34.8,
+      "bnns": 10.3
+    },
+    "outros1": {
+      "Ronaldo Caiado": 5.0,
+      "Renan Santos": 3.3,
+      "Romeu Zema": 2.8,
+      "Augusto Cury": 2.6,
+      "Pablo Marçal": 2.0,
+      "Clariana Barão": 0.8,
+      "Edmilson Costa": 0.5,
+      "Wilson Grassi": 0.4,
+      "Rui Costa Pimenta": 0.2,
+      "Hertz Dias": 0.1,
+      "Samara Martins": 0.1
+    },
+    "t2": {
+      "lula": 44.5,
+      "flavio": 45.1,
+      "bnns": 10.4
+    },
+    "fonte": "https://agorarn.com.br/politica/flavio-lula-empate-segundo-turno-vox-brasil/"
+  },
+  {
+    "id": "poderdata-2026-08-26",
+    "instituto": "PoderData",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-08-23",
+    "fim": "2026-08-26",
+    "n": 2400,
+    "moe": 2.0,
+    "tse": "BR-04974/2026",
+    "t1": {
+      "lula": 38,
+      "flavio": 35,
+      "bnns": 7
+    },
+    "outros1": {
+      "Ronaldo Caiado": 4,
+      "Renan Santos": 4,
+      "Augusto Cury": 4,
+      "Pablo Marçal": 3,
+      "Romeu Zema": 2,
+      "Hertz Dias": 2,
+      "Edmilson Costa": 1,
+      "Samara Martins": 1
+    },
+    "t2": {
+      "lula": 45,
+      "flavio": 44,
+      "bnns": 11
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/poderdata-presidente-agosto-2026/"
+  },
+  {
+    "id": "gerp-2026-08-25",
+    "instituto": "Gerp",
+    "contratante": "Aesp",
+    "inicio": "2026-08-21",
+    "fim": "2026-08-25",
+    "n": 2400,
+    "moe": 2.0,
+    "tse": "BR-03547/2026",
+    "t1": {
+      "lula": 37,
+      "flavio": 38,
+      "bnns": 12
+    },
+    "outros1": {
+      "Pablo Marçal": 4,
+      "Renan Santos": 3,
+      "Ronaldo Caiado": 3,
+      "Augusto Cury": 1,
+      "Romeu Zema": 1
+    },
+    "t2": {
+      "lula": 42,
+      "flavio": 47,
+      "bnns": 11
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/gerp-presidente-agosto-2026-2/"
+  },
+  {
+    "id": "indexa-2026-08-23",
+    "instituto": "Indexa",
+    "contratante": "Agência Estado",
+    "inicio": "2026-08-20",
+    "fim": "2026-08-23",
+    "n": 2000,
+    "moe": 2.2,
+    "tse": "BR-06366/2026",
+    "t1": {
+      "lula": 39,
+      "flavio": 34,
+      "bnns": 16
+    },
+    "outros1": {
+      "Ronaldo Caiado": 5,
+      "Renan Santos": 4,
+      "Romeu Zema": 1,
+      "Augusto Cury": 1
+    },
+    "t2": {
+      "lula": 46,
+      "flavio": 41,
+      "bnns": 13
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/indexa-broadcast-presidente-agosto-2026/"
+  },
+  {
+    "id": "nexus-2026-08-23",
+    "instituto": "Nexus",
+    "contratante": "Banco BTG Pactual",
+    "inicio": "2026-08-21",
+    "fim": "2026-08-23",
+    "n": 2006,
+    "moe": 2.0,
+    "tse": "BR-09028/2026",
+    "t1": {
+      "lula": 41,
+      "flavio": 37,
+      "bnns": 8
+    },
+    "outros1": {
+      "Ronaldo Caiado": 5,
+      "Renan Santos": 3,
+      "Romeu Zema": 3,
+      "Augusto Cury": 2,
+      "Samara Martins": 1
+    },
+    "t2": {
+      "lula": 46,
+      "flavio": 45,
+      "bnns": 9
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/nexus-btg-pactual-presidente-agosto-2026-4/"
+  },
+  {
+    "id": "verita-2026-08-20",
+    "instituto": "Veritá",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-08-16",
+    "fim": "2026-08-20",
+    "n": 3840,
+    "moe": 2.0,
+    "tse": "BR-04006/2026",
+    "t1": {
+      "lula": 39.3,
+      "flavio": 39.1,
+      "bnns": 4.2
+    },
+    "outros1": {
+      "Pablo Marçal": 5.2,
+      "Renan Santos": 3.8,
+      "Ronaldo Caiado": 3.3,
+      "Augusto Cury": 2.2,
+      "Romeu Zema": 1.3,
+      "Clariana Barão": 0.8,
+      "Samara Martins": 0.4,
+      "Hertz Dias": 0.4,
+      "Edmilson Costa": 0.1,
+      "Rui Costa Pimenta": 0.1
+    },
+    "t2": {
+      "lula": 42.0,
+      "flavio": 47.3,
+      "bnns": 10.7
+    },
+    "fonte": "https://www.cnnbrasil.com.br/eleicoes/verita-lula-perde-para-flavio-no-2o-turno-com-marcal-no-pleito-ha-empate/"
+  },
+  {
+    "id": "datafolha-2026-08-20",
+    "instituto": "Datafolha",
+    "contratante": "Folha de S.Paulo e Grupo Globo",
+    "inicio": "2026-08-18",
+    "fim": "2026-08-20",
+    "n": 2058,
+    "moe": 2.0,
+    "tse": "BR-04496/2026",
+    "t1": {
+      "lula": 39,
+      "flavio": 33,
+      "bnns": 10
+    },
+    "outros1": {
+      "Ronaldo Caiado": 5,
+      "Renan Santos": 4,
+      "Romeu Zema": 3,
+      "Augusto Cury": 2,
+      "Samara Martins": 1,
+      "Rui Costa Pimenta": 1,
+      "Wilson Grassi": 1,
+      "Edmilson Costa": 1
+    },
+    "t2": {
+      "lula": 47,
+      "flavio": 43,
+      "bnns": 11
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/datafolha-presidente-agosto-2026/"
+  },
+  {
+    "id": "nexus-2026-08-16",
+    "instituto": "Nexus",
+    "contratante": "Banco BTG Pactual",
+    "inicio": "2026-08-14",
+    "fim": "2026-08-16",
+    "n": 2003,
+    "moe": 2.0,
+    "tse": "BR-03317/2026",
+    "t1": {
+      "lula": 41,
+      "flavio": 36,
+      "bnns": 7
+    },
+    "outros1": {
+      "Ronaldo Caiado": 4,
+      "Renan Santos": 4,
+      "Romeu Zema": 4,
+      "Augusto Cury": 1,
+      "Samara Martins": 1
+    },
+    "t2": {
+      "lula": 47,
+      "flavio": 44,
+      "bnns": 9
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/nexus-btg-pactual-presidente-agosto-2026-3/"
+  },
+  {
+    "id": "quaest-2026-08-13",
+    "instituto": "Genial/Quaest",
+    "contratante": "Grupo Globo",
+    "inicio": "2026-08-10",
+    "fim": "2026-08-13",
+    "n": 2004,
+    "moe": 2.0,
+    "tse": "BR-06773/2026",
+    "t1": {
+      "lula": 38,
+      "flavio": 31,
+      "bnns": 18
+    },
+    "outros1": {
+      "Renan Santos": 4,
+      "Ronaldo Caiado": 4,
+      "Romeu Zema": 2,
+      "Augusto Cury": 2,
+      "Samara Martins": 1
+    },
+    "t2": {
+      "lula": 43,
+      "flavio": 40,
+      "bnns": 17
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/quaest-pesquisa-presidente-agosto-2026/"
+  },
+  {
+    "id": "poderdata-2026-08-12",
+    "instituto": "PoderData",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-08-09",
+    "fim": "2026-08-12",
+    "n": 2400,
+    "moe": 2.0,
+    "tse": "BR-06868/2026",
+    "t1": {
+      "lula": 41,
+      "flavio": 35,
+      "bnns": 6
+    },
+    "outros1": {
+      "Ronaldo Caiado": 4,
+      "Renan Santos": 4,
+      "Romeu Zema": 3,
+      "Augusto Cury": 3,
+      "Leonardo Avalanche": 1,
+      "Clariana Barão": 1,
+      "Rui Costa Pimenta": 1
+    },
+    "t2": {
+      "lula": 46,
+      "flavio": 45,
+      "bnns": 9
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/poderdata-presidente-pesquisa-agosto-2026/"
+  },
+  {
+    "id": "gerp-2026-08-10",
+    "instituto": "Gerp",
+    "contratante": "não informado na fonte",
+    "inicio": "2026-08-06",
+    "fim": "2026-08-10",
+    "n": 2400,
+    "moe": 2.0,
+    "tse": "BR-08045/2026",
+    "t1": {
+      "lula": 38,
+      "flavio": 38,
+      "bnns": 11
+    },
+    "outros1": {
+      "Renan Santos": 5,
+      "Ronaldo Caiado": 4,
+      "Romeu Zema": 2,
+      "Cabo Daciolo": 1,
+      "Augusto Cury": 1
+    },
+    "t2": {
+      "lula": 43,
+      "flavio": 45,
+      "bnns": 12
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/gerp-presidente-agosto-2026/"
+  },
+  {
+    "id": "mda-2026-08-09",
+    "instituto": "MDA",
+    "contratante": "CNT",
+    "inicio": "2026-08-05",
+    "fim": "2026-08-09",
+    "n": 2002,
+    "moe": 2.2,
+    "tse": "BR-06935/2026",
+    "t1": {
+      "lula": 42.4,
+      "flavio": 28.7,
+      "bnns": 14.0
+    },
+    "outros1": {
+      "Ronaldo Caiado": 4.0,
+      "Romeu Zema": 3.3,
+      "Renan Santos": 2.8,
+      "Samara Martins": 1.6,
+      "Augusto Cury": 1.2,
+      "Rui Costa Pimenta": 0.9,
+      "Outros": 0.9
+    },
+    "t2": {
+      "lula": 48.0,
+      "flavio": 39.1,
+      "bnns": 12.9
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/cnt-mda-presidente-agosto-2026/"
+  },
+  {
+    "id": "nexus-2026-08-09",
+    "instituto": "Nexus",
+    "contratante": "Banco BTG Pactual",
+    "inicio": "2026-08-07",
+    "fim": "2026-08-09",
+    "n": 2001,
+    "moe": 2.0,
+    "tse": "BR-08428/2026",
+    "t1": {
+      "lula": 40,
+      "flavio": 35,
+      "bnns": 8
+    },
+    "outros1": {
+      "Ronaldo Caiado": 5,
+      "Renan Santos": 4,
+      "Romeu Zema": 3,
+      "Samara Martins": 2,
+      "Augusto Cury": 1,
+      "Cabo Daciolo": 1
+    },
+    "t2": {
+      "lula": 47,
+      "flavio": 44,
+      "bnns": 9
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/nexus-btg-pactual-presidente-agosto-2026-2/"
+  },
+  {
+    "id": "futura-2026-08-07",
+    "instituto": "Futura",
+    "contratante": "Próprio instituto (Futura / Apex Partners)",
+    "inicio": "2026-08-03",
+    "fim": "2026-08-07",
+    "n": 2000,
+    "moe": 2.2,
+    "tse": "BR-08109/2026",
+    "t1": {
+      "lula": 38.8,
+      "flavio": 34.1,
+      "bnns": 11.0
+    },
+    "outros1": {
+      "Ronaldo Caiado": 5.9,
+      "Renan Santos": 3.6,
+      "Romeu Zema": 3.6,
+      "Augusto Cury": 1.2,
+      "Rui Costa Pimenta": 0.8,
+      "Samara Martins": 0.7,
+      "Cabo Daciolo": 0.4,
+      "Edmilson Costa": 0.1
+    },
+    "t2": {
+      "lula": 46.5,
+      "flavio": 44.0,
+      "bnns": 9.5
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/futura-inteligencia-presidente-agosto-2026/"
+  },
+  {
+    "id": "palver-2026-08-07",
+    "instituto": "Palver",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-08-03",
+    "fim": "2026-08-07",
+    "n": 5000,
+    "moe": 3.0,
+    "tse": "BR-06596/2026",
+    "t1": {
+      "lula": 44,
+      "flavio": 40,
+      "bnns": 1
+    },
+    "outros1": {
+      "Renan Santos": 10,
+      "Ronaldo Caiado": 2,
+      "Romeu Zema": 1,
+      "Samara Martins": 1
+    },
+    "t2": {
+      "lula": 46,
+      "flavio": 46,
+      "bnns": 8
+    },
+    "fonte": "https://www.cartacapital.com.br/politica/as-intencoes-de-voto-de-lula-e-flavio-bolsonaro-em-pesquisa-de-estreia-da-palver/"
+  },
+  {
+    "id": "ideia-2026-08-03",
+    "instituto": "Ideia",
+    "contratante": "Meio",
+    "inicio": "2026-07-31",
+    "fim": "2026-08-03",
+    "n": 1500,
+    "moe": 2.5,
+    "tse": "BR-04579/2026",
+    "t1": {
+      "lula": 43.0,
+      "flavio": 35.0,
+      "bnns": 6.0
+    },
+    "outros1": {
+      "Ronaldo Caiado": 5.7,
+      "Renan Santos": 4.7,
+      "Romeu Zema": 2.6,
+      "Augusto Cury": 1.7,
+      "Cabo Daciolo": 0.6,
+      "Samara Martins": 0.3,
+      "Edmilson Costa": 0.2,
+      "Hertz Dias": 0.1,
+      "Rui Costa Pimenta": 0.1
+    },
+    "t2": {
+      "lula": 48.5,
+      "flavio": 43.0,
+      "bnns": 8.5
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/meio-ideia-presidente-agosto-2026/"
+  },
+  {
+    "id": "quaest-2026-08-03",
+    "instituto": "Genial/Quaest",
+    "contratante": "Banco Genial",
+    "inicio": "2026-07-31",
+    "fim": "2026-08-03",
+    "n": 2004,
+    "moe": 2.0,
+    "tse": "BR-06591/2026",
+    "t1": {
+      "lula": 39,
+      "flavio": 30,
+      "bnns": 18
+    },
+    "outros1": {
+      "Renan Santos": 4,
+      "Ronaldo Caiado": 4,
+      "Romeu Zema": 2,
+      "Cabo Daciolo": 1,
+      "Augusto Cury": 1,
+      "Samara Martins": 1
+    },
+    "t2": {
+      "lula": 44,
+      "flavio": 39,
+      "bnns": 17
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/genial-quaest-presidente-agosto-2026/"
   },
   {
     "id": "poder-jul",
@@ -29,15 +2332,52 @@
     "n": 2400,
     "moe": 2.0,
     "tse": "BR-07845/2026",
-    "t1": { "lula": 41, "flavio": 35, "bnns": 9 },
+    "t1": {
+      "lula": 41,
+      "flavio": 35,
+      "bnns": 9
+    },
     "outros1": {
       "Ronaldo Caiado": 5,
       "Renan Santos": 4,
       "Romeu Zema": 3,
       "Augusto Cury": 3
     },
-    "t2": { "lula": 46, "flavio": 43, "bnns": 11 },
+    "t2": {
+      "lula": 46,
+      "flavio": 43,
+      "bnns": 11
+    },
     "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/poderdata-presidente-pesquisa-julho-2026/"
+  },
+  {
+    "id": "atlas-jul",
+    "instituto": "AtlasIntel",
+    "contratante": "Próprio instituto / Bloomberg",
+    "inicio": "2026-07-22",
+    "fim": "2026-07-27",
+    "n": 5021,
+    "moe": 1.0,
+    "tse": "BR-08602/2026",
+    "t1": {
+      "lula": 44.9,
+      "flavio": 35.8,
+      "bnns": 1.6
+    },
+    "outros1": {
+      "Renan Santos": 7.8,
+      "Ronaldo Caiado": 3.1,
+      "Romeu Zema": 2.8,
+      "Samara Martins": 2.1,
+      "Augusto Cury": 1.6,
+      "Cabo Daciolo": 0.1
+    },
+    "t2": {
+      "lula": 49.2,
+      "flavio": 42.9,
+      "bnns": 7.9
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/atlasintel-presidente-julho-2026-2/"
   },
   {
     "id": "nexus-jul",
@@ -48,7 +2388,11 @@
     "n": 2004,
     "moe": 2.0,
     "tse": "BR-01489/2026",
-    "t1": { "lula": 42, "flavio": 33, "bnns": 8 },
+    "t1": {
+      "lula": 42,
+      "flavio": 33,
+      "bnns": 8
+    },
     "outros1": {
       "Ronaldo Caiado": 6,
       "Renan Santos": 5,
@@ -56,7 +2400,11 @@
       "Augusto Cury": 2,
       "Cabo Daciolo": 1
     },
-    "t2": { "lula": 47, "flavio": 43, "bnns": 10 },
+    "t2": {
+      "lula": 47,
+      "flavio": 43,
+      "bnns": 10
+    },
     "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/nexus-btg-pactual-presidente-julho-2026-2/"
   },
   {
@@ -68,31 +2416,17 @@
     "n": 2004,
     "moe": 2.0,
     "tse": "BR-01166/2026",
-    "t1": { "lula": 40, "flavio": 32, "bnns": null },
-    "t2": { "lula": 48, "flavio": 43, "bnns": 9 },
-    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/datafolha-presidente-julho-2026/"
-  },
-  {
-    "id": "gerp-jul",
-    "instituto": "Gerp",
-    "contratante": "Próprio instituto",
-    "inicio": "2026-07-15",
-    "fim": "2026-07-17",
-    "n": 2000,
-    "moe": 2.19,
-    "tse": "BR-05026/2026",
-    "t1": { "lula": 38, "flavio": 38, "bnns": 12 },
-    "outros1": {
-      "Romeu Zema": 3,
-      "Renan Santos": 3,
-      "Ronaldo Caiado": 3,
-      "Samara Martins": 1,
-      "Cabo Daciolo": 1,
-      "Joaquim Barbosa": 1,
-      "Augusto Cury": 1
+    "t1": {
+      "lula": 40,
+      "flavio": 32,
+      "bnns": null
     },
-    "t2": { "lula": 45, "flavio": 46, "bnns": 9 },
-    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/gerp-presidente-julho-2026-2/"
+    "t2": {
+      "lula": 48,
+      "flavio": 43,
+      "bnns": 9
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/datafolha-presidente-julho-2026/"
   },
   {
     "id": "indexa-jul",
@@ -103,7 +2437,11 @@
     "n": 2000,
     "moe": 2.2,
     "tse": "BR-02094/2026",
-    "t1": { "lula": 41, "flavio": 30, "bnns": 15 },
+    "t1": {
+      "lula": 41,
+      "flavio": 30,
+      "bnns": 15
+    },
     "outros1": {
       "Ronaldo Caiado": 6,
       "Romeu Zema": 3,
@@ -111,8 +2449,42 @@
       "Joaquim Barbosa": 1,
       "Augusto Cury": 1
     },
-    "t2": { "lula": 46, "flavio": 39, "bnns": 15 },
+    "t2": {
+      "lula": 46,
+      "flavio": 39,
+      "bnns": 15
+    },
     "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/indexa-pesquisas-presidente-julho-2026/"
+  },
+  {
+    "id": "gerp-jul",
+    "instituto": "Gerp",
+    "contratante": "Próprio instituto",
+    "inicio": "2026-07-15",
+    "fim": "2026-07-17",
+    "n": 2000,
+    "moe": 2.19,
+    "tse": "BR-05026/2026",
+    "t1": {
+      "lula": 38,
+      "flavio": 38,
+      "bnns": 12
+    },
+    "outros1": {
+      "Romeu Zema": 3,
+      "Renan Santos": 3,
+      "Ronaldo Caiado": 3,
+      "Samara Martins": 1,
+      "Cabo Daciolo": 1,
+      "Joaquim Barbosa": 1,
+      "Augusto Cury": 1
+    },
+    "t2": {
+      "lula": 45,
+      "flavio": 46,
+      "bnns": 9
+    },
+    "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/gerp-presidente-julho-2026-2/"
   },
   {
     "id": "quaest-jul",
@@ -123,7 +2495,11 @@
     "n": 2004,
     "moe": 2.0,
     "tse": "BR-07181/2026",
-    "t1": { "lula": 40, "flavio": 28, "bnns": 19 },
+    "t1": {
+      "lula": 40,
+      "flavio": 28,
+      "bnns": 19
+    },
     "outros1": {
       "Ronaldo Caiado": 4,
       "Renan Santos": 3,
@@ -133,7 +2509,11 @@
       "Joaquim Barbosa": 1,
       "Samara Martins": 1
     },
-    "t2": { "lula": 45, "flavio": 37, "bnns": 18 },
+    "t2": {
+      "lula": 45,
+      "flavio": 37,
+      "bnns": 18
+    },
     "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/genial-quaest-presidente-julho-2026/"
   },
   {
@@ -146,7 +2526,11 @@
     "moe": 1.0,
     "tse": "BR-04582/2026",
     "t1": null,
-    "t2": { "lula": 48.8, "flavio": 42.3, "bnns": 8.9 },
+    "t2": {
+      "lula": 48.8,
+      "flavio": 42.3,
+      "bnns": 8.9
+    },
     "fonte": "https://exame.com/brasil/atlasintel-lula-tem-488-e-flavio-bolsonaro-423-no-2o-turno/"
   },
   {
@@ -159,7 +2543,11 @@
     "moe": 2.0,
     "tse": "BR-05722/2026",
     "t1": null,
-    "t2": { "lula": 46, "flavio": 43, "bnns": 11 },
+    "t2": {
+      "lula": 46,
+      "flavio": 43,
+      "bnns": 11
+    },
     "fonte": "https://www.cnnbrasil.com.br/eleicoes/poderdata-lula-empata-com-flavio-zema-e-caiado-no-2o-turno/"
   },
   {
@@ -172,7 +2560,11 @@
     "moe": 2.0,
     "tse": "BR-09956/2026",
     "t1": null,
-    "t2": { "lula": 47, "flavio": 43, "bnns": 10 },
+    "t2": {
+      "lula": 47,
+      "flavio": 43,
+      "bnns": 10
+    },
     "fonte": "https://www.cnnbrasil.com.br/eleicoes/no-2o-turno-lula-tem-47-contra-43-de-flavio-bolsonaro-diz-datafolha/"
   },
   {
@@ -184,7 +2576,11 @@
     "n": 2004,
     "moe": 2.0,
     "tse": "BR-07661/2026",
-    "t1": { "lula": 39, "flavio": 29, "bnns": 19 },
+    "t1": {
+      "lula": 39,
+      "flavio": 29,
+      "bnns": 19
+    },
     "outros1": {
       "Renan Santos": 3,
       "Ronaldo Caiado": 3,
@@ -194,7 +2590,11 @@
       "Joaquim Barbosa": 1,
       "Samara Martins": 1
     },
-    "t2": { "lula": 44, "flavio": 38, "bnns": 18 },
+    "t2": {
+      "lula": 44,
+      "flavio": 38,
+      "bnns": 18
+    },
     "fonte": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/genial-quaest-presidente-junho-2026/"
   },
   {
@@ -207,7 +2607,11 @@
     "moe": 2.0,
     "tse": "registrada (nº n/d na fonte)",
     "t1": null,
-    "t2": { "lula": 46, "flavio": 43, "bnns": 11 },
+    "t2": {
+      "lula": 46,
+      "flavio": 43,
+      "bnns": 11
+    },
     "fonte": "https://www.yahoo.com/news/articles/flavio-bolsonaro-draws-even-lula-161733328.html"
   },
   {
@@ -219,8 +2623,16 @@
     "n": 2004,
     "moe": 2.0,
     "tse": "BR-00835/2026",
-    "t1": { "lula": 36, "flavio": 23, "bnns": null },
-    "t2": { "lula": 45, "flavio": 38, "bnns": 17 },
+    "t1": {
+      "lula": 36,
+      "flavio": 23,
+      "bnns": null
+    },
+    "t2": {
+      "lula": 45,
+      "flavio": 38,
+      "bnns": 17
+    },
     "fonte": "https://www.aol.com/articles/brazils-lula-leads-wing-rivals-133832563.html"
   }
 ]

@@ -2,12 +2,12 @@
   {
     "id": "atlasintel",
     "nome": "AtlasIntel",
-    "aliases": ["Atlas Intel", "Atlas", "AtlasIntel/Bloomberg"]
+    "aliases": ["Atlas Intel", "Atlas", "AtlasIntel/Bloomberg", "Atlas/Bloomberg"]
   },
   {
     "id": "poderdata",
     "nome": "PoderData",
-    "aliases": ["Poder Data", "Poder360/PoderData"]
+    "aliases": ["Poder Data", "Poder360/PoderData", "PoderData/Aya"]
   },
   {
     "id": "nexus",
@@ -17,7 +17,7 @@
   {
     "id": "datafolha",
     "nome": "Datafolha",
-    "aliases": ["Data Folha", "Instituto Datafolha"]
+    "aliases": ["Data Folha", "Instituto Datafolha", "Datafolha/Folha"]
   },
   {
     "id": "gerp",
@@ -27,12 +27,19 @@
   {
     "id": "indexa",
     "nome": "Indexa",
-    "aliases": ["Indexa Pesquisas"]
+    "aliases": ["Indexa Pesquisas", "Indexa/Broadcast"]
   },
   {
     "id": "quaest",
     "nome": "Genial/Quaest",
-    "aliases": ["Quaest", "Genial Quaest", "Quaest/Genial", "Genial"]
+    "aliases": [
+      "Quaest",
+      "Genial Quaest",
+      "Quaest/Genial",
+      "Genial",
+      "Quaest/Globo",
+      "Genial/Quaest/Globo"
+    ]
   },
   {
     "id": "ipec",
@@ -48,5 +55,45 @@
     "id": "parana",
     "nome": "Paraná Pesquisas",
     "aliases": ["Parana Pesquisas", "Paraná"]
+  },
+  {
+    "id": "futura",
+    "nome": "Futura",
+    "aliases": ["Futura Inteligência", "Instituto Futura", "Futura/100% Cidades"]
+  },
+  {
+    "id": "mda",
+    "nome": "MDA",
+    "aliases": ["CNT/MDA", "MDA Pesquisa"]
+  },
+  {
+    "id": "palver",
+    "nome": "Palver",
+    "aliases": ["Instituto Palver"]
+  },
+  {
+    "id": "datatrends",
+    "nome": "DataTrends",
+    "aliases": ["Data Trends"]
+  },
+  {
+    "id": "ipespe",
+    "nome": "Ipespe",
+    "aliases": ["IPESPE", "Ipespe/Abrapel"]
+  },
+  {
+    "id": "voxbrasil",
+    "nome": "Vox Brasil",
+    "aliases": ["Vox", "Instituto Vox Brasil"]
+  },
+  {
+    "id": "ideia",
+    "nome": "Ideia",
+    "aliases": ["Ideia Big Data", "Instituto Ideia"]
+  },
+  {
+    "id": "verita",
+    "nome": "Veritá",
+    "aliases": ["Verita", "Instituto Veritá"]
   }
 ]

@@ -56,21 +56,23 @@ export function Replay2022() {
           outros. Quatro peças contra duas e três viraram três contra duas e
           três. */}
       <div className="mt-4 grid gap-3 lg:grid-cols-3 lg:items-stretch">
-        <Nicho className="h-full">
-          <p className="text-secao text-tinta">1º turno, com o erro de 2022 aplicado</p>
-          <p className="mt-2">
-            <Chip tom="ameixa" className="numeros">
-              vai a 2º turno em {p2t} de cada 100
-            </Chip>
-          </p>
-          <p className="mt-2 text-micro text-tinta-media numeros">
-            Lula {fmt(replay.r1L)}% × Flávio {fmt(replay.r1F)}% dos votos válidos. Pelos números
-            centrais, ninguém chega à metade: em {p2t} de cada 100 cenários dessa hipótese haveria
-            2º turno, com uma chegada apertada de {fmtSinal(replay.r1L - replay.r1F)} pontos, em vez
-            dos {t1Dif === null ? "–" : fmtSinal(t1Dif)} das pesquisas. Lula chegar em 1º lugar
-            acontece em {emCem(replay.pLider1)} de cada 100.
-          </p>
-        </Nicho>
+        {replay.r1L != null && replay.r1F != null && (
+          <Nicho className="h-full">
+            <p className="text-secao text-tinta">1º turno, com o erro de 2022 aplicado</p>
+            <p className="mt-2">
+              <Chip tom="ameixa" className="numeros">
+                vai a 2º turno em {p2t} de cada 100
+              </Chip>
+            </p>
+            <p className="mt-2 text-micro text-tinta-media numeros">
+              Lula {fmt(replay.r1L)}% × Flávio {fmt(replay.r1F)}% dos votos válidos. Pelos números
+              centrais, ninguém chega à metade: em {p2t} de cada 100 cenários dessa hipótese haveria
+              2º turno, com uma chegada apertada de {fmtSinal(replay.r1L - replay.r1F)} pontos, em
+              vez dos {t1Dif === null ? "–" : fmtSinal(t1Dif)} das pesquisas. Lula chegar em 1º
+              lugar acontece em {emCem(replay.pLider1)} de cada 100.
+            </p>
+          </Nicho>
+        )}
 
         <Nicho className="h-full">
           <p className="text-secao text-tinta">2º turno, com o erro de 2022 aplicado</p>

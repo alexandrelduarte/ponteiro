@@ -17,7 +17,24 @@ import seedJson from "@/data/pesquisas.seed.json";
 
 import * as orig from "./reference/original.mjs";
 
-const PESQ = seedJson as unknown as Pesquisa[];
+/** As 13 rodadas do protótipo — o gabarito só conhece estas; rodadas acrescentadas ao seed
+ *  depois (2º turno etc.) ficam fora da paridade de propósito. */
+const IDS_PROTOTIPO = new Set([
+  "atlas-jul",
+  "poder-jul",
+  "nexus-jul",
+  "dataf-jul",
+  "gerp-jul",
+  "indexa-jul",
+  "quaest-jul",
+  "atlas-jun",
+  "poder-jun",
+  "dataf-jun",
+  "quaest-jun",
+  "dataf-mar",
+  "quaest-jan",
+]);
+const PESQ = (seedJson as unknown as Pesquisa[]).filter((p) => IDS_PROTOTIPO.has(p.id));
 
 /* ---------------------- comparador profundo ---------------------- */
 
@@ -105,10 +122,18 @@ function conferir(recebido: unknown, esperado: unknown, rotulo: string): void {
 
 /* ---------------------- matriz de casos ---------------------- */
 
+/** Paridade exata com o protótipo vale ANTES do 1º turno. Depois de 04/10 o porte desvia
+ *  de propósito (o protótipo não modelava o pós-1ºT — DECISOES.md); ver `DATAS_POS1T`. */
 const DATAS: [string, number][] = [
   ["03/08/2026 (base editorial)", Date.parse("2026-08-03T12:00:00-03:00")],
   ["20/08/2026", Date.parse("2026-08-20T12:00:00-03:00")],
   ["01/10/2026 (véspera do 1ºT)", Date.parse("2026-10-01T12:00:00-03:00")],
+  ["04/10/2026 11:59 (último minuto antes do marco)", Date.parse("2026-10-04T11:59:00-03:00")],
+];
+
+const DATAS_POS1T: [string, number][] = [
+  ["04/10/2026 12:00 (marco do 1ºT)", Date.parse("2026-10-04T12:00:00-03:00")],
+  ["16/10/2026 (entre turnos)", Date.parse("2026-10-16T12:00:00-03:00")],
   ["01/11/2026 (pós-eleição, dias=0)", Date.parse("2026-11-01T12:00:00-03:00")],
 ];
 
@@ -285,6 +310,133 @@ describe("rodarModelo + derivados — subconjuntos da série", () => {
     porte.rodarModelo(entrada, PARAMS_PADRAO, DATAS[0][1]);
     porte.calcCampoCompleto(entrada, PARAMS_PADRAO.meiaVida, DATAS[0][1]);
     expect(entrada).toEqual(intacta);
+  });
+});
+
+/* ---------------------- pós-1º turno: desvio documentado ---------------------- */
+
+/**
+ * Depois de 04/10 o 1º turno já aconteceu e não elegeu ninguém. O porte zera o caminho
+ * "ganhar direto no 1º turno" (DECISOES.md — "o protótipo não modelava o pós-1ºT").
+ * Aqui o gabarito é o protótipo COM essa única troca aplicada: tudo o que não depende do
+ * 1º turno continua idêntico a 1e-9; o que dependia passa a ser o 2º turno puro.
+ */
+function compararPos1T(
+  pesquisas: readonly Pesquisa[],
+  params: ParamsModelo,
+  hojeMs: number,
+  rot: string,
+) {
+  const M = porte.rodarModelo(cop(pesquisas), params, hojeMs);
+  const O = orig.rodarModelo(cop(pesquisas), params, hojeMs);
+  if (!O) {
+    expect(M).toBeNull();
+    return;
+  }
+  expect(M).not.toBeNull();
+  const esperado = {
+    ...O,
+    p1: null,
+    p2Tacontece: 1,
+    eleito: {
+      hoje: { l: O.pL2hoje, f: 1 - O.pL2hoje },
+      dia: { l: O.pL2dia, f: 1 - O.pL2dia },
+    },
+    // título/texto dependem de `eleito` — conferidos à parte, pela faixa
+    titulo: M!.titulo,
+    texto: M!.texto,
+  };
+  conferir(M, esperado, `${rot}/rodarModelo`);
+
+  const pLider = Math.max(O.pL2dia, 1 - O.pL2dia);
+  const lider = O.pL2dia >= 0.5 ? "LULA" : "FLÁVIO BOLSONARO";
+  if (pLider < 0.6) expect(M!.titulo).toContain("INDEFINIDA");
+  else if (pLider < 0.75) expect(M!.titulo).toBe(`${lider} LEVEMENTE FAVORITO`);
+  else if (pLider < 0.9) expect(M!.titulo).toContain(`${lider} FAVORITO —`);
+  else expect(M!.titulo).toBe(`${lider} AMPLAMENTE FAVORITO`);
+  expect(M!.texto).not.toContain(" 0 dias");
+
+  for (let v = -3; v <= 10.0001; v += 0.5) {
+    const vv = Math.round(v * 100) / 100;
+    const mA = O.margem - vv;
+    conferir(
+      porte.calcVies(M, vv),
+      {
+        vies: vv,
+        mA,
+        elD: orig.normCdf(mA / O.sigmaDia2),
+        elH: orig.normCdf(mA / O.sigmaHoje),
+      },
+      `${rot}/calcVies(${vv})`,
+    );
+  }
+  conferir(porte.calcDadosDist(M), orig.dadosDist(O), `${rot}/dadosDist`);
+
+  const r = porte.calcReplay(M);
+  expect(r).not.toBeNull();
+  expect(r!.r1L).toBeNull();
+  expect(r!.p1Ld).toBeNull();
+  expect(r!.pLider1).toBeNull();
+  expect(r!.p2Trep).toBe(1);
+  expect(r!.elRepD).toBe(r!.pV2rep);
+  const ro = orig.replay(O);
+  if (ro) {
+    conferir(
+      { r2L: r!.r2L, r2F: r!.r2F, pV2rep: r!.pV2rep },
+      { r2L: ro.r2L, r2F: ro.r2F, pV2rep: ro.pV2rep },
+      `${rot}/replay(2ºT)`,
+    );
+  }
+
+  const cb = porte.calcCenarioBase(M, params.vies);
+  expect(cb).not.toBeNull();
+  expect(cb!.pDireto).toBe(0);
+  expect(cb!.pLulaEm1).toBeNull();
+  conferir(cb!.pElei, pLider, `${rot}/cenBase.pElei`);
+  const co = orig.cenBase(O, params);
+  if (co) {
+    conferir(
+      { bandas: cb!.bandas, modal: cb!.modal, placarL: cb!.placarL, pV2: cb!.pV2 },
+      {
+        bandas: co.bandas,
+        modal: co.modal,
+        placarL: co.placarL,
+        pV2: O.pL2dia >= 0.5 ? O.pL2dia : 1 - O.pL2dia,
+      },
+      `${rot}/cenBase(2ºT)`,
+    );
+  }
+
+  conferir(
+    porte.calcCampoCompleto(cop(pesquisas), params.meiaVida, hojeMs),
+    orig.campoCompleto(cop(pesquisas), params, hojeMs),
+    `${rot}/campoCompleto`,
+  );
+  conferir(porte.calcPontosGrafico(M, 1), orig.pontosGrafico(O, 1), `${rot}/pontosGrafico(1)`);
+  conferir(porte.calcPontosGrafico(M, 2), orig.pontosGrafico(O, 2), `${rot}/pontosGrafico(2)`);
+}
+
+describe("pós-1º turno — protótipo com o caminho do 1ºT zerado", () => {
+  for (const [rotData, hoje] of DATAS_POS1T) {
+    for (const [rotParams, params] of CONJUNTOS_PARAMS) {
+      it(`${rotData} · ${rotParams}`, () => {
+        compararPos1T(PESQ, params, hoje, `${rotData}|${rotParams}`);
+      });
+    }
+    for (const [rotSub, ps] of SUBCONJUNTOS) {
+      it(`${rotData} · ${rotSub}`, () => {
+        compararPos1T(ps, PARAMS_PADRAO, hoje, `${rotData}|${rotSub}`);
+      });
+    }
+  }
+
+  it("entre turnos, a manchete É a chance do 2º turno (a ponte 84×82 vira identidade)", () => {
+    const M = porte.rodarModelo(cop(PESQ), PARAMS_PADRAO, DATAS_POS1T[1][1])!;
+    expect(M.eleito.dia.l).toBe(M.pL2dia);
+    expect(M.eleito.hoje.l).toBe(M.pL2hoje);
+    expect(M.p2Tacontece).toBe(1);
+    expect(M.p1).toBeNull();
+    expect(M.dias1T).toBe(0);
   });
 });
 

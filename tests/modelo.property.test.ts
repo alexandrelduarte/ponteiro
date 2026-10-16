@@ -359,7 +359,7 @@ describe("derivados", () => {
       dentro01(cb.pElei, `${rot}/pElei`);
       dentro01(cb.pDireto, `${rot}/pDireto`);
       dentro01(cb.pV2, `${rot}/pV2`);
-      dentro01(cb.pLulaEm1, `${rot}/pLulaEm1`);
+      if (cb.pLulaEm1 != null) dentro01(cb.pLulaEm1, `${rot}/pLulaEm1`);
       expect(cb.pElei, `${rot}/pElei ≥ 0,5`).toBeGreaterThanOrEqual(0.5);
       expect(cb.lider).toBe(cb.liderLula ? "LULA" : "FLÁVIO BOLSONARO");
     }
@@ -374,9 +374,9 @@ describe("derivados", () => {
       vistos++;
       dentro01(r.elRepD, `${rot}/elRepD`);
       dentro01(r.elRepH, `${rot}/elRepH`);
-      dentro01(r.p1Ld, `${rot}/p1Ld`);
+      if (r.p1Ld != null) dentro01(r.p1Ld, `${rot}/p1Ld`);
       dentro01(r.p2Trep, `${rot}/p2Trep`);
-      dentro01(r.pLider1, `${rot}/pLider1`);
+      if (r.pLider1 != null) dentro01(r.pLider1, `${rot}/pLider1`);
       dentro01(r.pV2rep, `${rot}/pV2rep`);
       dentro01(r.pPainel, `${rot}/pPainel`);
       // os erros NÃO se somam: cada turno recebe o erro medido no seu próprio turno

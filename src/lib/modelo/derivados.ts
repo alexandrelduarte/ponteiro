@@ -36,7 +36,8 @@ export function calcVies(m: ResultadoModelo | null, vies: number): ResultadoVies
   const pL2h = normCdf(mA / m.sigmaHoje);
   let elD = pL2d,
     elH = pL2h;
-  if (m.t1valL && m.t1valF) {
+  // depois de 04/10 (dias1T = 0) não existe mais o caminho do 1º turno — ver nucleo.ts
+  if (m.dias1T > 0 && m.t1valL && m.t1valF) {
     const vL = m.t1valL.valor - vies / 2,
       vF = m.t1valF.valor + vies / 2;
     const p1Ld = normCdf((vL - 50) / sigShare(m.sigmaDia1));
@@ -91,12 +92,13 @@ export function calcDadosDist(m: ResultadoModelo | null): PontoDist[] {
 
 /* ---------------------- réplica de 2022 ---------------------- */
 
-/** Réplica fiel de 2022: o erro de cada turno aplicado no seu próprio turno. */
+/** Réplica fiel de 2022: o erro de cada turno aplicado no seu próprio turno.
+ *  Campos do 1º turno são `null` depois de 04/10 (o turno já aconteceu). */
 export interface Replay {
   /** Lula no 1ºT (válidos) com o erro do 1ºT de 2022 */
-  r1L: number;
+  r1L: number | null;
   /** Flávio no 1ºT (válidos) com o erro do 1ºT de 2022 */
-  r1F: number;
+  r1F: number | null;
   /** Lula no 2ºT (válidos) com o erro do 2ºT de 2022 */
   r2L: number;
   /** Flávio no 2ºT (válidos) com o erro do 2ºT de 2022 */
@@ -106,11 +108,11 @@ export interface Replay {
   /** chance de Lula eleito na réplica, no cenário atual */
   elRepH: number;
   /** chance de Lula fechar o 1ºT já eleito, na réplica */
-  p1Ld: number;
+  p1Ld: number | null;
   /** chance de haver 2º turno, na réplica */
   p2Trep: number;
   /** chance de Lula chegar em 1º lugar no 1º turno */
-  pLider1: number;
+  pLider1: number | null;
   /** chance de Lula vencer o 2º turno na réplica */
   pV2rep: number;
   /** chance de Lula eleito pelo painel com viés = erro do 2ºT de 2022 (+3,1) */
@@ -122,7 +124,9 @@ export interface Replay {
  * Os erros NÃO se somam — o do 2ºT foi medido sobre pesquisas novas, refeitas após o 1ºT.
  */
 export function calcReplay(m: ResultadoModelo | null): Replay | null {
-  if (!m || !m.t1valL || !m.t1valF) return null;
+  if (!m) return null;
+  if (m.dias1T === 0) return calcReplayEntreTurnos(m);
+  if (!m.t1valL || !m.t1valF) return null;
   const r1L = m.t1valL.valor + ERRO_2022.t1.lula;
   const r1F = m.t1valF.valor + ERRO_2022.t1.flavio;
   const r2L = m.validoL2 + ERRO_2022.t2.lula;
@@ -162,6 +166,31 @@ export function calcReplay(m: ResultadoModelo | null): Replay | null {
   };
 }
 
+/** Réplica depois de 04/10: só o erro do 2ºT de 2022 importa — o 1º turno já aconteceu
+ *  (mesmas expressões do ramo do 2º turno de `calcReplay`, com p2Trep = 1). */
+function calcReplayEntreTurnos(m: ResultadoModelo): Replay {
+  const r2L = m.validoL2 + ERRO_2022.t2.lula;
+  const r2F = 100 - m.validoL2 + ERRO_2022.t2.flavio;
+  const seA = m.seAgora;
+  const sD2c = Math.hypot(seA, m.deriva2);
+  const mRep = m.margem - ERRO_2022.t2.margem;
+  const p2d = normCdf(mRep / sD2c),
+    p2h = normCdf(mRep / seA);
+  return {
+    r1L: null,
+    r1F: null,
+    r2L,
+    r2F,
+    elRepD: p2d,
+    elRepH: p2h,
+    p1Ld: null,
+    p2Trep: 1,
+    pLider1: null,
+    pV2rep: p2d,
+    pPainel: calcVies(m, ERRO_2022.t2.margem).elD,
+  };
+}
+
 /* ---------------------- cenário-base modal ---------------------- */
 
 /** Banda de margem do 2º turno com sua probabilidade e a cor do protótipo. */
@@ -177,12 +206,12 @@ export interface CenarioBase {
   liderLula: boolean;
   /** chance de o líder ser eleito */
   pElei: number;
-  /** chance de o líder vencer já no 1º turno */
+  /** chance de o líder vencer já no 1º turno (0 depois de 04/10) */
   pDireto: number;
   /** chance de o líder vencer o 2º turno */
   pV2: number;
-  /** chance de Lula terminar o 1º turno em 1º lugar */
-  pLulaEm1: number;
+  /** chance de Lula terminar o 1º turno em 1º lugar (`null` depois de 04/10) */
+  pLulaEm1: number | null;
   bandas: BandaCenario[];
   /** banda mais provável */
   modal: BandaCenario;
@@ -192,18 +221,23 @@ export interface CenarioBase {
 
 /** Cenário-base modal do 2º turno (usa o viés corrente do painel). */
 export function calcCenarioBase(m: ResultadoModelo | null, viesParam: number): CenarioBase | null {
-  if (!m || !m.t1valL || !m.t1valF || !m.p1) return null;
+  if (!m) return null;
+  const entreTurnos = m.dias1T === 0; // 1º turno já realizado: só o 2º turno decide
+  if (!entreTurnos && (!m.t1valL || !m.t1valF || !m.p1)) return null;
   const vies = viesParam || 0;
-  const p1 = m.p1;
   const liderLula = m.eleito.dia.l >= 0.5;
   const lider = liderLula ? "LULA" : "FLÁVIO BOLSONARO";
   const pElei = Math.max(m.eleito.dia.l, m.eleito.dia.f);
-  const pDireto = liderLula ? p1.lulaDia : p1.flavioDia;
   const pV2 = liderLula ? m.pL2dia : 1 - m.pL2dia;
-  // líder da largada (1º colocado no 1º turno)
-  const m1 = m.t1valL.valor - m.t1valF.valor - vies;
-  const sM1 = Math.hypot(m.sigmaDia1, 3.0);
-  const pLulaEm1 = normCdf(m1 / sM1);
+  let pDireto = 0;
+  let pLulaEm1: number | null = null;
+  if (!entreTurnos && m.p1 && m.t1valL && m.t1valF) {
+    pDireto = liderLula ? m.p1.lulaDia : m.p1.flavioDia;
+    // líder da largada (1º colocado no 1º turno)
+    const m1 = m.t1valL.valor - m.t1valF.valor - vies;
+    const sM1 = Math.hypot(m.sigmaDia1, 3.0);
+    pLulaEm1 = normCdf(m1 / sM1);
+  }
   // bandas de margem do 2ºT sobre N(margemAj, sigmaDia2)
   const F = (x: number) => normCdf((x - m.margemAj) / m.sigmaDia2);
   const bandas: BandaCenario[] = [

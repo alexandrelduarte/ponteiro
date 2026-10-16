@@ -45,6 +45,15 @@ describe("coerência entre superfícies publicadas", () => {
     expect(Math.round(M.eleito.dia.l * 100)).toBe(Number(eleitoL));
   });
 
+  it("entre turnos (pós-04/10) manchete e enxame são o MESMO número — não há mais ponte", () => {
+    const E = rodarModelo(SEED, PARAMS_PADRAO, Date.parse("2026-10-16T09:00:00-03:00"))!;
+    const [eleitoL] = parEmCem(E.eleito.dia.l);
+    const layout = montarEnxame(E.margemAj, E.sigmaDia2);
+    expect(E.p2Tacontece).toBe(1);
+    expect(E.eleito.dia.l).toBe(E.pL2dia);
+    expect(Math.abs(layout.nLula - Number(eleitoL))).toBeLessThanOrEqual(1);
+  });
+
   it("a soma das bolinhas de cada lado do enxame confere com o layout", () => {
     const layout = montarEnxame(M.margemAj, M.sigmaDia2);
     const total = layout.colunas.reduce((s, c) => s + c.qtd, 0);

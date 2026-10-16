@@ -635,3 +635,28 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
   "vinha publicando" (imperfeito que insinua quebra).
 - Automação: puro sobre (pesquisas, hojeMs) + ISR 300 — o bloco envelhece sozinho; pesquisa
   nova aprovada → serieMudou já revalida a home → ritmos recalculam.
+
+## 2º turno — o modelo passa a saber que o 1º turno já aconteceu (out/2026)
+
+- **Contexto**: em 16/10/2026 (entre turnos) o painel ainda somava à manchete a chance de
+  "Lula ganhar já no 1º turno" (~6 em 100, congelada desde 04/10, porque `dias1T` é
+  truncado em 0 e `p1` continuava calculado com as pesquisas antigas de 1º turno). O hero
+  dizia "1º turno · faltam 0 dias" e a "ponte 84×82" afirmava que em ~6 de cada 100
+  cenários "não há 2º turno" — falso depois de 04/10. É **bug real**: o protótipo
+  (`agregador-presidencial-2026.jsx`) foi escrito em agosto e não modelava o pós-1ºT.
+- **Decisão**: `faseEleitoral(hojeMs)` (`src/lib/modelo/fase.ts`: `pre1T` → `entreTurnos`
+  em `ELEICAO_1T` → `encerrada` em `ELEICAO_2T`). No núcleo, `p1` só é calculado na fase
+  `pre1T`; daí `p2Tacontece = 1` e `eleito = pL2` sem tocar em nenhuma outra fórmula. Os
+  derivados seguem a mesma guarda via `dias1T === 0`: `calcVies` vira 2º turno puro;
+  `calcReplay` mantém só o ramo do 2º turno (campos do 1ºT = `null`, `p2Trep = 1`);
+  `calcCenarioBase` passa a existir sem dados de 1ºT (`pDireto = 0`, `pLulaEm1 = null`).
+  As médias `t1*`, `serie1` e `tend1` continuam calculadas (servem ao histórico). O
+  veredito não diz mais "0 dias até a decisão".
+- **Golden tests**: a paridade 1e-9 com o protótipo continua valendo ANTES de 04/10 (agora
+  até 04/10 11:59) e só sobre as 13 rodadas originais (`IDS_PROTOTIPO` — o seed vai crescer
+  com o 2º turno). Depois de 04/10, o gabarito é o protótipo COM a única troca aplicada
+  (`p1 = null`): todo o resto segue idêntico a 1e-9. A "ponte 84×82" vira identidade
+  (manchete = enxame) — travada em `tests/coerencia-superficies.test.ts`.
+- **sigmaSys continua 4,0**: o argumento antigo ("as pesquisas ainda não passaram pela
+  calibragem do 1º turno") perdeu a premissa, mas o 1º turno de 2026 mostrou erro
+  grande de novo — não há base para apertar a incerteza a 9 dias da decisão.

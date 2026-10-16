@@ -15,6 +15,7 @@
  */
 import { ELEICAO_1T, ELEICAO_2T } from "@/data/constantes";
 import type { ParamsModelo, Pesquisa, Placar } from "@/data/tipos";
+import { primeiroTurnoPendente } from "./fase";
 import { fmt, fmtSinal } from "./formatadores";
 
 /* ---------------------- tipos ---------------------- */
@@ -256,8 +257,11 @@ export function rodarModelo(
     meiaVida,
   );
 
+  /* Depois de 04/10 o 1º turno já aconteceu e não elegeu ninguém: o caminho "ganhar
+     direto no 1º turno" deixa de existir (p1 = null → p2Tacontece = 1, eleito = pL2).
+     Desvio deliberado do protótipo, que não modelava o pós-1ºT — ver DECISOES.md. */
   let p1: Probabilidades1T | null = null;
-  if (t1valL && t1valF) {
+  if (primeiroTurnoPendente(hojeMs) && t1valL && t1valF) {
     const sigShare = (base: number) => Math.sqrt((base / 2) ** 2 + 1.5 ** 2); // +realocação de indecisos
     const vL = t1valL.valor - vies / 2;
     const vF = t1valF.valor + vies / 2;
@@ -327,7 +331,10 @@ export function rodarModelo(
     texto = `A diferença efetiva de ${fmt(Math.abs(margemAj))} p.p. no 2º turno é pequena frente à incerteza projetada (±${fmt(sigmaDia2)} p.p.). Pelos dados, qualquer desfecho é plausível.`;
   } else if (pLider < 0.75) {
     titulo = `${liderNome} LEVEMENTE FAVORITO`;
-    texto = `Há vantagem, mas ela cabe dentro dos erros históricos de pesquisa somados aos ${Math.ceil(dias2T)} dias até a decisão. Virada segue plenamente possível.`;
+    texto =
+      dias2T > 0
+        ? `Há vantagem, mas ela cabe dentro dos erros históricos de pesquisa somados aos ${Math.ceil(dias2T)} dias até a decisão. Virada segue plenamente possível.`
+        : `Há vantagem, mas ela cabe dentro dos erros históricos de pesquisa. Virada segue plenamente possível.`;
   } else if (pLider < 0.9) {
     titulo = `${liderNome} FAVORITO — vitória provável, não garantida`;
     texto = `A vantagem efetiva de ${fmt(Math.abs(margemAj))} p.p. no 2º turno supera a incerteza de curto prazo, mas um erro coletivo de pesquisa como o de 2022, ou movimento na campanha de TV, ainda permitiria virada.`;

@@ -93,7 +93,7 @@ export function CenarioBase() {
   if (!cen) return null;
 
   const lider = cen.liderLula ? "Lula" : "Flávio";
-  const lider1T = cen.pLulaEm1 >= 0.5 ? "Lula" : "Flávio";
+  const lider1T = (cen.pLulaEm1 ?? 0) >= 0.5 ? "Lula" : "Flávio";
   const apertada = Math.abs(M.margemAj) < 5 ? "apertada" : "média";
   const pElei = emCem(cen.pElei);
   const pContra = emCem(1 - cen.pElei);

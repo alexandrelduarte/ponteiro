@@ -25,7 +25,9 @@ import { rodarModelo } from "@/lib/modelo";
 export const runtime = "nodejs";
 // Gerada UMA vez, no build: os arquivos são lidos do repositório durante o
 // prerender e a imagem vira asset estático — nada de I/O em runtime.
-export const dynamic = "force-static";
+// ISR de 5 min (era force-static: o número ficava congelado no último deploy —
+// em out/2026 o card ainda publicava a chance de agosto). DECISOES.md.
+export const revalidate = 300;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt =
@@ -46,7 +48,8 @@ const BASE_OG = join(process.cwd(), "public", "brand", "og-base.png");
 /**
  * `fetch(new URL(..., import.meta.url))` não funciona sob o Turbopack (fetch de
  * `file:` não é implementado), então lemos os arquivos do disco durante o
- * prerender. Com `dynamic = "force-static"` isso acontece só no build.
+ * prerender e a cada revalidação (os arquivos vão no bundle via
+ * `outputFileTracingIncludes`, next.config.ts).
  */
 async function carregarFontes() {
   const [serif, lexend, lexendForte] = await Promise.all([

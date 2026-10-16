@@ -74,7 +74,7 @@ export function ProximasPesquisas({ proximas }: { proximas: Proximas }) {
       ) : null}
       {semRitmo.length ? (
         <p className="mt-2 max-w-texto text-micro text-tinta-media">
-          Institutos com uma pesquisa só no painel ainda não mostram ritmo: {semRitmo.join(", ")}.
+          Sem pesquisas suficientes nos últimos 120 dias para mostrar ritmo: {semRitmo.join(", ")}.
         </p>
       ) : null}
 

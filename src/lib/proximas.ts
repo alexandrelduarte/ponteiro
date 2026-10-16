@@ -48,6 +48,10 @@ export interface Proximas {
 const DIA_MS = 86_400_000;
 export const JANELA_RITMO_DIAS = 120;
 const SEGUNDO_TURNO_ISO = "2026-10-25";
+/** Urnas fechadas no 2º turno: daí em diante não há "próxima pesquisa" a estimar. */
+const FIM_VOTACAO_2T = Date.parse("2026-10-25T17:00:00-03:00");
+/** Instituto parado: última pesquisa mais velha que max(30 dias, 3× o ritmo) sai da lista. */
+const PARADO_MIN_DIAS = 30;
 
 /** Datas fixadas em lei — nomes carimbados (§15.3). */
 const EVENTOS_OFICIAIS: readonly { nome: string; dataISO: string }[] = [
@@ -119,6 +123,9 @@ export function computarProximas(
     }
     const ritmoDias = Math.max(1, Math.round(mediana(intervalos)));
     const ultimaMs = fins[fins.length - 1];
+    // Casa que parou de publicar não "pode sair a qualquer momento" (out/2026: a
+    // lista dizia isso de institutos sem pesquisa havia meses). Sai sem frase.
+    if (hojeMs - ultimaMs > Math.max(PARADO_MIN_DIAS, 3 * ritmoDias) * DIA_MS) continue;
     const previstaMs = ultimaMs + ritmoDias * DIA_MS;
     institutos.push({
       instituto: maisRecente.instituto,
@@ -147,5 +154,7 @@ export function computarProximas(
     faltamDias: Math.round((meioDiaSP(e.dataISO) - meioDiaSP(hojeISO)) / DIA_MS),
   })).filter((e) => e.faltamDias >= 0);
 
+  // Depois que as urnas fecham, estimar a próxima pesquisa não faz sentido.
+  if (hojeMs >= FIM_VOTACAO_2T) return { institutos: [], semRitmo: [], eventos };
   return { institutos: institutos.slice(0, limiteInstitutos), semRitmo, eventos };
 }

@@ -93,6 +93,10 @@ export const registroTse = (tse: string | null | undefined): string => {
   return /n\/d/i.test(tse) ? "o número do registro não está na publicação" : tse;
 };
 
+/** Contagem regressiva por extenso: "faltam 9 dias", "falta 1 dia", "é hoje". */
+export const faltamDias = (dias: number): string =>
+  dias <= 0 ? "é hoje" : dias === 1 ? "falta 1 dia" : `faltam ${dias} dias`;
+
 /** Inteiro em formato brasileiro, sem depender de ICU (hidratação estável). */
 export const inteiroBr = (n: number | null | undefined): string =>
   n == null || !isFinite(n) ? "–" : String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -144,7 +148,8 @@ export const GLOSSARIO = {
     termo: "2º turno",
     texto:
       "Se ninguém passar da metade dos votos válidos no 1º turno, os dois mais votados disputam " +
-      "de novo, três semanas depois. Em 2026: 4 de outubro e 25 de outubro.",
+      "de novo, três semanas depois. Em 2026 ninguém passou da metade em 4 de outubro, e Lula e " +
+      "Flávio voltam às urnas em 25 de outubro.",
   },
   votosValidos: {
     termo: "votos válidos",
@@ -167,7 +172,8 @@ export const GLOSSARIO = {
     texto:
       "É a pergunta “e se todas as pesquisas estiverem puxando para o mesmo lado?”. Você diz o " +
       "tamanho da puxada e o painel refaz a conta. Exemplo: com uma puxada de 3 pontos a favor de " +
-      "Lula, uma diferença medida de 4,7 pontos vira 1,7 na conta. É um teste, não uma acusação.",
+      "Lula, uma diferença medida de 2 pontos a favor de Lula vira 1 ponto a favor de Flávio na " +
+      "conta. É um teste, não uma acusação.",
   },
   empateTecnico: {
     termo: "empate técnico",
@@ -181,8 +187,8 @@ export const GLOSSARIO = {
     termo: "projeção",
     texto:
       "É o número calculado para o dia da votação, não para hoje. Ele junta o retrato de hoje com " +
-      "o quanto a corrida ainda pode andar até lá. Exemplo: 88 em 100 se a votação fosse hoje " +
-      "podem virar 83 em 100 em outubro, porque falta tempo para a opinião se mexer.",
+      "o quanto a corrida ainda pode andar até lá. Exemplo: 75 em 100 se a votação fosse hoje " +
+      "podem virar 73 em 100 no dia da votação, porque ainda há dias para a opinião se mexer.",
   },
   peso: {
     termo: "peso da pesquisa",
@@ -215,8 +221,9 @@ export const GLOSSARIO = {
   deriva: {
     termo: "o quanto a corrida ainda pode andar",
     texto:
-      "É o espaço que sobra para a opinião mudar até a votação, por causa da propaganda na TV, dos " +
-      "debates e de fatos novos. Quanto mais longe o dia da votação, maior esse espaço.",
+      "É o espaço que sobra para a opinião mudar até a votação, por causa da reta final da " +
+      "campanha, dos debates e de fatos novos. Quanto mais perto o dia da votação, menor esse " +
+      "espaço.",
   },
   registroTse: {
     termo: "registro no TSE",

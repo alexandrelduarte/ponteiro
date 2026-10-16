@@ -22,17 +22,51 @@ import {
   Nicho,
   Subtitulo,
 } from "@/components/ui/blocos";
-import { parEmCem } from "@/components/ui/textos";
-import { calcReplay } from "@/lib/modelo";
+import { abs1, emCem, parEmCem } from "@/components/ui/textos";
+import { pct1T } from "@/data/resultado-1t";
+import { calcErro1T } from "@/lib/erro-1t";
+import { calcReplay, fmt, fmtSinal, rodarModelo } from "@/lib/modelo";
 import { ERROS_TRADUZIDOS, FONTES_TRADUZIDAS } from "./copia-erros";
 import { CurvaSensibilidade } from "./curva-sensibilidade";
 import { Replay2022 } from "./replay-2022";
 import { usePainel } from "./estado";
 
 export function Erro2022() {
-  const { M } = usePainel();
+  const { M, pesquisas, pesquisasOficiais, params, hojeMs } = usePainel();
   const replay = useMemo(() => calcReplay(M), [M]);
-  const [elDia] = parEmCem(replay?.elRepD ?? null);
+  const [elDia, elDiaF] = parEmCem(replay?.elRepD ?? null);
+  const margemRep = M.margem - 3.1;
+
+  /* O erro do 1º turno de 2026 (pesquisas da última semana × urna) entra na
+     tabela como sexta linha, calculado pela regra pública de src/lib/erro-1t.ts. */
+  const erro1T = useMemo(() => calcErro1T(pesquisasOficiais), [pesquisasOficiais]);
+  const linhas = useMemo(() => {
+    if (!erro1T) return ERROS_TRADUZIDOS;
+    return [
+      ...ERROS_TRADUZIDOS,
+      {
+        pleito: "2026 · 1º turno",
+        urna: `Lula ${fmt(pct1T("Lula"), 2)}% × Flávio ${fmt(pct1T("Flávio Bolsonaro"), 2)}%`,
+        pesq: `média de ${erro1T.k} pesquisas da última semana: Lula ${fmt(erro1T.pesqL)}% × Flávio ${fmt(erro1T.pesqF)}%`,
+        erro:
+          Math.abs(erro1T.erroMargem) < 0.5
+            ? "acerto na diferença (menos de meio ponto)"
+            : `diferença errada em ${abs1(erro1T.erroMargem)} pontos a favor de ${erro1T.erroMargem > 0 ? "Lula" : "Flávio"}`,
+      },
+    ];
+  }, [erro1T]);
+
+  /* "Traduzindo em número": a chance de Lula no dia sob três tamanhos da dúvida
+     sobre o erro do setor (régua de erro 3,0 · padrão 4,0 · 6,0). Calculado,
+     nunca fixo — os números de agosto (86/83/79) envelheceram com a série. */
+  const porRegua = useMemo(
+    () =>
+      [3, 4, 6].map((sigmaSys) => {
+        const R = rodarModelo(pesquisas, { ...params, sigmaSys }, hojeMs);
+        return R ? emCem(R.eleito.dia.l) : "–";
+      }),
+    [pesquisas, params, hojeMs],
+  );
 
   return (
     <Bloco rotuladoPor="titulo-erro-2022">
@@ -41,16 +75,18 @@ export function Erro2022() {
         pergunta="E se as pesquisas errarem como em 2022?"
         resposta={
           <>
-            Se o erro do 2º turno de 2022 se repetisse igual, Lula continuaria à frente — eleito em{" "}
-            <span className="numeros">{elDia}</span> de cada 100 cenários, e por pouco, como em
-            2022.
+            Se o erro do 2º turno de 2022 (3,1 pontos a favor de Lula) se repetisse igual, a
+            diferença passaria a <span className="numeros">{fmtSinal(margemRep)}</span>, com{" "}
+            {margemRep >= 0 ? "Lula" : "Flávio"} na frente: Lula eleito em{" "}
+            <span className="numeros">{elDia}</span> de cada 100 cenários e Flávio em{" "}
+            <span className="numeros">{elDiaF}</span>.
           </>
         }
         traduzindo={
           <>
-            Esta seção compara o que as pesquisas de véspera diziam com o resultado real, em cinco
-            eleições. Serve para dar tamanho ao erro possível. Não é uma previsão de que ele vai
-            acontecer de novo.
+            Esta seção compara o que as pesquisas de véspera diziam com o resultado real, em{" "}
+            {linhas.length === 5 ? "cinco" : "seis"} eleições. Serve para dar tamanho ao erro
+            possível. Não é uma previsão de que ele vai acontecer de novo.
           </>
         }
       />
@@ -62,7 +98,7 @@ export function Erro2022() {
         className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2 lg:hidden"
         aria-label="Erro das pesquisas, eleição a eleição"
       >
-        {ERROS_TRADUZIDOS.map((h) => (
+        {linhas.map((h) => (
           <li key={h.pleito}>
             {/* Rótulo e valor na MESMA linha: empilhados, os cinco cartões
                 custavam ~1 500px de altura a 390 sem dizer nada a mais. */}
@@ -95,7 +131,7 @@ export function Erro2022() {
       <div className="relative mt-5 hidden lg:block">
         <table className="w-full table-fixed text-micro">
           <caption className="sr-only">
-            O que as pesquisas de véspera diziam e qual foi o resultado real, em cinco eleições.
+            O que as pesquisas de véspera diziam e qual foi o resultado real, eleição a eleição.
           </caption>
           <colgroup>
             <col className="w-[14%]" />
@@ -120,7 +156,7 @@ export function Erro2022() {
             </tr>
           </thead>
           <tbody>
-            {ERROS_TRADUZIDOS.map((h) => (
+            {linhas.map((h) => (
               <tr key={h.pleito} className={`border-t border-filete align-top ${LINHA_TABELA}`}>
                 <th scope="row" className="py-3 pr-3 text-left font-semibold text-tinta">
                   {h.pleito}
@@ -139,18 +175,20 @@ export function Erro2022() {
           <Subtitulo>Por que pode acontecer de novo</Subtitulo>
           <p className="mt-1 text-corpo text-tinta">
             O erro não foi acidente de uma eleição. Em 2018 e em 2022 as pesquisas subestimaram a
-            direita — parte desse eleitor não responde, parte decide na última hora. O país continua
-            dividido do mesmo jeito e os métodos das casas continuam parecidos. Nada garante que a
-            correção já veio.
+            direita — parte desse eleitor não responde, parte decide na última hora.
+            {erro1T && erro1T.erroMargem >= 0.5
+              ? " No 1º turno de 2026 aconteceu de novo."
+              : ""}{" "}
+            Nada garante que a correção já veio.
           </p>
         </Nicho>
         <Nicho>
           <Subtitulo>Por que pode ser menor</Subtitulo>
           <p className="mt-1 text-corpo text-tinta-media numeros">
             A eleição se decide no 2º turno, e é ali que o erro histórico é bem menor: de 0,4 a 6,2
-            pontos em 2022, quase zero em 2018. Além disso, o candidato da direita agora é outro:
-            Flávio, não Jair. Não se sabe quanto do voto se transfere, e a direção do erro não é
-            regra.
+            pontos em 2022, quase zero em 2018. Entre um turno e outro os institutos ganham um
+            gabarito — o resultado real do 1º turno — e podem corrigir o método. A direção do erro
+            não é regra.
           </p>
         </Nicho>
       </div>
@@ -160,7 +198,7 @@ export function Erro2022() {
           gráfico. Viram detalhe, com afordância de controle: nada saiu da
           página, e quem quer a íntegra alcança num toque. */}
       <Detalhe
-        titulo="Por que o erro do 1º turno importa agora, se o do 2º é menor"
+        titulo="Por que o erro do 1º turno ainda importa, se o do 2º costuma ser menor"
         className="mt-5"
       >
         <Colunas
@@ -170,18 +208,17 @@ export function Erro2022() {
           <p className="max-w-texto">
             O erro pequeno da decisão de 2022 (3,1 pontos) só foi possível porque, entre um turno e
             outro, os institutos ganharam um gabarito perfeito: o resultado real do 1º turno. Com
-            ele na mão, eles corrigiram o método.{" "}
+            ele na mão, eles corrigiram o método. Em 2026 o gabarito existe desde 4 de outubro, e as
+            pesquisas de 2º turno desta lista foram feitas depois dele.{" "}
             <b className="font-semibold text-tinta">
-              As pesquisas que alimentam este painel ainda não passaram por essa correção
-            </b>{" "}
-            — são o mesmo tipo de instrumento que produziu o erro de 6,3.
+              Se a correção funcionou, só a urna de 25 de outubro vai dizer
+            </b>
+            .
           </p>
           <p className="max-w-texto">
-            Por isso o erro do 1º turno entra três vezes na conta. Ele dá o tamanho da dúvida de
-            hoje (o padrão de 4,0 fica entre os dois números). Ele muda a cara do 1º turno
-            projetado: uma folga de cerca de 9 pontos vira uma chegada de cerca de 2,5. E ele define
-            o teto do erro já visto no setor, usado no cartão de teste-limite. O 3,1 só vira a
-            referência certa depois de 4 de outubro, quando o gabarito voltar a existir.
+            Por isso o erro do 1º turno continua na conta. Ele dá o tamanho da dúvida de hoje (o
+            padrão de 4,0 fica entre o 3,1 da decisão de 2022 e os erros maiores dos 1ºs turnos). E
+            ele define o teto do erro já visto no setor, usado no cartão de teste-limite.
           </p>
           <p className="max-w-texto">
             <b className="font-semibold text-tinta">
@@ -197,10 +234,10 @@ export function Erro2022() {
           </p>
           <p className="max-w-texto">
             Traduzindo em número, sempre falando da chance de Lula no dia da votação: se a correção
-            se manteve (régua em 3,0), cerca de 86 em 100. Se veio só em parte — o padrão do painel,
-            4,0 — cerca de 83 em 100. Se o erro voltar para perto do tamanho do 1º turno (6,0, o
-            topo da régua), cerca de 79 em 100. Escolha a sua suposição na régua de erro, logo
-            acima.
+            se manteve (régua em 3,0), cerca de {porRegua[0]} em 100. Se veio só em parte — o padrão
+            do painel, 4,0 — cerca de {porRegua[1]} em 100. Se o erro voltar para perto do tamanho
+            do 1º turno (6,0, o topo da régua), cerca de {porRegua[2]} em 100. Escolha a sua
+            suposição na régua de erro, logo acima.
           </p>
         </Colunas>
       </Detalhe>

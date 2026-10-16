@@ -526,6 +526,9 @@ export function Vazio({
           alt={ilustracao.alt}
           width={320}
           height={118}
+          // lazy: o React não pré-carrega a ilustração quando a rota só é
+          // pré-buscada pelo link da barra (o navegador acusava preload sem uso).
+          loading="lazy"
           className="mb-3 h-auto w-full max-w-[20rem]"
         />
       ) : null}

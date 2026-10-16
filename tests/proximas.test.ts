@@ -8,9 +8,11 @@ import { computarProximas, JANELA_RITMO_DIAS } from "@/lib/proximas";
 
 const HOJE = Date.parse("2026-08-07T09:00:00-03:00");
 const meioDia = (iso: string) => Date.parse(`${iso}T12:00:00-03:00`);
+/** A base do protótipo (campo até 28/07) — o seed cresceu com ago–out depois disso. */
+const seedAte0708 = () => pesquisasDoSeed().filter((p) => p.fim <= "2026-07-31");
 
 describe("computarProximas (com a base real do seed, hoje = 07/08/2026)", () => {
-  const r = computarProximas(pesquisasDoSeed(), HOJE);
+  const r = computarProximas(seedAte0708(), HOJE);
 
   it("a janela de 120 dias impede a mediana envenenada de janeiro (§15.1)", () => {
     // Sem a janela, Quaest publicava "a cada 92 dias · próxima 13/10" (depois
@@ -74,8 +76,34 @@ describe("computarProximas (com a base real do seed, hoje = 07/08/2026)", () => 
   });
 
   it(`é determinístico e a janela é a registrada (${JANELA_RITMO_DIAS} dias)`, () => {
-    const b = computarProximas(pesquisasDoSeed(), HOJE);
+    const b = computarProximas(seedAte0708(), HOJE);
     expect(JSON.stringify(b)).toBe(JSON.stringify(r));
     expect(JANELA_RITMO_DIAS).toBe(120);
+  });
+});
+
+describe("computarProximas — 2º turno", () => {
+  it("casa parada há mais de max(30 dias, 3× o ritmo) sai da lista (não 'pode sair a qualquer momento')", () => {
+    const base = pesquisasDoSeed().filter(
+      (p) => p.slug!.startsWith("atlasintel") && p.fim < "2026-08-01",
+    );
+    expect(base.length).toBeGreaterThanOrEqual(2);
+    // última 27/07, ritmo 27 dias → parada a partir de 81 dias (16/10); em 20/10 já saiu
+    expect(computarProximas(base, meioDia("2026-08-10")).institutos.length).toBe(1);
+    expect(computarProximas(base, meioDia("2026-10-20")).institutos).toEqual([]);
+  });
+
+  it("depois das 17h de 25/10 (urnas fechadas) não há ritmo a estimar", () => {
+    const r = computarProximas(pesquisasDoSeed(), Date.parse("2026-10-25T17:30:00-03:00"));
+    expect(r.institutos).toEqual([]);
+    expect(r.semRitmo).toEqual([]);
+  });
+
+  it("entre turnos, com a base atual, todas as casas listadas publicaram há pouco", () => {
+    const hoje = meioDia("2026-10-16");
+    const r = computarProximas(pesquisasDoSeed(), hoje);
+    expect(r.institutos.length).toBeGreaterThan(0);
+    for (const i of r.institutos)
+      expect(hoje - meioDia(i.ultimaFimISO)).toBeLessThanOrEqual(30 * 86_400_000);
   });
 });

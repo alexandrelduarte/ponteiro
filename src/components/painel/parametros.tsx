@@ -90,10 +90,10 @@ export function Parametros() {
               erro foi de 6,3 pontos{" "}
               <b className="font-semibold text-tinta">na diferença entre os dois</b> no 1º turno e
               de 3,1 no 2º. A diferença é que, entre um turno e outro, os institutos corrigiram o
-              método usando o resultado real do 1º turno. As pesquisas de hoje ainda não passaram
-              por essa correção — por isso o padrão fica em 4,0, entre os dois números. Parte
-              daqueles 6,3 foi gente mudando de ideia na última hora, e isso já entra na régua de
-              baixo.
+              método usando o resultado real do 1º turno. Em 2026 as pesquisas de 2º turno já
+              tiveram esse gabarito, mas ainda não se sabe se a correção funcionou — por isso o
+              padrão fica em 4,0, entre os dois números. Parte daqueles 6,3 foi gente mudando de
+              ideia na última hora, e isso já entra na régua de baixo.
             </>
           }
         />
@@ -106,10 +106,10 @@ export function Parametros() {
           faixa={FAIXAS.coefDeriva}
           idTeste="slider-deriva"
           onChange={(v) => definirParam("coefDeriva", v)}
-          dicaResumo="Até a votação ainda tem propaganda na TV, debate e fato novo."
+          dicaResumo="Até a votação ainda tem debate, a reta final e fato novo."
           dica={
             <>
-              Até a votação ainda tem propaganda na TV, debate e fato novo. Esta régua diz{" "}
+              Até a votação ainda tem debate, a reta final e fato novo. Esta régua diz{" "}
               <Termo chave="deriva">o quanto a corrida ainda pode andar</Termo> até lá. Ela muda só
               o número projetado para o dia da votação — o retrato de hoje fica igual. É ela que faz
               as duas linhas do topo serem diferentes.
@@ -209,9 +209,9 @@ export function Parametros() {
               rotuloAcessivel={`Cem bolinhas, uma por cenário da decisão de 25 de outubro: ${layout.nLula} do lado de Lula e ${layout.nFlavio} do lado de Flávio.`}
             />
             {/* A frase colada no desenho usa O NÚMERO DO DESENHO (§10.1c). O
-                mini-enxame desenha os quantis da margem do 2º turno; a frase
-                acima soma também o caminho que acaba em 4 de outubro. Sem esta
-                reconciliação, escrito e desenhado discordavam sem aviso (H3).
+                mini-enxame desenha os quantis da margem do 2º turno — desde
+                04/10 o mesmo número da frase acima (não há mais o caminho do 1º
+                turno). Escrito e desenhado não podem discordar sem aviso (H3).
                 A cláusula do meio ensina a ler a FORMA, não só a contar os
                 lados: o desenho carregava a dúvida na largura da pilha e
                 nenhuma legenda do produto dizia isso — o leitor aprendia a
@@ -223,8 +223,7 @@ export function Parametros() {
             >
               As bolinhas mostram só a decisão de 25 de outubro: {layout.nLula} caem do lado de Lula
               e {layout.nFlavio} do lado de Flávio. A largura da pilha é o tamanho da dúvida no dia
-              da votação: quanto mais espalhadas, menos fechada está a disputa. A frase acima soma
-              também quem ganha já em 4 de outubro — por isso dá outro número.
+              da votação: quanto mais espalhadas, menos fechada está a disputa.
             </p>
           </div>
         </Colunas>

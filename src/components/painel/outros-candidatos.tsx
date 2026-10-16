@@ -22,11 +22,17 @@
  *     Dez colunas numa tela de 390 (ou de 768) só cabem com rolagem horizontal,
  *     que §6.3 bane com todas as letras. O número por instituto continua
  *     alcançável, a um toque, em qualquer largura.
+ *
+ * Desde 04/10 o 1º turno é FATO: a seção mostra o resultado oficial do TSE,
+ * com todos os candidatos, na mesma régua fixa de 0 a 50% — e não mais a média
+ * de pesquisas antigas (`ResultadoOficial1T`).
  */
 import { useRef } from "react";
 import { Bloco, Cabecalho, Chip, LINHA_TABELA, Vazio } from "@/components/ui/blocos";
 import { corDeExibicao } from "@/components/ui/cores-candidatos";
-import { fmt, fmtData, valCand } from "@/lib/modelo";
+import { inteiroBr } from "@/components/ui/textos";
+import { RESULTADO_1T } from "@/data/resultado-1t";
+import { faseEleitoral, fmt, fmtData, valCand } from "@/lib/modelo";
 import { usePainel, type Aba } from "./estado";
 
 const ORDEM: Aba[] = ["principal", "todos"];
@@ -50,7 +56,98 @@ const ABREV_INSTITUTO: Record<string, string> = {
   Indexa: "Indexa",
 };
 
+/** O 1º turno já aconteceu: o ranking é o resultado oficial, para todos os nomes. */
+function ResultadoOficial1T() {
+  const [, segundo, terceiro] = RESULTADO_1T.candidatos;
+  return (
+    <Bloco rotuladoPor="titulo-outros">
+      <Cabecalho
+        id="titulo-outros"
+        pergunta="E os outros candidatos?"
+        resposta={
+          <>
+            Ficaram no 1º turno. Na urna de 4 de outubro, o terceiro colocado teve{" "}
+            <span className="numeros">{fmt(terceiro.pctValidos, 2)}%</span> dos votos válidos,
+            contra <span className="numeros">{fmt(segundo.pctValidos, 2)}%</span> do segundo — por
+            isso a decisão é só entre Lula e Flávio.
+          </>
+        }
+        traduzindo={
+          <>
+            Este é o resultado oficial do TSE, com todos os candidatos. O par do 2º turno não é
+            escolha nossa: são os dois mais votados na urna.
+          </>
+        }
+      />
+
+      <div id="painel-outros">
+        <div
+          aria-hidden="true"
+          className="relative mt-4 h-5 max-w-[40rem] text-micro text-tinta-media"
+        >
+          <span className="absolute left-0">0</span>
+          <span className="absolute left-1/2 -translate-x-1/2">25%</span>
+          <span className="absolute right-0">50% dos votos válidos</span>
+        </div>
+        <ul className="mt-1 max-w-[40rem] space-y-3" data-testid="lista-candidatos">
+          {RESULTADO_1T.candidatos.map((c, i) => (
+            <li key={c.nome}>
+              <div className="flex items-baseline justify-between gap-x-3">
+                <span className="min-w-0 text-corpo font-semibold text-tinta">
+                  {i + 1}º · {c.nome}
+                </span>
+                <span className="shrink-0 text-corpo font-semibold whitespace-nowrap text-tinta numeros">
+                  {fmt(c.pctValidos, 2)}%
+                </span>
+              </div>
+              <p className="flex flex-wrap items-center gap-x-2 text-micro text-tinta-media numeros">
+                <span>
+                  {c.partido} · {inteiroBr(c.votos)} votos
+                </span>
+                {i < 2 ? <Chip tom="ameixa">vai ao 2º turno</Chip> : null}
+              </p>
+              <div className="relative mt-1 h-3 overflow-hidden rounded-plena bg-nicho">
+                <div
+                  data-testid={`barra-candidato-${i}`}
+                  className="h-full rounded-plena"
+                  style={{
+                    width: `${Math.min(100, (100 * c.pctValidos) / REGUA_MAX)}%`,
+                    background: corDeExibicao(c.nome, i),
+                  }}
+                />
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-contorno"
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <p className="mt-3 max-w-texto text-micro text-tinta-media">
+        Todas as barras estão na mesma régua: de 0 a 50% dos votos válidos. Votos válidos são os
+        votos em candidatos — sem brancos e nulos. Fonte:{" "}
+        <a
+          href={RESULTADO_1T.fonte}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2"
+        >
+          resultado oficial do TSE
+        </a>
+        .
+      </p>
+    </Bloco>
+  );
+}
+
 export function OutrosCandidatos() {
+  const { hojeMs } = usePainel();
+  if (faseEleitoral(hojeMs) !== "pre1T") return <ResultadoOficial1T />;
+  return <OutrosCandidatosPesquisas />;
+}
+
+function OutrosCandidatosPesquisas() {
   const { campoCompleto, aba, definirAba } = usePainel();
   const refs = useRef<Record<Aba, HTMLButtonElement | null>>({ principal: null, todos: null });
 

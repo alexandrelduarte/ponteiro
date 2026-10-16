@@ -31,6 +31,10 @@ com link. O código é aberto (AGPL-3.0): https://github.com/alexandrelduarte/po
 
 ## Fatos que não mudam
 - Eleição 2026: 1º turno em 04/10, 2º turno em 25/10.
+- Resultado oficial do 1º turno (TSE, votos válidos): Flávio Bolsonaro (PL) 47,03% ·
+  Lula (PT) 45,16% · Augusto Cury 2,89% · Renan Santos 2,24% · Ronaldo Caiado 2,18% ·
+  demais abaixo de 0,3%. Ninguém passou de 50%: a decisão é no 2º turno, entre os dois.
+- Desde 04/10 a chance publicada é a de vencer o 2º turno (não há mais o caminho do 1º).
 - O modelo é determinístico e auditável (testes de paridade 1e-9 no repositório).
 - Pesquisas encontradas por IA só entram após aprovação humana, com auditoria pública.
 - O site não pede voto, não recebe dinheiro de campanha e trata os dois candidatos

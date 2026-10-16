@@ -29,8 +29,8 @@ test.describe("nenhum conteúdo escondido atrás de rolagem lateral", () => {
       await page.setViewportSize({ width: largura, height: 900 });
       await page.goto("/");
       await painelPronto(page);
-      await page.getByTestId("aba-todos").scrollIntoViewIfNeeded();
-      await page.getByTestId("aba-todos").click();
+      // Entre turnos a seção mostra o resultado oficial do 1º turno (sem abas).
+      await page.getByTestId("lista-candidatos").scrollIntoViewIfNeeded();
 
       const estourando = await page.evaluate(() =>
         [...document.querySelectorAll<HTMLElement>("*")]
@@ -144,8 +144,8 @@ test.describe("os rótulos das réguas caem sobre a marca", () => {
       await page.setViewportSize({ width: largura, height: 900 });
       await page.goto("/");
       await painelPronto(page);
-      await page.getByTestId("aba-todos").scrollIntoViewIfNeeded();
-      await page.getByTestId("aba-todos").click();
+      // Entre turnos a seção mostra o resultado oficial do 1º turno (sem abas).
+      await page.getByTestId("lista-candidatos").scrollIntoViewIfNeeded();
       // A árvore VISÍVEL é que manda: a outra está em `display:none` e não
       // rola para lugar nenhum.
       await page.locator('[data-testid="barra-candidato-0"]:visible').scrollIntoViewIfNeeded();

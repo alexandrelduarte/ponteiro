@@ -20,7 +20,8 @@ import { abs1 } from "@/components/ui/textos";
 import { ALTURA, CaixaGrafico } from "@/components/graficos/comum";
 import { EvolucaoLazy } from "@/components/graficos/carregados";
 import { ELEICAO_1T, ELEICAO_2T } from "@/data/constantes";
-import { calcPontosGrafico, fmt } from "@/lib/modelo";
+import { pct1T } from "@/data/resultado-1t";
+import { calcPontosGrafico, faseEleitoral, fmt } from "@/lib/modelo";
 import { usePainel } from "./estado";
 
 const TURNOS = [1, 2] as const;
@@ -30,8 +31,15 @@ export function Evolucao() {
   const refs = useRef<Record<number, HTMLButtonElement | null>>({ 1: null, 2: null });
 
   const pontos = useMemo(() => calcPontosGrafico(M, turnoGrafico), [M, turnoGrafico]);
-  const serie = turnoGrafico === 2 ? M.serie2 : M.serie1;
+  /* Depois de 04/10 o 1º turno é passado: a linha dele termina no dia da
+     votação, sem projeção, e o ponto da urna marca o resultado oficial. */
+  const t1Feito = faseEleitoral(hojeMs) !== "pre1T";
+  const serie =
+    turnoGrafico === 2 ? M.serie2 : t1Feito ? M.serie1.filter((p) => p.x <= ELEICAO_1T) : M.serie1;
+  const hojeGrafico = turnoGrafico === 1 && t1Feito ? ELEICAO_1T : hojeMs;
+  const urna1T = pct1T("Lula") - pct1T("Flávio Bolsonaro");
   const inicio = M.serie2[0] ? M.serie2[0].l - M.serie2[0].f : null;
+  const quem = (d: number) => (d >= 0 ? "Lula" : "Flávio");
 
   const aoTeclar = (evento: React.KeyboardEvent) => {
     const proximo =
@@ -53,10 +61,19 @@ export function Evolucao() {
         pergunta="Como a diferença mudou com o tempo?"
         resposta={
           <>
-            Desde janeiro a diferença encolheu: era de cerca de{" "}
-            <span className="numeros">{inicio === null ? "–" : abs1(inicio)}</span> pontos e hoje
-            está em <span className="numeros">{abs1(M.margem)}</span>. No caminho ela subiu e desceu
-            — não foi uma queda em linha reta.
+            {inicio === null ? (
+              <>
+                Hoje a diferença está em <span className="numeros">{abs1(M.margem)}</span> pontos,
+                com {quem(M.margem)} na frente.
+              </>
+            ) : (
+              <>
+                No começo da lista, {quem(inicio)} estava cerca de{" "}
+                <span className="numeros">{abs1(inicio)}</span> pontos na frente; hoje,{" "}
+                {quem(M.margem)} está <span className="numeros">{abs1(M.margem)}</span> na frente.
+                No caminho a diferença subiu e desceu — não andou em linha reta.
+              </>
+            )}
           </>
         }
         traduzindo={
@@ -127,8 +144,11 @@ export function Evolucao() {
               <EvolucaoLazy
                 serie={serie}
                 pontos={pontos}
-                hojeMs={hojeMs}
+                hojeMs={hojeGrafico}
                 eleicaoMs={turnoGrafico === 2 ? ELEICAO_2T : ELEICAO_1T}
+                resultado={
+                  turnoGrafico === 1 && t1Feito ? { x: ELEICAO_1T, dif: urna1T } : undefined
+                }
                 centroProjetado={
                   turnoGrafico === 2 ? M.margemAj : (serie.at(-1)?.l ?? 0) - (serie.at(-1)?.f ?? 0)
                 }
@@ -158,6 +178,14 @@ export function Evolucao() {
           <p className="max-w-texto">
             No 1º turno a linha é mais curta: nem todo instituto divulgou esse cenário nas pesquisas
             mais antigas.
+            {t1Feito ? (
+              <>
+                {" "}
+                Ela termina em 4 de outubro: o ponto{" "}
+                <b className="font-semibold text-tinta">urna</b> é o resultado oficial (
+                {quem(urna1T)} {abs1(urna1T)} pontos na frente, em votos válidos).
+              </>
+            ) : null}
           </p>
         ) : null}
         {/* Este gráfico é de DIFERENÇA e tem uma linha só, ameixa. Dizer
@@ -168,8 +196,10 @@ export function Evolucao() {
           Cada bolinha é uma pesquisa, na cor de quem aparece à frente nela: acima da régua,{" "}
           <b className="font-semibold text-lula">Lula</b>; abaixo,{" "}
           <b className="font-semibold text-flavio">Flávio</b>. A linha ameixa é a média do painel, e
-          é uma só. Hoje a média do {turnoGrafico}º turno está em {fmt(serie.at(-1)?.l)}% para Lula
-          e {fmt(serie.at(-1)?.f)}% para Flávio.
+          é uma só.{" "}
+          {turnoGrafico === 1 && t1Feito
+            ? `Na véspera da votação, a média do 1º turno estava em ${fmt(serie.at(-1)?.l)}% para Lula e ${fmt(serie.at(-1)?.f)}% para Flávio.`
+            : `Hoje a média do ${turnoGrafico}º turno está em ${fmt(serie.at(-1)?.l)}% para Lula e ${fmt(serie.at(-1)?.f)}% para Flávio.`}
         </p>
       </div>
     </Bloco>

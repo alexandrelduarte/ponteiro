@@ -660,3 +660,137 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
 - **sigmaSys continua 4,0**: o argumento antigo ("as pesquisas ainda não passaram pela
   calibragem do 1º turno") perdeu a premissa, mas o 1º turno de 2026 mostrou erro
   grande de novo — não há base para apertar a incerteza a 9 dias da decisão.
+
+## 2º turno — superfícies, dados e fluxo de coleta (out/2026)
+
+### Por que o site parou em agosto (diagnóstico)
+
+- A série pública parou em 02/08 (14 pesquisas) e o último deploy foi de 07/08. O coletor
+  tinha defeitos estruturais: (1) a busca partia da ÚLTIMA PUBLICADA, então só andava
+  quando o admin aprovava; (2) pesquisa com campo mais antigo que a última aprovada era
+  recusada para sempre ("fim < ultimoFim"); (3) o prompt pedia no máximo 6 itens, sem data
+  de hoje, sem a fase da eleição e sem dizer se queria votos totais ou válidos; (4) a
+  extração ia do primeiro "[" ao ÚLTIMO "]" — a busca na web termina com citações
+  "[fonte](url)", o JSON quebrava e o /admin dizia "a série já está em dia"; (5) o selo de
+  frescor lia o snapshot do cron, que é gravado mesmo quando a coleta falha.
+
+### Fluxo de coleta reescrito (src/lib/updater.ts)
+
+- **Janela**: `desde = min(última publicada, hoje − 21 dias)`; a rejeição "anterior à última
+  da série" virou "anterior à janela". Dedup carrega também as chaves REJEITADAS (o que o
+  admin recusou não volta todo dia).
+- **Prompt**: data de hoje, resultado do 1º turno, 2º turno em 25/10, até 12 itens, votos
+  TOTAIS explícitos (`l2/f2`), `bn2` (branco/nulo do 2º turno, agora gravado em `t2_bnns`),
+  `l2v/f2v` (válidos, só para conferência) e 1º turno só antes de 04/10.
+- **Sanidade nova**: par que soma ≥ 98,5 sem `bn2` "parece voto válido" e é recusado (o
+  admin decide); `l2+f2+bn2` precisa fechar 100 ± 3. Campo OPCIONAL inválido (`n`, `moe`,
+  `tse`, `contratante`, `l1`, `f1`, `bn1`, `bn2`) vira `null` com `_avisos` no forense em vez
+  de derrubar a pesquisa; `n` "2.004" é 2004.
+- **Leitura robusta**: cada "[" candidato é testado com contagem de colchetes fora de
+  strings. Resposta ilegível é FALHA (`falhaLeitura` → `erro`), nunca "série em dia".
+- **Rastreio**: toda execução grava `audit_log.acao = 'coleta'` (ok, desde, contagens,
+  até 12 motivos). A view pública `coleta_publica` expõe só `em` e `ok`; o selo de frescor
+  lê a última coleta BEM-SUCEDIDA (com fallback para o snapshot se a view não existir). O
+  cron responde 500 quando a coleta falha; o /admin mostra os motivos de cada recusa e a
+  rota do /admin ganhou `maxDuration = 300`.
+- **Inclusão manual**: campo de branco/nulo do 2º turno; chave ocupada por linha
+  REJEITADA é reaproveitada com os números conferidos (antes, só mexendo no banco).
+- **Cron segue diário**: o plano da Vercel em uso só permite execução diária; na reta final
+  o botão "Verificar agora" do /admin cobre o resto.
+
+### Dados
+
+- **Resultado oficial do 1º turno** em `src/data/resultado-1t.ts`, lido do JSON oficial do
+  TSE (totalização de 05/10 12:51; soma dos candidatos = válidos, 119.300.788).
+- **Leva 1** (17 pesquisas de 2º turno com campo encerrado a partir de 04/10) conferida em
+  imprensa/PDF do instituto: votos TOTAIS, registro TSE, link https. Escolhas registradas:
+  Datafolha mais recente com campo 13–14/10 (ficha técnica do Poder360; outras fontes dizem
+  13–15); Indexa com branco/nulo 14 (inclui 8 de "não iria votar"); Palver com o registro
+  BR-08028/2026 (fontes divergem; painel online não probabilístico); AtlasIntel com campo
+  iniciado em 03/10 (parte antes do 1º turno) — entra pela regra do fim do campo.
+- O seed (`pesquisas.seed.json`) deixa de ser só o protótipo: recebe as mesmas cargas
+  verificadas, para o fallback R8 refletir o 2º turno. A paridade golden continua sobre
+  as 13 rodadas originais (`IDS_PROTOTIPO`).
+- Carga no banco por migração (`0005_segundo_turno.sql`): upsert dos institutos novos
+  (Futura, MDA, Palver, DataTrends, Ipespe, Vox Brasil, Ideia) e das pesquisas como
+  `publicada`/origem `admin`, uma linha `inclusao_manual` por pesquisa no audit_log;
+  pendente/rejeitada com a mesma chave é substituída pelos números verificados.
+
+### Superfícies
+
+- **Hero**: contagem até 25/10 por dias de calendário em SP ("é hoje" no domingo); a
+  frase-ponte do 84×82 saiu; o 1º turno virou fato (resultado oficial com link do TSE);
+  aviso de dado velho quando a pesquisa mais recente tem mais de 7 dias.
+- **Simetria (R4)**: textos escritos supondo Lula na frente ("é Flávio quem ganha a
+  decisão", "a ponta de baixo é uma vitória de Flávio", "pesquisa em que Flávio aparece à
+  frente") passaram a usar quem está atrás na média, dos dois lados.
+- **Bandas do cenário-base simétricas**: o protótipo binava magnitude só do lado de Lula
+  (uma banda "Flávio vence" contra três de Lula). A barra agora é calculada na
+  apresentação, duas bandas por lado com corte em 5 pontos, sobre a MESMA N(margemAj,
+  sigmaDia2) — o modelo e a paridade não mudam. Entra o token `flavio-fundo-2` (espelho do
+  `lula-fundo-2` em clareza) e sai o `lula-fundo-3`.
+- **Números fixos de agosto viraram conta**: "+4,7 → ~1,6", "86/83/79 em 100", "6 dos 7
+  institutos de julho", "47% contra 38%", "51 × 49", "menos que os 6,3" — agora calculados
+  do modelo, ou removidos quando eram contexto de julho.
+- **Erro do 1º turno de 2026** (`src/lib/erro-1t.ts`): média SIMPLES, em válidos, das
+  pesquisas com campo encerrado de 27/09 a 03/10 × urna — a mesma conta do erro de 2022.
+  Aparece como sexta linha da tabela de erros, no cartão do 1º turno e na /metodologia;
+  só entra quando houver pesquisas da última semana na série.
+- **"E os outros candidatos?"**: depois de 04/10 mostra o resultado oficial (12 nomes) na
+  régua fixa de 0 a 50%, no lugar da média de pesquisas antigas.
+- **Evolução**: a linha do 1º turno termina em 04/10 com o ponto "urna" (resultado em
+  válidos); a frase "desde janeiro a diferença encolheu" virou direção calculada.
+- **Próximas pesquisas**: casa parada há mais de max(30 dias, 3× o ritmo) sai da lista
+  (não "pode sair a qualquer momento" depois de meses); depois das 17h de 25/10 não há
+  ritmo; a frase de `semRitmo` deixou de afirmar "uma pesquisa só" (era falsa).
+- **OG**: deixou `force-static` (publicava a chance do último deploy) e revalida a cada 5
+  min, com fontes e fundo no bundle (`outputFileTracingIncludes`). `serieMudou` também
+  revalida /api/resumo, /embed, /llms.txt e a OG.
+
+### A média do 2º turno recomeça em 04/10 (decisão do dono, 16/10/2026)
+
+- **Contexto**: com a série completa (98 rodadas), a média do 2º turno misturava as
+  pesquisas de setembro — feitas antes de os institutos terem o gabarito da urna, e cujo 1º
+  turno errou 4,3 pontos na diferença a favor de Lula — com as refeitas depois de 04/10. Só
+  pós-1ºT: Flávio +2,6 (eleito em 73/100). Misturando: Flávio +1,5 (64/100).
+- **Decisão**: entre turnos (e depois), se houver ao menos uma pesquisa com campo
+  encerrado a partir de 04/10, a média do 2º turno usa SÓ essas. As anteriores continuam
+  nas linhas com `w = 0` (lista, fichas, gráfico — rotuladas "feita antes do 1º turno: não
+  entra na média do 2º turno"); `qtdRecentes/qtdEmpate` só contam quem entra na média; a
+  série do gráfico do 2º turno também recomeça em 04/10, e o último ponto bate com a margem.
+- **Porquê**: é o mesmo argumento que o painel já usava para 2022 ("as do 2º turno foram
+  refeitas depois do susto do 1º") e a prática padrão dos agregadores entre turnos. Golden:
+  as 13 rodadas do protótipo são todas pré-1ºT, então a regra não as alcança (paridade
+  intacta); `tests/coerencia-superficies.test.ts` trava "margem com a série inteira = margem
+  só com as pós-1ºT".
+
+### Leva 2 (03/08 → 03/10) e o erro do 1º turno de 2026
+
+- 68 rodadas (20 de agosto, 48 de setembro/início de outubro) por migração `0006`, mesmo
+  rito da 0005. **Excluída**: American Analytics 15–20/09 — registro TSE impresso fora do
+  padrão ("BR-032587/26"), não conferível. Instituto novo: Veritá.
+- Escolhas registradas: cenário de 1º turno SEM Pablo Marçal quando havia os dois (ele não
+  foi candidato); quando só havia o cenário com ele, ele fica em `outros1`. Gerp e Indexa:
+  branco/nulo = "nenhum" + "não sabe" (+ "não iria votar" no Indexa). Datafolha 01/10 com
+  campo 29/09–01/10 (fontes divergem). Futura 02–03/10, Palver 30/09–03/10 e Gerp 24–28/09
+  sem branco/nulo do 1º turno publicado — ficam FORA da conta do erro (a regra exige o dado).
+- **Erro do 1º turno de 2026** pela regra pública (16 pesquisas com campo encerrado de
+  27/09 a 03/10): pesquisas Lula 44,9% × Flávio 42,5% em válidos; urna 45,16% × 47,03%;
+  erro na diferença = 4,3 pontos a favor de Lula. Vira a 6ª linha da tabela de erros e o
+  cartão "Igual ao 1º turno de 2026" na curva de puxada (valor MEDIDO, arredondado a 1
+  casa). O padrão do painel continua sem puxada.
+- O seed passa a ficar em ordem de fim de campo decrescente (era a ordem do protótipo); a
+  paridade golden filtra as 13 originais por id, então a ordem não a afeta.
+
+### Contexto social de outubro
+
+- Os cinco cartões de julho (aprovação, rejeição, piso, calendário de agosto, "pano de
+  fundo") deram lugar a cinco de outubro, todos com campo depois do 1º turno e conferidos
+  em página aberta: aprovação (Quaest, PoderData, Datafolha), rejeição no 2º turno, voto
+  decidido, calendário da reta final (propaganda 9–23/10; debates Record e pool
+  cancelados, Band 18/10, Globo 23/10) e apoios de quem saiu no 1º turno (três a Flávio,
+  um neutro, nenhum a Lula — e o Datafolha mostrando que ~1/3 desses eleitores vai de
+  Lula). Ficou FORA o que não deu para conferir (recorte de voto decidido por candidato;
+  regra exata de divulgação de pesquisa no dia da votação).
+- Os cartões já nascem em linguagem simples; o mapa de tradução de `copia-contexto.ts`
+  ficou vazio (o teste de jargão continua valendo).

@@ -19,8 +19,8 @@ const TITULOS = [
   "Quanta gente aprova o governo",
   "Quanta gente diz que não votaria de jeito nenhum",
   "Quanta gente já está decidida",
-  "O que ainda vai acontecer até a votação",
-  "O que está por trás desta disputa",
+  "O que ainda acontece até a votação",
+  "Quem os candidatos que saíram apoiam",
 ];
 
 export function ContextoSocial() {
@@ -31,8 +31,8 @@ export function ContextoSocial() {
         pergunta="Por que a disputa está assim?"
         resposta={
           <>
-            Os dois lados têm voto fechado e rejeição alta. Por isso a diferença anda devagar, e
-            quase sempre dentro da mesma faixa.
+            Os dois têm rejeição alta e quase todo mundo já decidiu o voto. Por isso a diferença
+            anda pouco, e quase sempre dentro da mesma faixa.
           </>
         }
         traduzindo={
@@ -89,8 +89,8 @@ export function ContextoSocial() {
         <Nicho tom="faixa">
           <Subtitulo>O que ainda pode mexer</Subtitulo>
           <p className="mt-2 text-corpo text-tinta">
-            Os cerca de 10% que estão em cima do muro, a propaganda na TV a partir do fim de agosto
-            e fato novo na economia ou na Justiça.
+            O grupo de cerca de 1 em cada 10 que ainda pode mudar o voto, os debates da reta final e
+            fato novo até 25 de outubro.
           </p>
         </Nicho>
       </div>

@@ -141,7 +141,8 @@ test.describe("painel", () => {
     await page.getByTestId("abrir-form-simulacao").click();
 
     await page.getByTestId("campo-instituto").fill("Instituto de Teste");
-    await page.getByTestId("campo-fim").fill("2026-08-01");
+    // Entre turnos só pesquisa pós-04/10 entra na média do 2º turno (DECISOES.md).
+    await page.getByTestId("campo-fim").fill("2026-10-15");
     await page.getByTestId("campo-l2").fill("38");
     await page.getByTestId("campo-f2").fill("52");
     await page.getByTestId("campo-n").fill("3000");
@@ -172,16 +173,17 @@ test.describe("painel", () => {
     await expect(page.getByTestId("manchete-lula")).toHaveText(oficial);
   });
 
-  test("a aba «candidatos testados» mostra o ranking do 1º turno", async ({ page }) => {
+  test("entre turnos, «E os outros candidatos?» mostra o resultado oficial do 1º turno", async ({
+    page,
+  }) => {
     await page.goto("/");
     await painelPronto(page);
 
-    await page.getByTestId("aba-todos").scrollIntoViewIfNeeded();
-    await page.getByTestId("aba-todos").click();
-    await expect(page.getByTestId("aba-todos")).toHaveAttribute("aria-selected", "true");
-    await expect(page.getByRole("tabpanel", { name: /Candidatos testados/ })).toContainText(
-      "disputa principal",
-    );
+    const lista = page.getByTestId("lista-candidatos");
+    await lista.scrollIntoViewIfNeeded();
+    await expect(lista).toContainText("vai ao 2º turno");
+    await expect(lista).toContainText("47,03%");
+    await expect(lista).toContainText("45,16%");
   });
 
   test("em 390px a série vira cartões", async ({ page }) => {
@@ -226,7 +228,8 @@ test.describe("painel", () => {
     await page.getByTestId("abrir-form-simulacao").scrollIntoViewIfNeeded();
     await page.getByTestId("abrir-form-simulacao").click();
     await page.getByTestId("campo-instituto").fill("Instituto de Teste");
-    await page.getByTestId("campo-fim").fill("2026-08-01");
+    // Entre turnos só pesquisa pós-04/10 entra na média do 2º turno (DECISOES.md).
+    await page.getByTestId("campo-fim").fill("2026-10-15");
     await page.getByTestId("campo-l2").fill("38");
     await page.getByTestId("campo-f2").fill("52");
     await page.getByTestId("campo-n").fill("3000");
@@ -250,7 +253,7 @@ test.describe("painel", () => {
     await expect(page.getByTestId("enxame-n-lula")).toHaveText(String(vermelhas));
     await expect(page.getByTestId("enxame-n-flavio")).toHaveText(String(azuis));
     await expect(page.getByTestId("legenda-enxame")).toContainText(
-      `${vermelhas} do lado de Lula, ${azuis} do lado de Flávio`,
+      `São ${vermelhas} do lado de Lula e ${azuis} do lado de Flávio`,
     );
 
     // Mini-enxame da simulação: a legenda usa o número do próprio desenho.
@@ -342,16 +345,16 @@ test.describe("painel", () => {
   test("as barras dos candidatos usam régua fixa, não o líder", async ({ page }) => {
     await page.goto("/");
     await painelPronto(page);
-    await page.getByTestId("aba-todos").scrollIntoViewIfNeeded();
-    await page.getByTestId("aba-todos").click();
+    // Entre turnos a seção mostra o resultado oficial do 1º turno (sem abas).
+    await page.getByTestId("lista-candidatos").scrollIntoViewIfNeeded();
 
     const primeira = page.locator('[data-testid="barra-candidato-0"]:visible');
     await primeira.scrollIntoViewIfNeeded();
     const trilho = primeira.locator("..");
     const larguraBarra = (await primeira.boundingBox())!.width;
     const larguraTrilho = (await trilho.boundingBox())!.width;
-    // O líder tem ~41% de 50% da régua: nunca o trilho inteiro. Normalizada
-    // pelo líder, esta razão era exatamente 1.
+    // O 1º colocado tem 47,03% de 50% da régua: nunca o trilho inteiro.
+    // Normalizada pelo líder, esta razão era exatamente 1.
     expect(larguraBarra / larguraTrilho).toBeGreaterThan(0.5);
     expect(larguraBarra / larguraTrilho).toBeLessThan(0.95);
   });

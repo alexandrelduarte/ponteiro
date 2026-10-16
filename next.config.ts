@@ -140,6 +140,11 @@ const cabecalhosSeguranca = [
 const nextConfig: NextConfig = {
   // Não anuncia a stack para quem varre a internet atrás de versão vulnerável.
   poweredByHeader: false,
+  // A imagem OG deixou de ser force-static (revalida a cada 5 min): a função
+  // que a regenera lê fontes e o fundo do disco, então eles precisam ir junto.
+  outputFileTracingIncludes: {
+    "/opengraph-image": ["./src/app/_og/fontes/**", "./public/brand/og-base.png"],
+  },
   async headers() {
     // /embed é a ÚNICA rota que pode ser emoldurada (widget de imprensa):
     // ela define os próprios cabeçalhos no route handler (CSP com

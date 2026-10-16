@@ -44,6 +44,9 @@ import { usePainel } from "./estado";
 
 const PESO_BAIXO = 0.15;
 
+/** Entre turnos, a média do 2º turno recomeça em 04/10: as anteriores ficam com peso 0. */
+const foraDaMedia = (l: { w: number; fim: string }) => l.w === 0 && l.fim < "2026-10-04";
+
 function leitura(l: LinhaModelo) {
   if (l.empate2) return { texto: "empate técnico", tom: "atencao" as const };
   return l.margem2 >= 0
@@ -103,7 +106,11 @@ function DetalheRegistro({ l, rotulo }: { l: LinhaModelo; rotulo?: string }) {
     >
       <p className="numeros">
         {inteiroBr(l.n)} pessoas ouvidas · folga da medida de {fmt(l.moe)} pontos · registro no TSE{" "}
-        {registroTse(l.tse)} · peso na média de hoje: {fmt(l.w, 2)}.
+        {registroTse(l.tse)} ·{" "}
+        {foraDaMedia(l)
+          ? "feita antes do 1º turno: não entra na média do 2º turno"
+          : `peso na média de hoje: ${fmt(l.w, 2)}`}
+        .
       </p>
       {/* Contratante: item obrigatório de divulgação (Res.-TSE 23.600, art. 10,
           "se for o caso, de quem contratou") — o dado sempre existiu no seed;
@@ -173,9 +180,10 @@ function CartaoPesquisa({
       </div>
 
       <p className="mt-1 text-micro text-tinta-media numeros">
-        {fmtData(l.inicio)}–{fmtData(l.fim)} · peso na média {fmt(l.w, 2)}
+        {fmtData(l.inicio)}–{fmtData(l.fim)} ·{" "}
+        {foraDaMedia(l) ? "antes do 1º turno: fora da média" : `peso na média ${fmt(l.w, 2)}`}
       </p>
-      {baixo ? (
+      {baixo && !foraDaMedia(l) ? (
         <p className="text-micro text-atencao">
           Esta pesquisa já está velha: conta pouco na média de hoje.
         </p>
@@ -219,7 +227,11 @@ export function SeriePesquisas() {
   const recentes = linhas.slice(0, CARTOES_ABERTOS);
   const antigas = linhas.slice(CARTOES_ABERTOS);
   const escala = escalaDaSerie(M.linhas);
-  const naoEmpate = M.qtdRecentes - M.qtdEmpate;
+  // Fora do empate técnico, quem aparece na frente — contado dos DOIS lados (R4):
+  // o texto antigo afirmava "Lula aparece na frente" para todas.
+  const foraEmpate = M.linhas.filter((l) => l.idadeDias < 35 && l.w > 0 && !l.empate2);
+  const frenteLula = foraEmpate.filter((l) => l.margem2 > 0).length;
+  const frenteFlavio = foraEmpate.filter((l) => l.margem2 < 0).length;
 
   const rotuloRemover = (l: LinhaModelo) => `Tirar ${l.instituto} da minha simulação`;
 
@@ -236,9 +248,16 @@ export function SeriePesquisas() {
           <Pergunta id="titulo-serie">O que dizem as {pesquisas.length} pesquisas?</Pergunta>
           <Resposta>
             <span className="numeros">{M.qtdEmpate}</span> das{" "}
-            <span className="numeros">{M.qtdRecentes}</span> pesquisas dos últimos 35 dias estão em{" "}
-            <Termo chave="empateTecnico">empate técnico</Termo>; nas outras{" "}
-            <span className="numeros">{naoEmpate}</span>, Lula aparece na frente.
+            <span className="numeros">{M.qtdRecentes}</span> pesquisas dos últimos 35 dias que
+            entram na média estão em <Termo chave="empateTecnico">empate técnico</Termo>
+            {foraEmpate.length ? (
+              <>
+                ; nas outras, Lula aparece na frente em{" "}
+                <span className="numeros">{frenteLula}</span> e Flávio em{" "}
+                <span className="numeros">{frenteFlavio}</span>
+              </>
+            ) : null}
+            .
           </Resposta>
         </div>
         <Traduzindo className="lg:mt-0">
@@ -424,7 +443,11 @@ export function SeriePesquisas() {
                     </span>
                     {/* O alerta desceu da coluna de peso, que saiu: ele fala de
                         IDADE da pesquisa, e é aqui que a idade está escrita. */}
-                    {baixo ? <span className="block text-atencao">conta pouco hoje</span> : null}
+                    {foraDaMedia(l) ? (
+                      <span className="block">antes do 1º turno: fora da média</span>
+                    ) : baixo ? (
+                      <span className="block text-atencao">conta pouco hoje</span>
+                    ) : null}
                   </td>
                   <td className="py-3 pr-3 whitespace-nowrap numeros">
                     <span className="text-lula">{fmt(l.t2.lula)}</span>

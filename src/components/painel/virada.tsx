@@ -14,12 +14,21 @@
 import { Bloco, Cabecalho } from "@/components/ui/blocos";
 import { abs1, parEmCem } from "@/components/ui/textos";
 import { Enxame, montarEnxame } from "./enxame";
+import { calcErro1T } from "@/lib/erro-1t";
 import { usePainel } from "./estado";
 
 export function Virada() {
-  const { M } = usePainel();
+  const { M, pesquisasOficiais } = usePainel();
+  const erro1T = calcErro1T(pesquisasOficiais);
   const layout = montarEnxame(M.margemAj, M.sigmaDia2);
-  const [, eleitoF] = parEmCem(M.eleito.dia.l);
+  /* Quem está atrás na diferença (com a puxada do leitor) é quem "vira" — vale
+     igual para os dois lados (R4). Entre turnos, a manchete é a própria decisão. */
+  const liderLula = M.margemAj >= 0;
+  const outro = liderLula ? "Flávio" : "Lula";
+  const lider = liderLula ? "Lula" : "Flávio";
+  const nOutro = liderLula ? layout.nFlavio : layout.nLula;
+  const [eleitoL, eleitoF] = parEmCem(M.eleito.dia.l);
+  const eleitoOutro = liderLula ? eleitoF : eleitoL;
 
   return (
     <Bloco rotuladoPor="titulo-virada">
@@ -28,10 +37,9 @@ export function Virada() {
         pergunta="Isso ainda pode virar?"
         resposta={
           <>
-            Pode. Em <span className="numeros">{layout.nFlavio}</span> de cada 100 cenários para 25
-            de outubro, é Flávio quem ganha a decisão — e em{" "}
-            <span className="numeros">{eleitoF}</span> de cada 100 ele termina eleito, contando os
-            dois caminhos.
+            Pode. Em <span className="numeros">{nOutro}</span> de cada 100 cenários para 25 de
+            outubro, é {outro} quem ganha a decisão — e em{" "}
+            <span className="numeros">{eleitoOutro}</span> de cada 100 {outro} termina eleito.
           </>
         }
         traduzindo={
@@ -66,15 +74,20 @@ export function Virada() {
               tanto de voto" saiu daqui: o traduzindo, cinco linhas acima, já
               diz qual lado é de quem, e a régua já vem rotulada "empate". */}
           <p className="max-w-texto text-corpo text-tinta-media">
-            Tudo o que está do lado esquerdo da régua é o espaço de virada que os dados de hoje
-            ainda comportam.
+            Tudo o que está do lado de {outro}, depois da régua, é o espaço de virada que os dados
+            de hoje ainda comportam.
           </p>
 
           <p className="mt-4 max-w-texto text-corpo text-tinta-media">
             Três coisas mudariam este quadro. Pesquisas novas trazendo a diferença para baixo de 2
-            pontos. Três institutos seguidos com Flávio na frente, fora da folga. Ou uma puxada das
-            pesquisas a favor de Lula maior que <span className="numeros">{abs1(M.margem)}</span>{" "}
-            pontos — menos que os 6,3 do 1º turno de 2022.
+            pontos. Três institutos seguidos com {outro} na frente, fora da folga. Ou uma puxada das
+            pesquisas a favor de {lider} maior que <span className="numeros">{abs1(M.margem)}</span>{" "}
+            pontos
+            {liderLula
+              ? " — menos que os 6,3 do 1º turno de 2022."
+              : erro1T && erro1T.erroMargem >= 0.5
+                ? ". Em 2018, em 2022 e no 1º turno de 2026 o erro das pesquisas foi no sentido contrário, a favor de Lula."
+                : ". Em 2018 e em 2022 o erro das pesquisas foi no sentido contrário, a favor de Lula."}
           </p>
         </div>
       </div>

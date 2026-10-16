@@ -10,9 +10,13 @@
  * começava em y=839 de 844 e a dobra o cortava pelas ascendentes.
  *
  * A manchete é SEMPRE a chance de ser eleito (`eleito.dia`) — o número que o
- * OG, o JSON-LD e o compartilhamento também publicam. O enxame logo abaixo é
- * a diferença no 2º turno (`pL2dia`), e a micro-legenda reconcilia os dois na
- * MESMA tela, nunca atrás de um clique: é a correção mandatória §2.1.
+ * OG, o JSON-LD e o compartilhamento também publicam. Desde 04/10 (1º turno
+ * realizado) ela É a decisão do 2º turno (`pL2dia`), o mesmo número do enxame
+ * logo abaixo: a antiga "ponte 84×82" virou identidade (DECISOES.md).
+ *
+ * Fases (src/lib/modelo/fase.ts): entre turnos, contagem até 25/10 e o resultado
+ * oficial do 1º turno como fato; depois das 17h de 25/10, a projeção vira
+ * "última leitura antes da votação" e o resultado que vale é o do TSE.
  *
  * Tudo aqui sai pronto do HTML do servidor. Nenhum número espera JavaScript.
  */
@@ -20,12 +24,16 @@ import { useState } from "react";
 import { Nicho, Bloco, Aviso, Colunas } from "@/components/ui/blocos";
 import { Termo } from "@/components/ui/glossario";
 import { Contagem } from "@/components/ui/movimento";
-import { abs1, direcaoVies, faixaVeredito, parEmCem } from "@/components/ui/textos";
-import { fmt, fmtSinal } from "@/lib/modelo";
+import { abs1, direcaoVies, faixaVeredito, faltamDias, parEmCem } from "@/components/ui/textos";
+import { RESULTADO_1T, pct1T } from "@/data/resultado-1t";
+import { diasAte2T, diasCorridos, faseEleitoral, fmt, fmtSinal } from "@/lib/modelo";
 import { Enxame, montarEnxame } from "./enxame";
 import { Medidor } from "./medidor";
 import { EXPLICA_FRESCOR, type SeloFrescor } from "./frescor";
 import { usePainel } from "./estado";
+
+/** Pesquisa mais recente com mais dias que isto, entre turnos, acende o aviso. */
+const DIAS_DADO_VELHO = 7;
 
 /** Chance publicada: conta quando muda, e respeita piso e teto (H13). */
 function NumeroChance({ texto, className }: { texto: string; className?: string }) {
@@ -35,11 +43,23 @@ function NumeroChance({ texto, className }: { texto: string; className?: string 
 }
 
 export function Hero({ selo }: { selo: SeloFrescor }) {
-  const { M, params, pesquisas } = usePainel();
+  const { M, params, pesquisas, pesquisasOficiais, hojeMs } = usePainel();
 
   const [eleitoL, eleitoF] = parEmCem(M.eleito.dia.l);
   const [eleitoHojeL, eleitoHojeF] = parEmCem(M.eleito.hoje.l);
-  const [p2t, p1tDef] = parEmCem(M.p2Tacontece);
+
+  const fase = faseEleitoral(hojeMs);
+  const encerrada = fase === "encerrada";
+  const faltam = diasAte2T(hojeMs);
+  const lula1T = fmt(pct1T("Lula"), 2);
+  const flavio1T = fmt(pct1T("Flávio Bolsonaro"), 2);
+  /* Idade da pesquisa oficial mais recente (fim do campo, em dias corridos). */
+  const ultimaFim = pesquisasOficiais.reduce<string | null>(
+    (max, p) => (max === null || p.fim > max ? p.fim : max),
+    null,
+  );
+  const idadeUltima = ultimaFim ? -diasCorridos(ultimaFim, hojeMs) : null;
+  const dadoVelho = !encerrada && idadeUltima !== null && idadeUltima > DIAS_DADO_VELHO;
 
   const layout = montarEnxame(M.margemAj, M.sigmaDia2);
   const nLula = String(layout.nLula);
@@ -57,13 +77,33 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
     <div className="mx-auto w-full max-w-pagina px-goteira pt-3 md:px-goteira-md lg:px-goteira-lg">
       {/* 1. Linha de tempo */}
       <p className="entra text-etiqueta text-tinta-media numeros">
-        2º turno · 25 de outubro · faltam {M.dias2T} dias
+        {encerrada
+          ? "2º turno · 25 de outubro · votação encerrada"
+          : `2º turno · 25 de outubro · ${faltamDias(faltam)}`}
       </p>
 
       {/* 2. Título da página — a primeira aparição dos dois nomes é completa. */}
       <h1 className="entra mt-1 text-secao font-normal text-tinta-media">
         Presidente 2026 · Lula (PT) × Flávio Bolsonaro (PL)
       </h1>
+
+      {encerrada ? (
+        <Aviso className="mt-3">
+          <span data-testid="aviso-encerrada">
+            A votação acabou em 25 de outubro. Quem foi eleito é quem o{" "}
+            <a
+              href={RESULTADO_1T.fonte}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2"
+            >
+              resultado oficial do TSE
+            </a>{" "}
+            disser. Os números abaixo são a última leitura das pesquisas antes da votação — não
+            mudam mais.
+          </span>
+        </Aviso>
+      ) : null}
 
       {/* 3. A manchete. Sem animação de entrada: é o LCP e não pode nascer
              invisível. Os dois números somam 100 e são o mesmo inteiro que o
@@ -151,28 +191,24 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
                leitura continua exatamente a de §5.1 (legenda → não é previsão)
                e a dobra de 844px não muda um pixel. */}
         <Colunas arranjo="principal" className="mt-3">
-          {/* 5. A micro-legenda, na redação assinada pelo data-scientist
-                 (AUDITORIA-COPY §10.2): 55 palavras, com DUAS marcas de dúvida
-                 dentro — "nenhuma é o resultado" e a cláusula literal de H2,
-                 "até outubro isso ainda pode mudar". É ela que garante que a
-                 primeira dobra de 390px carregue dúvida mesmo quando o
-                 veredito desce para baixo da linha do horizonte.
-                 Os fechos condicionais por líder ficaram APOSENTADOS: duas
-                 fontes para o mesmo fato foi como o 83 ↔ 82 nasceu. */}
+          {/* 5. A micro-legenda (AUDITORIA-COPY §10.2), com DUAS marcas de
+                 dúvida dentro — "nenhuma é o resultado" e a cláusula de H2,
+                 "ainda pode mudar". É ela que garante que a primeira dobra de
+                 390px carregue dúvida mesmo quando o veredito desce para baixo
+                 da linha do horizonte. A frase-ponte do 84×82 ("em N de cada
+                 100 cenários não há 2º turno") saiu em 04/10: entre turnos a
+                 manchete e o enxame são o mesmo número. */}
           <p
             data-testid="legenda-enxame"
             className={`max-w-texto text-corpo text-tinta-media ${verHero === "ponteiro" ? "hidden" : ""}`}
           >
             Cada bolinha é um resultado possível: nenhuma é o resultado —{" "}
-            <b className="font-semibold text-tinta">até outubro isso ainda pode mudar</b>. Aqui, só
-            a decisão de 25 de outubro: {nLula} do lado de Lula, {nFlavio} do lado de Flávio.{" "}
-            {/* A 390 o negrito alargava a legenda e estourava a dobra travada —
-                o destaque da ponte é ganho de DESKTOP (onde o tropeço 84×82
-                nasce do bater de olho); no piso, o texto segue como sempre. */}
-            <b className="font-normal text-tinta-media md:font-semibold md:text-tinta">
-              Em {p1tDef} de cada 100 cenários não há 2º turno; esses entram na frase de cima, que
-              dá {eleitoL} e {eleitoF}.
+            <b className="font-semibold text-tinta">
+              {encerrada
+                ? "o resultado que vale é o oficial do TSE"
+                : "até 25 de outubro isso ainda pode mudar"}
             </b>
+            . São {nLula} do lado de Lula e {nFlavio} do lado de Flávio.
           </p>
 
           {/* 6. "Não é previsão" — nunca some a 390px (H4), e §5.1 pede os seis
@@ -181,13 +217,23 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
                  Dentro da placa ele sobe o vão de 16px mais o respiro de 20px do
                  fim do cartão — e passa a caber inteiro. */}
           <p data-testid="disclaimer" className="mt-3 max-w-texto text-intro text-tinta lg:mt-0">
-            Isto não é previsão. É o que as {pesquisas.length} pesquisas registradas no TSE dizem
-            hoje, mais o tanto que a corrida ainda pode andar até outubro.
+            {encerrada
+              ? `Isto não é previsão nem resultado. É o que as ${pesquisas.length} pesquisas registradas no TSE diziam na véspera da votação.`
+              : `Isto não é previsão. É o que as ${pesquisas.length} pesquisas registradas no TSE dizem hoje, mais o tanto que a corrida ainda pode andar até 25 de outubro.`}
           </p>
         </Colunas>
       </Bloco>
 
       <Bloco className="mt-4">
+        {dadoVelho ? (
+          <Aviso className="mb-4">
+            <span data-testid="aviso-dado-velho">
+              Atenção: a pesquisa mais recente desta lista terminou de ouvir as pessoas há{" "}
+              {idadeUltima} dias. O retrato pode estar atrasado em relação às pesquisas que saíram
+              depois.
+            </span>
+          </Aviso>
+        ) : null}
         {params.vies !== 0 ? (
           <Aviso className="mb-4">
             <span data-testid="aviso-vies">
@@ -228,16 +274,17 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
               ) : null}
               {faixa === "leve" ? (
                 <>
-                  A vantagem existe, mas cabe dentro do erro que as pesquisas já cometeram antes,
-                  somado aos {M.dias2T} dias que ainda faltam. Virada segue possível.
+                  A vantagem existe, mas cabe dentro do erro que as pesquisas já cometeram antes
+                  {faltam > 0 ? `, somado aos ${faltam} dias que ainda faltam` : ""}. Virada segue
+                  possível.
                 </>
               ) : null}
               {faixa === "favorito" ? (
                 <>
                   A vantagem de {abs1(M.margemAj)} pontos na decisão é grande diante da dúvida de
                   hoje, que é de cerca de {fmt(M.sigmaHoje)} pontos para cada lado. Mesmo assim, um
-                  erro das pesquisas do tamanho do de 2022, ou a campanha na TV, ainda permitiriam a
-                  virada.
+                  erro das pesquisas do tamanho do de 2022 — ou do que aconteceu no 1º turno deste
+                  ano — ainda permitiria a virada.
                 </>
               ) : null}
               {faixa === "amplo" ? (
@@ -263,7 +310,7 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
               Chance não é resultado. O painel monta 100 cenários compatíveis com as pesquisas de
               hoje{" "}
               <b className="font-semibold text-tinta">
-                e com o quanto a corrida ainda pode andar até outubro
+                e com o quanto a corrida ainda pode andar até 25 de outubro
               </b>
               , e conta em quantos deles cada um termina eleito.
             </p>
@@ -281,20 +328,28 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
               de cada 100 cenários; Flávio, em <b className="numeros">{eleitoHojeF}</b>.
             </p>
             <p className="mt-2 text-micro text-tinta-media">
-              A diferença entre as duas linhas é o tempo. O número de outubro soma o quanto a
-              corrida ainda pode andar — propaganda na TV, debates, fato novo. Por isso o número de
-              outubro carrega mais dúvida que o de hoje.
+              A diferença entre as duas linhas é o tempo. O número do dia da votação soma o quanto a
+              corrida ainda pode andar até 25 de outubro — debates, fato novo, a reta final. Por
+              isso ele carrega mais dúvida que o de hoje.
             </p>
           </Nicho>
           <Nicho>
-            <p className="text-corpo text-tinta">
-              Como a eleição se decide: <b className="numeros">{p2t}</b> de cada 100 cenários
-              terminam com decisão no <Termo chave="segundoTurno">2º turno</Termo>, em 25 de
-              outubro. Em <b className="numeros">{p1tDef}</b> de cada 100, a eleição acaba já no 1º
-              turno.
+            <p data-testid="resultado-1t" className="text-corpo text-tinta">
+              O 1º turno já aconteceu, em 4 de outubro, e ninguém passou da metade dos votos
+              válidos. Resultado oficial: Lula <b className="numeros">{lula1T}%</b> × Flávio{" "}
+              <b className="numeros">{flavio1T}%</b>. Agora só o{" "}
+              <Termo chave="segundoTurno">2º turno</Termo>, em 25 de outubro, decide.
             </p>
             <p className="mt-2 text-micro text-tinta-media">
-              1º turno · 4 de outubro · faltam {M.dias1T} dias
+              Fonte:{" "}
+              <a
+                href={RESULTADO_1T.fonte}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2"
+              >
+                resultado oficial do TSE
+              </a>
             </p>
           </Nicho>
         </div>

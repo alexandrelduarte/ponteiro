@@ -22,7 +22,6 @@ test.describe("acessibilidade (axe-core)", () => {
     await page.goto("/?vies=6.3");
     // A faixa só aparece depois da hidratação + leitura da URL.
     await expect(page.getByTestId("faixa-simulacao")).toBeVisible();
-    await page.getByTestId("aba-todos").click();
     await page.getByTestId("abrir-form-simulacao").scrollIntoViewIfNeeded();
     await page.getByTestId("abrir-form-simulacao").click();
 

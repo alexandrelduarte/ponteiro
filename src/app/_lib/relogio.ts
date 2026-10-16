@@ -9,7 +9,16 @@ import "server-only";
  * relógio direto no corpo de um componente é impureza (a regra
  * `react-hooks/purity` reclama, com razão); (3) concentrar aqui deixa óbvio,
  * numa busca, quem depende do tempo.
+ *
+ * `PONTEIRO_RELOGIO` (ISO 8601, só no servidor) fixa o instante para conferir
+ * as fases da eleição antes da hora — p.ex. o estado "votação encerrada" de
+ * 25/10. Nunca deve existir no ambiente de produção.
  */
 export async function instanteDoRender(): Promise<number> {
+  const fixo = process.env.PONTEIRO_RELOGIO;
+  if (fixo) {
+    const ms = Date.parse(fixo);
+    if (Number.isFinite(ms)) return ms;
+  }
   return Date.now();
 }

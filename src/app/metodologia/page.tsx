@@ -136,8 +136,9 @@ export default async function Metodologia() {
                     Cada pesquisa entra na média com um peso: mais nova e com mais gente ouvida pesa
                     mais. Depois o painel calcula duas chances — uma se a votação fosse hoje e outra
                     para o dia da votação. A segunda carrega mais dúvida, porque até lá a corrida
-                    ainda pode andar. A chance final soma os dois caminhos: ganhar já no 1º turno,
-                    ou ganhar no 2º.
+                    ainda pode andar. Antes de 4 de outubro, a chance final somava dois caminhos:
+                    ganhar já no 1º turno, ou ganhar no 2º. Como ninguém passou da metade no 1º
+                    turno, hoje só o 2º turno conta.
                   </p>
                 }
               >
@@ -146,9 +147,11 @@ export default async function Metodologia() {
                   probabilidade “no cenário atual” usa a incerteza de hoje (dispersão entre
                   institutos + erro sistemático possível de todo o setor). A probabilidade “no dia
                   da votação” soma a deriva da opinião, que cresce com a raiz do tempo restante —
-                  por isso ela é sempre menos cravada que a de hoje. A chance de eleição combina os
-                  caminhos: vitória direta no 1º turno (mais de 50% dos válidos) ou vitória no 2º
-                  turno.
+                  por isso ela é sempre menos cravada que a de hoje. Até 04/10/2026 a chance de
+                  eleição combinava os caminhos: vitória direta no 1º turno (mais de 50% dos
+                  válidos) ou vitória no 2º turno. Depois do 1º turno — em que ninguém chegou à
+                  maioria — o caminho direto deixa de existir e a chance de eleição é a própria
+                  chance de vencer o 2º turno.
                 </p>
                 <p>
                   As probabilidades são arredondadas para número inteiro e assim ficam. Casa decimal
@@ -196,14 +199,37 @@ export default async function Metodologia() {
                 <p>
                   Sobre a chance de eleição projetada: 50–60% empate técnico projetado · 60–75% leve
                   favoritismo · 75–90% favorito · 90%+ amplamente favorito. Em cada pesquisa
-                  isolada, “empate técnico” = diferença ≤ 2× a margem de erro. O modelo assume que
-                  os dois primeiros colocados vão ao 2º turno — nas pesquisas atuais o 3º colocado
-                  tem no máximo 8%.
+                  isolada, “empate técnico” = diferença ≤ 2× a margem de erro. O 2º turno é entre os
+                  dois mais votados na urna de 04/10/2026 (resultado oficial do TSE).
                 </p>
                 <p>
                   A régua acima é publicada de propósito e usada literalmente: o título do veredito
                   nunca usa uma palavra que não esteja nesta tabela. Palavras carregam probabilidade
                   implícita, e cada leitor calibra a sua — então a nossa fica à vista.
+                </p>
+              </BlocoMetodo>
+
+              <BlocoMetodo
+                id="erro-1t-2026"
+                titulo="Como medimos o erro do 1º turno de 2026"
+                simples={
+                  <p>
+                    Pegamos as pesquisas da lista que terminaram de ouvir as pessoas na última
+                    semana antes da votação (27/09 a 03/10), passamos cada uma para votos válidos e
+                    tiramos a média simples. Depois comparamos com a urna. A diferença entre os dois
+                    é o erro.
+                  </p>
+                }
+              >
+                <p>
+                  Janela: campo encerrado de 27/09 a 03/10/2026. Entram as rodadas que divulgaram
+                  Lula, Flávio e branco/nulo/não sabe no 1º turno estimulado; válidos = votos ÷ (100
+                  − branco/nulo/não sabe). Média SIMPLES, sem os pesos do painel — é a mesma conta
+                  usada para medir o erro de 2022, para que os números sejam comparáveis. Erro =
+                  (Lula − Flávio nas pesquisas) − (Lula − Flávio na urna, resultado oficial do TSE);
+                  positivo quer dizer que as pesquisas puxavam para Lula. O padrão do painel
+                  continua sem puxada: o erro medido entra como fato e como cenário pronto, nunca
+                  escondido na conta.
                 </p>
               </BlocoMetodo>
 
@@ -221,13 +247,15 @@ export default async function Metodologia() {
                 <p>
                   Pesquisas são retratos. Em 2022 parte dos institutos subestimou a votação da
                   direita — o erro sistemático do modelo existe por isso e é ajustável. O erro
-                  sistemático padrão (4,0) é ancorado no estado não calibrado dos institutos: o
-                  gabarito que reduziu o erro para +3,1 em 2022 — o resultado real do 1º turno — só
-                  existirá depois de 04/10/2026. Cenários estimulados variam (lista de nomes,
-                  presencial × telefone × on-line). Rodadas antigas de alguns institutos não
-                  divulgaram o 1º turno ou o detalhe de brancos/nulos (marcadas n/d) — elas entram
-                  só onde há dado. A Datafolha de julho não detalhou brancos/nulos do 1º turno,
-                  então fica fora do cálculo de votos válidos do 1º turno.
+                  sistemático padrão (4,0) fica entre o +3,1 do 2º turno de 2022 — medido depois que
+                  os institutos tiveram o gabarito do 1º turno — e os erros maiores dos 1ºs turnos.
+                  Em 2026 o gabarito existe desde 04/10, mas o 1º turno deste ano voltou a mostrar
+                  erro grande, então o padrão não foi apertado. Cenários estimulados variam (lista
+                  de nomes, presencial × telefone × on-line). Rodadas antigas de alguns institutos
+                  não divulgaram o 1º turno ou o detalhe de brancos/nulos (marcadas n/d) — elas
+                  entram só onde há dado. O painel usa sempre votos TOTAIS de cada pesquisa (com
+                  branco, nulo e indecisos), nunca os válidos que alguns institutos destacam: os
+                  válidos são calculados a partir deles.
                 </p>
                 <p>
                   Resultados de institutos diferentes não são estritamente comparáveis entre si:

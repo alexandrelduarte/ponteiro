@@ -44,55 +44,14 @@
 import { CONTEXTO } from "@/data/contexto";
 import type { ItemContexto } from "@/data/tipos";
 
-const CARTOES: Record<string, { dado: string; leitura: string }> = {
-  "Aprovação do governo (jul/26)": {
-    dado:
-      "Quaest: 48% aprovam, 47% desaprovam · Real Time Big Data: 46% aprovam, 50% desaprovam · " +
-      "AtlasIntel: 47,6% aprovam, 51,2% desaprovam · PoderData: 42% aprovam, 51% desaprovam.",
-    leitura:
-      "País dividido. Na Quaest foi a primeira vez, desde dezembro de 2024, que mais gente " +
-      "aprova do que desaprova. Isso vai na mesma direção da leve melhora de Lula nas pesquisas " +
-      "de voto. Governo com aprovação entre 42% e 48% costuma disputar de igual para igual: " +
-      "continua na disputa, mas sem vantagem grande.",
-  },
-  "Rejeição e teto de voto": {
-    dado:
-      "Não votaria de jeito nenhum: Lula 47% a 53% · Flávio 46% a 57%, conforme o instituto. " +
-      "Quem diz que poderia votar (Quaest, julho): Lula 47% × Flávio 38%.",
-    leitura:
-      "Os dois têm muita gente que não votaria neles de jeito nenhum, e isso limita até onde " +
-      "cada um pode chegar. A disputa se decide entre os cerca de 8% a 15% que ainda não " +
-      "escolheram ou vão de branco e nulo. Pelo número de quem diz que poderia votar, o limite " +
-      "de Flávio hoje é mais baixo que o de Lula — é esse número que a campanha do PL precisa " +
-      "mover.",
-  },
-  "Piso firme (comprometimento)": {
-    dado: "“É o único em que votaria”: Lula 36% × Flávio 31% (PoderData, julho).",
-    leitura:
-      "Dois terços de quem vota em cada um já diz que não votaria em mais ninguém. Com o " +
-      "eleitorado dividido assim, sobra pouca gente para conquistar — e a opinião tende a se " +
-      "mexer pouco.",
-  },
-  "Calendário que ainda pesa": {
-    dado:
-      "16/08: começa a campanha de Lula · a convenção do PL confirmou Flávio · propaganda no " +
-      "rádio e na TV a partir do fim de agosto · debates na TV · votação em 04/10 e 25/10.",
-    leitura:
-      "A maior parte da propaganda e dos debates ainda não aconteceu. É daí que sai a conta do " +
-      "quanto a corrida ainda pode andar: quanto mais tempo falta para a votação, maior a " +
-      "chance de o quadro se mexer.",
-  },
-  "Pano de fundo da disputa": {
-    dado:
-      "Jair Bolsonaro está preso, com pena de 27 anos, e não pode se candidatar até 2030 · " +
-      "desde 22/07 os Estados Unidos cobram uma tarifa de 25% sobre produtos brasileiros, e as " +
-      "duas campanhas usam o assunto.",
-    leitura:
-      "São dois fatos grandes, vindos de fora da disputa, e ainda não se sabe o efeito de " +
-      "nenhum deles na eleição. Sem o ex-presidente, a direita se reorganizou em torno do " +
-      "filho. E a tarifa virou disputa sobre quem defende a economia e o país.",
-  },
-};
+/**
+ * 2º turno (out/2026): os cartões de outubro já nascem escritos em linguagem
+ * simples em `src/data/contexto.ts` — não há tradução a fazer, e o mapa fica
+ * vazio (o fallback devolve o dado como está). As traduções dos cartões de
+ * julho saíram junto com eles. `tests/copia-apresentacao.test.ts` continua
+ * vigiando o jargão banido no que chega à tela.
+ */
+const CARTOES: Record<string, { dado: string; leitura: string }> = {};
 
 /**
  * A 1ª camada da leitura, DERIVADA — nunca redigida à parte.

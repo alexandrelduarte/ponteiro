@@ -15,45 +15,90 @@ import { parEmCem } from "@/components/ui/textos";
 import { ALTURA, CaixaGrafico } from "@/components/graficos/comum";
 import { SensibilidadeLazy } from "@/components/graficos/carregados";
 import { CENARIOS_VIES } from "@/data/constantes";
-import { calcSerieSens, calcVies, fmtSinal } from "@/lib/modelo";
+import type { Pesquisa } from "@/data/tipos";
+import { calcErro1T } from "@/lib/erro-1t";
+import { calcSerieSens, calcVies, fmt, fmtSinal } from "@/lib/modelo";
 import { usePainel } from "./estado";
 
-/** Os títulos e as frases são do COPY-DECK; os VALORES vêm de `CENARIOS_VIES`. */
-const TEXTO_CENARIO: Record<string, { titulo: string; texto: (pl: string) => React.ReactNode }> = {
-  "0": {
-    titulo: "As pesquisas estão certas",
-    texto: () => null,
-  },
-  "3.1": {
-    titulo: "Igual a 2022",
-    texto: (pl) => (
-      <>
-        As pesquisas da decisão erram 3,1 pontos a favor de Lula — o mesmo tamanho do erro do 2º
-        turno de 2022. A diferença medida cairia para cerca de 1,6 ponto, e Lula seria eleito em{" "}
-        {pl} de cada 100 cenários: apertado, como em 2022.
-      </>
-    ),
-  },
-  "6.3": {
-    titulo: "Teste-limite: 6,3",
-    texto: (pl) => (
-      <>
-        Uma hipótese que <b className="font-semibold text-tinta">não</b> aconteceu em 2022: o erro
-        grande do 1º turno chegar inteiro até a decisão, sem a correção que os institutos fizeram
-        entre os turnos. Como 6,3 passa do ponto de virada, quem fica na frente é Flávio — Lula é
-        eleito em {pl} de cada 100 cenários.
-      </>
-    ),
-  },
-};
+/** Contexto que as frases dos cartões leem do modelo — nada de número fixo. */
+interface CtxCenario {
+  /** chance de Lula eleito, já no formato publicado */
+  pl: string;
+  /** diferença medida (Lula − Flávio), sem puxada */
+  margem: number;
+}
+
+const quemNaFrente = (m: number) => (m >= 0 ? "Lula" : "Flávio");
+
+/** Os títulos são do COPY-DECK; os VALORES vêm de `CENARIOS_VIES` e do modelo. */
+const TEXTO_CENARIO: Record<string, { titulo: string; texto: (c: CtxCenario) => React.ReactNode }> =
+  {
+    "0": {
+      titulo: "As pesquisas estão certas",
+      texto: () => null,
+    },
+    "3.1": {
+      titulo: "Igual a 2022",
+      texto: ({ pl, margem }) => (
+        <>
+          As pesquisas da decisão erram 3,1 pontos a favor de Lula — o mesmo tamanho do erro do 2º
+          turno de 2022. A diferença medida passaria a{" "}
+          <span className="numeros">{fmtSinal(margem - 3.1)}</span> ({quemNaFrente(margem - 3.1)} na
+          frente), e Lula seria eleito em {pl} de cada 100 cenários.
+        </>
+      ),
+    },
+    "6.3": {
+      titulo: "Teste-limite: 6,3",
+      texto: ({ pl, margem }) => (
+        <>
+          O erro do 1º turno de 2022 (6,3 pontos a favor de Lula) chegando inteiro até a decisão. A
+          diferença medida passaria a <span className="numeros">{fmtSinal(margem - 6.3)}</span> (
+          {quemNaFrente(margem - 6.3)} na frente), e Lula seria eleito em {pl} de cada 100 cenários.
+        </>
+      ),
+    },
+  };
+
+/**
+ * Os cartões: os três do protótipo + "Igual ao 1º turno de 2026", cujo valor é
+ * MEDIDO (src/lib/erro-1t.ts) e não fixo — só aparece quando a série tem as
+ * pesquisas da última semana antes do 1º turno. O padrão do painel continua sem
+ * puxada (decisão do dono, DECISOES.md).
+ */
+function useCenarios(pesquisas: readonly Pesquisa[]) {
+  return useMemo(() => {
+    const base = CENARIOS_VIES.map((c) => ({ vies: c.vies, ...TEXTO_CENARIO[String(c.vies)] }));
+    const erro = calcErro1T(pesquisas);
+    if (!erro || erro.erroMargem < 0.5) return base;
+    const vies = Math.round(erro.erroMargem * 10) / 10;
+    return [
+      ...base.slice(0, 2),
+      {
+        vies,
+        titulo: "Igual ao 1º turno de 2026",
+        texto: ({ pl, margem }: CtxCenario) => (
+          <>
+            As pesquisas da decisão erram o mesmo que as da última semana antes do 1º turno deste
+            ano: <span className="numeros">{fmt(vies)}</span> pontos a favor de Lula na diferença. A
+            diferença medida passaria a <span className="numeros">{fmtSinal(margem - vies)}</span> (
+            {quemNaFrente(margem - vies)} na frente), e Lula seria eleito em {pl} de cada 100
+            cenários.
+          </>
+        ),
+      },
+      ...base.slice(2),
+    ];
+  }, [pesquisas]);
+}
 
 export function CurvaSensibilidade() {
-  const { M, params, definirParam } = usePainel();
+  const { M, params, definirParam, pesquisasOficiais } = usePainel();
   const serie = useMemo(() => calcSerieSens(M), [M]);
+  const cartoes = useCenarios(pesquisasOficiais);
   const cenarios = useMemo(
-    () =>
-      CENARIOS_VIES.map((c) => ({ vies: c.vies, rotulo: TEXTO_CENARIO[String(c.vies)].titulo })),
-    [],
+    () => cartoes.map((c) => ({ vies: c.vies, rotulo: c.titulo })),
+    [cartoes],
   );
 
   return (
@@ -97,16 +142,18 @@ export function CurvaSensibilidade() {
         O ponto preto é a virada: as duas linhas se cruzam quando a puxada suposta fica{" "}
         <b className="font-semibold text-tinta">perto do tamanho</b> da diferença medida (
         <span className="numeros">{fmtSinal(M.margem)}</span> pontos). Puxada maior que isso a favor
-        de Lula inverte quem está na frente.
+        de {quemNaFrente(M.margem)} inverte quem está na frente.
       </p>
       <p className="sr-only">
         Gráfico: chance de cada candidato ser eleito conforme o tamanho da puxada suposta, de −3 a
         +10 pontos. A virada acontece em {fmtSinal(M.margem)} pontos.
       </p>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-3 md:items-start">
-        {CENARIOS_VIES.map((c) => {
-          const copy = TEXTO_CENARIO[String(c.vies)];
+      <div
+        className={`mt-4 grid gap-3 md:items-start ${cartoes.length > 3 ? "md:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3"}`}
+      >
+        {cartoes.map((c) => {
+          const copy = c;
           const [pl, pf] = parEmCem(calcVies(M, c.vies).elD);
           const ativo = Math.abs(params.vies - c.vies) < 0.05;
           return (
@@ -142,7 +189,7 @@ export function CurvaSensibilidade() {
                     real. É assim que o painel calcula por padrão.
                   </>
                 ) : (
-                  copy.texto(pl)
+                  copy.texto({ pl, margem: M.margem })
                 )}
               </span>
               {ativo ? (

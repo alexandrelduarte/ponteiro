@@ -11,8 +11,11 @@
  *
  * As probabilidades aqui são CONDICIONAIS a essa hipótese: dentro dela o erro
  * vira suposição fixa e a única dúvida que sobra é o quanto a opinião ainda
- * pode andar até outubro. Por isso os números diferem dos do painel principal,
- * e o texto diz exatamente por quê.
+ * pode andar até 25 de outubro. Por isso os números diferem dos do painel
+ * principal, e o texto diz exatamente por quê.
+ *
+ * Desde 04/10 o 1º turno já aconteceu: o cartão do 1º turno some (os campos
+ * dele vêm `null` do modelo) e a síntese passa a ser só a decisão.
  */
 import { useMemo } from "react";
 import { Botao, Chip, Detalhe, Nicho, Subtitulo } from "@/components/ui/blocos";
@@ -35,6 +38,8 @@ export function Replay2022() {
   const p1Direto = emCem(replay.p1Ld);
   const v2Abs = Math.round(replay.p2Trep * replay.pV2rep * 100);
   const r2lInt = Math.round(replay.r2L);
+  const tem1T = replay.r1L != null && replay.r1F != null;
+  const dif2 = replay.r2L - replay.r2F;
 
   return (
     <div className="mt-6">
@@ -55,7 +60,9 @@ export function Replay2022() {
           cartão devolveu ao balão o parágrafo que o fazia ter o dobro dos
           outros. Quatro peças contra duas e três viraram três contra duas e
           três. */}
-      <div className="mt-4 grid gap-3 lg:grid-cols-3 lg:items-stretch">
+      <div
+        className={`mt-4 grid gap-3 lg:items-stretch ${tem1T ? "lg:grid-cols-3" : "md:grid-cols-2"}`}
+      >
         {replay.r1L != null && replay.r1F != null && (
           <Nicho className="h-full">
             <p className="text-secao text-tinta">1º turno, com o erro de 2022 aplicado</p>
@@ -82,9 +89,9 @@ export function Replay2022() {
             </Chip>
           </p>
           <p className="mt-2 text-micro text-tinta-media numeros">
-            Lula {fmt(replay.r2L)}% × Flávio {fmt(replay.r2F)}% dos votos válidos: vitória apertada
-            de Lula por {fmtSinal(replay.r2L - replay.r2F)} pontos — quase o resultado real de 2022,
-            que foi 50,9 × 49,1.
+            Lula {fmt(replay.r2L)}% × Flávio {fmt(replay.r2F)}% dos votos válidos: vitória de{" "}
+            {dif2 >= 0 ? "Lula" : "Flávio"} por {fmt(Math.abs(dif2))}{" "}
+            {Math.abs(dif2) === 1 ? "ponto" : "pontos"}. Em 2022, o resultado real foi 50,9 × 49,1.
           </p>
         </Nicho>
 
@@ -92,7 +99,9 @@ export function Replay2022() {
             fica em 4,47:1 — 0,03 abaixo do piso AA (axe reprova). O lilás segue
             reservado às formas de incerteza; a síntese destaca pelo título. */}
         <Nicho className="h-full">
-          <p className="text-secao text-tinta">Somando os dois turnos nesta hipótese</p>
+          <p className="text-secao text-tinta">
+            {tem1T ? "Somando os dois turnos nesta hipótese" : "A decisão, nesta hipótese"}
+          </p>
           <p className="mt-2 text-dado numeros">
             <span className="text-lula">Lula {elDia} em 100</span>
             <span className="text-tinta-media"> × </span>
@@ -104,20 +113,29 @@ export function Replay2022() {
               fazia esta coluna ter o dobro de altura das outras duas. Nenhuma
               palavra mudou: ela está inteira a um toque. */}
           <p className="mt-2 text-micro text-tinta numeros">
-            De cada 100 cenários desta hipótese: <b className="font-semibold">{p1Direto}</b>{" "}
-            terminam com Lula eleito já no 1º turno. Os outros{" "}
-            <b className="font-semibold">{p2t}</b> vão à decisão, e Lula ganha em {pv2} de cada 100
-            deles — o que dá <b className="font-semibold">{v2Abs}</b> em 100. Somando os dois
-            caminhos: <b className="font-semibold">{elDia}</b> em 100.{" "}
+            {tem1T ? (
+              <>
+                De cada 100 cenários desta hipótese: <b className="font-semibold">{p1Direto}</b>{" "}
+                terminam com Lula eleito já no 1º turno. Os outros{" "}
+                <b className="font-semibold">{p2t}</b> vão à decisão, e Lula ganha em {pv2} de cada
+                100 deles — o que dá <b className="font-semibold">{v2Abs}</b> em 100. Somando os
+                dois caminhos: <b className="font-semibold">{elDia}</b> em 100.
+              </>
+            ) : (
+              <>
+                O 1º turno já aconteceu: o que sobra é a decisão de 25 de outubro, em que Lula ganha
+                em <b className="font-semibold">{elDia}</b> de cada 100 cenários desta hipótese.
+              </>
+            )}{" "}
             <MaisSobre
-              titulo="Somando os dois turnos nesta hipótese"
-              rotuloAcessivel="ver por que a distância até outubro derruba esse número"
+              titulo={tem1T ? "Somando os dois turnos nesta hipótese" : "A decisão, nesta hipótese"}
+              rotuloAcessivel="ver por que a distância até a votação mexe nesse número"
             >
-              Nesta hipótese o erro vira suposição fixa, turno a turno, como aconteceu em 2022. A
-              única dúvida que sobra é o quanto a opinião ainda pode andar até outubro. Se a votação
-              fosse hoje sob essa hipótese, a dúvida quase desapareceria: a diferença ficaria perto
-              de {r2lInt} × {100 - r2lInt} e Lula seria eleito em {emCem(replay.elRepH)} de cada 100
-              cenários. É a distância até outubro que derruba esse número para {elDia}.
+              Nesta hipótese o erro vira suposição fixa, como aconteceu em 2022. A única dúvida que
+              sobra é o quanto a opinião ainda pode andar até 25 de outubro. Se a votação fosse hoje
+              sob essa hipótese, a diferença ficaria perto de {r2lInt} × {100 - r2lInt} e Lula seria
+              eleito em {emCem(replay.elRepH)} de cada 100 cenários. É a distância até a votação que
+              leva esse número para {elDia}.
             </MaisSobre>
           </p>
         </Nicho>
@@ -145,9 +163,10 @@ export function Replay2022() {
           4,9), e o resultado real foi 1,8. Os dois erros não se somam: as do 2º turno foram
           refeitas depois do susto do 1º, e o que sobrou de erro na decisão foi 3,1. No painel
           principal esta mesma hipótese aparece como cerca de {emCem(replay.pPainel)} em 100, porque
-          lá a dúvida sobre o tamanho da puxada continua na conta. Para a corrida se inverter seria
-          preciso algo que <b className="font-semibold text-tinta">não</b> aconteceu em 2022: o erro
-          do 1º turno chegar inteiro à decisão — é o cartão de teste-limite, acima.
+          lá a dúvida sobre o tamanho da puxada continua na conta. O que acontece se o erro do 1º
+          turno de 2022 chegar inteiro à decisão — algo que{" "}
+          <b className="font-semibold text-tinta">não</b> aconteceu em 2022 — está no cartão de
+          teste-limite, acima.
         </p>
       </Detalhe>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * "O que é mais provável acontecer em outubro?" — o cenário-base
+ * "O que é mais provável acontecer em 25 de outubro?" — o cenário-base
  * (COPY-DECK §M, INVENTÁRIO 3.9).
  *
  * É o caminho MODAL da árvore de probabilidades do próprio modelo, nos números
@@ -22,31 +22,47 @@
  *
  * Condição do despacho (AUDITORIA §9.3): o título "do jeito que as pesquisas
  * medem" fica na MESMA dobra dos chips, nunca colapsado.
+ *
+ * BANDAS SIMÉTRICAS (2º turno, out/2026 — DECISOES.md): as bandas do protótipo
+ * (`calcCenarioBase().bandas`) binavam magnitude só do lado de Lula — uma banda
+ * única "Flávio vence" contra três de Lula. Com Flávio na frente isso jogava
+ * todas as vitórias dele num balde só (R4). A barra agora é calculada aqui, na
+ * apresentação, com duas bandas por lado e o mesmo corte de 5 pontos — o modelo
+ * (e a paridade dele) não muda.
  */
 import { useMemo, type CSSProperties } from "react";
 import { Bloco, Cabecalho, Colunas, Detalhe, Nicho, Subtitulo } from "@/components/ui/blocos";
 import { Termo } from "@/components/ui/glossario";
-import { emCem, inteiroEmCem } from "@/components/ui/textos";
-import { calcCenarioBase, fmt } from "@/lib/modelo";
+import { abs1, emCem } from "@/components/ui/textos";
+import { pct1T } from "@/data/resultado-1t";
+import { calcErro1T } from "@/lib/erro-1t";
+import { calcCenarioBase, fmt, normCdf } from "@/lib/modelo";
 import { usePainel } from "./estado";
 
-/** Rótulos das quatro bandas, na ordem em que o modelo as devolve. */
+/** Corte de magnitude das bandas, em pontos — o mesmo dos dois lados. */
+const CORTE_BANDA = 5;
+
+/** Rótulos das quatro bandas, da esquerda (Flávio) para a direita (Lula). */
 const ROTULO_BANDA = [
-  "Flávio na frente",
-  "Lula por até 5 pontos",
-  "Lula por 5 a 10",
-  "Lula por mais de 10",
+  `Flávio por mais de ${CORTE_BANDA} pontos`,
+  `Flávio por até ${CORTE_BANDA}`,
+  `Lula por até ${CORTE_BANDA}`,
+  `Lula por mais de ${CORTE_BANDA}`,
 ];
 
 /**
  * Cor de cada banda, alinhada 1:1 com ROTULO_BANDA: direção = família do
  * candidato, magnitude = degrau da rampa de fundo (tokens.css §4, contrastes
- * calculados lá). `anel` é o contorno da banda modal — na cor do candidato,
- * nunca em tinta: ≥3:1 sobre o próprio fundo em todos os degraus (7,39:1 no
- * naval; 4,80 · 3,81 · 3,07:1 nos três carmins). Strings completas para o
- * scanner do Tailwind.
+ * calculados lá — a rampa naval espelha a carmim em clareza). `anel` é o
+ * contorno da banda modal, na cor do candidato (≥3:1 sobre o próprio fundo).
+ * Strings completas para o scanner do Tailwind.
  */
 const ESTILO_BANDA = [
+  {
+    fundo: "bg-flavio-fundo-2",
+    borda: "border-flavio",
+    anel: "shadow-[inset_0_0_0_2px_var(--color-flavio)]",
+  },
   {
     fundo: "bg-flavio-fundo",
     borda: "border-flavio",
@@ -59,11 +75,6 @@ const ESTILO_BANDA = [
   },
   {
     fundo: "bg-lula-fundo-2",
-    borda: "border-lula",
-    anel: "shadow-[inset_0_0_0_2px_var(--color-lula)]",
-  },
-  {
-    fundo: "bg-lula-fundo-3",
     borda: "border-lula",
     anel: "shadow-[inset_0_0_0_2px_var(--color-lula)]",
   },
@@ -87,30 +98,45 @@ function AmostraBanda({ indice, className }: { indice: number; className?: strin
 }
 
 export function CenarioBase() {
-  const { M, params } = usePainel();
+  const { M, params, pesquisasOficiais } = usePainel();
   const cen = useMemo(() => calcCenarioBase(M, params.vies), [M, params.vies]);
+  const erro1T = useMemo(() => calcErro1T(pesquisasOficiais), [pesquisasOficiais]);
 
   if (!cen) return null;
 
   const lider = cen.liderLula ? "Lula" : "Flávio";
-  const lider1T = (cen.pLulaEm1 ?? 0) >= 0.5 ? "Lula" : "Flávio";
-  const apertada = Math.abs(M.margemAj) < 5 ? "apertada" : "média";
+  const apertada = Math.abs(M.margemAj) < CORTE_BANDA ? "apertada" : "média";
   const pElei = emCem(cen.pElei);
   const pContra = emCem(1 - cen.pElei);
   const umaEm = Math.max(2, Math.round(1 / Math.max(0.01, 1 - cen.pElei)));
-  const p2t = emCem(M.p2Tacontece);
-  const pV2 = emCem(cen.pV2);
-  const pV2Abs = inteiroEmCem(M.p2Tacontece * cen.pV2);
-  const p1Direto = inteiroEmCem(cen.pDireto);
 
-  /* Geometria das bandas: índice da modal, fronteira da régua do empate e o
-     centro da banda modal (âncora do chip), tudo em % da largura da barra. */
-  const idxModal = cen.bandas.indexOf(cen.modal);
-  const fronteira = Math.max(cen.bandas[0].p * 100, 0);
-  const antesDaModal = cen.bandas.slice(0, idxModal).reduce((soma, banda) => soma + banda.p, 0);
-  const centroModal = (antesDaModal + cen.modal.p / 2) * 100;
+  /* Bandas simétricas sobre N(margemAj, sigmaDia2) — a mesma distribuição do
+     enxame e das bandas do modelo, só que binada igual dos dois lados. */
+  const F = (x: number) => normCdf((x - M.margemAj) / M.sigmaDia2);
+  const bandas = [
+    F(-CORTE_BANDA),
+    F(0) - F(-CORTE_BANDA),
+    F(CORTE_BANDA) - F(0),
+    Math.max(0, 1 - F(CORTE_BANDA)),
+  ].map((p, i) => ({ rot: ROTULO_BANDA[i], p }));
+  const idxModal = bandas.reduce((m, b, i) => (b.p > bandas[m].p ? i : m), 0);
+  const modal = bandas[idxModal];
+
+  /* Recentes de 2º turno (últimos 35 dias): quem aparece à frente em cada uma. */
+  const recentes = M.linhas.filter((l) => l.idadeDias < 35);
+  const recentesLider = recentes.filter((l) =>
+    cen.liderLula ? l.margem2 > 0 : l.margem2 < 0,
+  ).length;
+  const recentesEmpate = recentes.filter((l) => l.empate2).length;
+  const lider1T = pct1T("Flávio Bolsonaro") > pct1T("Lula") ? "Flávio" : "Lula";
+
+  /* Geometria das bandas: fronteira da régua do empate (entre a 2ª e a 3ª
+     banda) e o centro da banda modal (âncora do chip), em % da largura. */
+  const fronteira = Math.max((bandas[0].p + bandas[1].p) * 100, 0);
+  const antesDaModal = bandas.slice(0, idxModal).reduce((soma, banda) => soma + banda.p, 0);
+  const centroModal = (antesDaModal + modal.p / 2) * 100;
   const empateNaDireita = fronteira > 70;
-  const colunasBandas = cen.bandas
+  const colunasBandas = bandas
     .map((b) => `minmax(0, ${Math.max(b.p, 0.001).toFixed(4)}fr)`)
     .join(" ");
 
@@ -118,16 +144,14 @@ export function CenarioBase() {
     <Bloco rotuladoPor="titulo-cenario-base">
       <Cabecalho
         id="titulo-cenario-base"
-        pergunta="O que é mais provável acontecer em outubro?"
+        pergunta="O que é mais provável acontecer em 25 de outubro?"
         resposta={
           <span data-testid="cenario-base-titulo">
-            {lider} eleito, com a definição saindo em 25 de outubro e por diferença {apertada}: é o
-            caminho que aparece em <span className="numeros">{pV2Abs}</span> de cada 100 cenários.
-            Somando com o caminho de vitória já em 4 de outubro, {lider} termina eleito em{" "}
+            {lider} eleito, por diferença {apertada}: é o desfecho que aparece em{" "}
             <span data-testid="cenario-base-probabilidade" className="numeros">
               {pElei}
             </span>{" "}
-            de cada 100.
+            de cada 100 cenários da decisão de 25 de outubro.
           </span>
         }
         traduzindo={
@@ -141,18 +165,17 @@ export function CenarioBase() {
 
       <div className="mt-5 grid gap-3 md:grid-cols-3 md:items-start">
         <Nicho>
-          <Subtitulo>4 de outubro · 1º turno</Subtitulo>
+          <Subtitulo>4 de outubro · 1º turno · já aconteceu</Subtitulo>
           <p className="mt-1 text-corpo text-tinta-media numeros">
-            Na maioria dos cenários ninguém passa da metade: vai para o 2º turno em {p2t} de cada
-            100. Lula chega em 1º lugar em {emCem(cen.pLulaEm1)} de cada 100.
+            Ninguém passou da metade dos votos válidos: Lula {fmt(pct1T("Lula"), 2)}% × Flávio{" "}
+            {fmt(pct1T("Flávio Bolsonaro"), 2)}%. Por isso a eleição vai ao 2º turno.
           </p>
         </Nicho>
         <Nicho>
           <Subtitulo>25 de outubro · 2º turno</Subtitulo>
           <p className="mt-1 text-corpo text-tinta-media numeros">
-            Havendo 2º turno, {lider} ganha a decisão em {pV2} de cada 100 desses cenários — como o
-            2º turno acontece em {p2t} de cada 100, esse caminho vale {pV2Abs} em 100. Some os{" "}
-            {p1Direto} em 100 em que {lider} já ganha em 4 de outubro: {pElei} em 100.
+            {lider} ganha a decisão em {emCem(cen.pV2)} de cada 100 cenários. Como o 1º turno já
+            passou, é a mesma chance de ser eleito.
           </p>
         </Nicho>
         <Nicho>
@@ -210,24 +233,19 @@ export function CenarioBase() {
           </span>
         </p>
 
-        {/* Quatro bandas CONTÍGUAS (somam 100): a DIREÇÃO é a família de cor
-            do candidato e a posição contra a régua; a MAGNITUDE é o degrau da
-            rampa de fundo (tokens.css §4). O que separa uma banda da outra é
-            um vão de placa de 2px — vão, não traço. O fio de contorno desenha
-            o limite da barra: fundo claro não segura a forma sozinho contra a
-            placa (mesma doutrina da faixa da dúvida, §6 dos tokens). A banda
-            modal ganha o anel de 2px na cor do candidato — canal de forma por
-            cima da cor, nunca tinta preta. */}
+        {/* Quatro bandas CONTÍGUAS (somam 100), duas de cada lado da régua do
+            empate: a DIREÇÃO é a família de cor do candidato e a posição contra
+            a régua; a MAGNITUDE é o degrau da rampa de fundo (tokens.css §4).
+            O que separa uma banda da outra é um vão de placa de 2px. A banda
+            modal ganha o anel de 2px na cor do candidato. */}
         <div
           className="relative flex h-8 w-full overflow-hidden rounded-plena border border-contorno"
           role="img"
-          aria-label={cen.bandas
-            .map((b, i) => `${ROTULO_BANDA[i]}: ${emCem(b.p)} em 100`)
-            .join("; ")}
+          aria-label={bandas.map((b) => `${b.rot}: ${emCem(b.p)} em 100`).join("; ")}
         >
-          {cen.bandas.map((b, i) => (
+          {bandas.map((b, i) => (
             <div
-              key={ROTULO_BANDA[i]}
+              key={b.rot}
               className={[
                 "h-full border-r-2 border-placa last:border-r-0",
                 ESTILO_BANDA[i].fundo,
@@ -236,9 +254,8 @@ export function CenarioBase() {
               style={{ width: `${Math.max(b.p * 100, 0)}%` }}
             />
           ))}
-          {/* A régua do empate mora na fronteira entre a primeira banda
-              (Flávio na frente) e a segunda: é o mesmo zero do enxame, e por
-              isso é desenhada POR CIMA, em tinta. */}
+          {/* A régua do empate mora na fronteira entre as bandas de Flávio e
+              as de Lula: é o mesmo zero do enxame, desenhado POR CIMA. */}
           <span
             aria-hidden="true"
             className="absolute inset-y-0 w-[3px] -translate-x-1/2 bg-tinta"
@@ -247,9 +264,7 @@ export function CenarioBase() {
         </div>
 
         {/* Legenda ANCORADA: em sm+ o grid repete as proporções das bandas e
-            cada rótulo cai debaixo do seu pedaço; a 390 vira lista vertical.
-            Nas duas formas a amostra de cor liga o rótulo à banda — e o texto
-            continua dizendo direção e magnitude com todas as letras. */}
+            cada rótulo cai debaixo do seu pedaço; a 390 vira lista vertical. */}
         <ul
           className={[
             "mt-2 grid grid-cols-1 gap-y-1.5 text-micro text-tinta-media",
@@ -257,14 +272,11 @@ export function CenarioBase() {
           ].join(" ")}
           style={{ "--colunas-bandas": colunasBandas } as CSSProperties}
         >
-          {cen.bandas.map((b, i) => (
-            <li
-              key={ROTULO_BANDA[i]}
-              className="numeros flex items-start gap-1.5 sm:min-w-0 sm:pr-3"
-            >
+          {bandas.map((b, i) => (
+            <li key={b.rot} className="numeros flex items-start gap-1.5 sm:min-w-0 sm:pr-3">
               <AmostraBanda indice={i} className="mt-1" />
               <span className="min-w-0">
-                {ROTULO_BANDA[i]}: <b className="font-semibold text-tinta">{emCem(b.p)} em 100</b>
+                {b.rot}: <b className="font-semibold text-tinta">{emCem(b.p)} em 100</b>
                 {i === idxModal ? (
                   <span className="font-semibold text-tinta"> — o mais provável</span>
                 ) : null}
@@ -278,39 +290,43 @@ export function CenarioBase() {
         </p>
       </div>
 
-      {/* Um parágrafo de nove orações numerado por dentro ("Um:… Dois:… Três:…
-          Quatro:") é uma LISTA disfarçada de prosa — e, preso na medida de
-          leitura, era 678px de altura contra 49% da placa em branco ao lado.
-          Aqui ele vira o que já era: quatro itens, palavra por palavra, em duas
-          colunas a partir de lg. Os marcadores são os do próprio texto
-          auditado; nenhuma frase foi reescrita nem reordenada. */}
+      {/* Os motivos saem dos DADOS da lista (e do resultado oficial do 1º
+          turno), não de texto fixo: com outra lista, outra frase. */}
       <div className="mt-6">
         <Subtitulo>Por que este é o caminho mais provável</Subtitulo>
-        <p className="mt-1 max-w-texto text-corpo text-tinta-media">Quatro motivos.</p>
         <ul className="mt-2 text-corpo text-tinta-media numeros lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-10 lg:gap-y-3">
           <li className="mt-2 max-w-texto lg:mt-0">
-            <b className="font-semibold text-tinta">Um:</b> a vantagem é constante — 6 dos 7
-            institutos de julho mostram Lula à frente, e no sétimo os dois estão em empate técnico;
-            a comparação de cada instituto com ele mesmo está estável.
+            <b className="font-semibold text-tinta">As pesquisas recentes:</b>{" "}
+            {recentes.length > 0 ? (
+              <>
+                {recentesLider} das {recentes.length} pesquisas de 2º turno dos últimos 35 dias
+                mostram {lider} à frente; {recentesEmpate} delas estão em empate técnico.
+              </>
+            ) : (
+              <>nenhuma pesquisa da lista é dos últimos 35 dias — o retrato pode estar atrasado.</>
+            )}
           </li>
           <li className="mt-2 max-w-texto lg:mt-0">
-            <b className="font-semibold text-tinta">Dois:</b> o contexto medido não desfavorece quem
-            está no governo: aprovação e desaprovação próximas, rejeição alta dos dois lados e mais
-            gente aberta a votar em Lula (47% contra 38%).
+            <b className="font-semibold text-tinta">A urna do 1º turno:</b> {lider1T} terminou na
+            frente em 4 de outubro, por{" "}
+            {fmt(Math.abs(pct1T("Flávio Bolsonaro") - pct1T("Lula")), 2)} pontos dos votos válidos.
+            O 2º turno é outra votação, mas o ponto de partida é esse.
           </li>
           <li className="mt-2 max-w-texto">
-            <b className="font-semibold text-tinta">Três:</b> com dois terços de cada lado já
-            decididos, a diferença anda devagar. Virar exige movimento fora do padrão de 2026.
-          </li>
-          <li className="mt-2 max-w-texto">
-            <b className="font-semibold text-tinta">Quatro:</b> mesmo assim a diferença fica
-            apertada. Quando as pesquisas erraram em 2018 e em 2022, o erro foi na mesma direção —
-            subestimando a direita — e a repetição fiel de 2022 dá algo perto de 51 × 49.
+            <b className="font-semibold text-tinta">O erro das pesquisas:</b>{" "}
+            {erro1T && Math.abs(erro1T.erroMargem) >= 0.5 ? (
+              <>
+                no 1º turno deste ano elas erraram {abs1(erro1T.erroMargem)} pontos na diferença, a
+                favor de {erro1T.erroMargem > 0 ? "Lula" : "Flávio"}. Em 2018 e em 2022 o erro
+                também subestimou a direita.
+              </>
+            ) : (
+              <>em 2018 e em 2022 as pesquisas erraram na mesma direção, subestimando a direita.</>
+            )}{" "}
+            Por isso a diferença medida não basta: a régua da puxada, mais abaixo, mostra o que
+            acontece se o erro se repetir.
           </li>
         </ul>
-        {/* A lista das "três coisas que mudariam o quadro" mora no bloco
-            "Isso ainda pode virar?" — aqui ela voltava quase palavra por
-            palavra, na mesma página. */}
       </div>
 
       <Detalhe titulo="Como este caminho foi escolhido" className="mt-4">
@@ -321,10 +337,9 @@ export function CenarioBase() {
             caminho mais comum, não o único.
           </p>
           <p className="mt-3 max-w-texto lg:mt-0">
-            Acaba no 1º turno? Não, em {p2t} de cada 100 cenários vai para o 2º. Quem chega na
-            frente? {lider1T}. Quem ganha a decisão? {lider}. Por quanto? A faixa em destaque acima.
-            Nada disso é opinião fixa: mude a régua da puxada para 6,3 e esta seção passa a
-            descrever, sozinha, a vitória de Flávio.
+            Quem ganha a decisão? {lider}. Por quanto? A faixa em destaque acima. Nada disso é
+            opinião fixa: mude a régua da puxada e esta seção passa a descrever, sozinha, o outro
+            desfecho quando ele virar o mais provável.
           </p>
         </Colunas>
       </Detalhe>

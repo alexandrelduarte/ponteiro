@@ -26,6 +26,7 @@ import {
   CartesianGrid,
   ComposedChart,
   Line,
+  ReferenceDot,
   ReferenceLine,
   ResponsiveContainer,
   Scatter,
@@ -49,6 +50,8 @@ export interface PropsEvolucao {
   sigmaHoje: number;
   /** coeficiente da deriva — o quanto a corrida ainda pode andar */
   coefDeriva: number;
+  /** resultado oficial do turno, quando ele já aconteceu (diferença em votos válidos) */
+  resultado?: { x: number; dif: number };
 }
 
 interface PontoPlotado {
@@ -71,6 +74,7 @@ export default function GraficoEvolucao({
   centroProjetado,
   sigmaHoje,
   coefDeriva,
+  resultado,
 }: PropsEvolucao) {
   const observado: PontoPlotado[] = serie.map((p) => ({
     x: p.x,
@@ -91,7 +95,9 @@ export default function GraficoEvolucao({
     }
   }
 
-  const dados = [...observado, ...projetado].sort((a, b) => a.x - b.x);
+  const dados = [...observado, ...projetado, ...(resultado ? [{ x: resultado.x }] : [])].sort(
+    (a, b) => a.x - b.x,
+  );
 
   const extremos = dados.flatMap((d) => [
     ...(d.faixa ?? []),
@@ -99,7 +105,7 @@ export default function GraficoEvolucao({
     ...(d.dif !== undefined ? [d.dif] : []),
   ]);
   const dosPontos = pontos.map((p) => p.lVal - p.fVal);
-  const todos = [...extremos, ...dosPontos, 0];
+  const todos = [...extremos, ...dosPontos, ...(resultado ? [resultado.dif] : []), 0];
   const folga = 1.5;
   const dominio: [number, number] = [Math.min(...todos) - folga, Math.max(...todos) + folga];
 
@@ -204,6 +210,25 @@ export default function GraficoEvolucao({
               position: "insideTopRight",
               fontSize: 13,
               fill: COR.ameixa,
+              className: "rotulo-grafico",
+            }}
+          />
+        ) : null}
+
+        {/* O RESULTADO da urna, quando o turno já aconteceu: fato, não média —
+            ponto de tinta com rótulo, na data da votação. */}
+        {resultado ? (
+          <ReferenceDot
+            x={resultado.x}
+            y={resultado.dif}
+            r={5}
+            fill={COR.tinta}
+            stroke={COR.tinta}
+            label={{
+              value: "urna",
+              position: "left",
+              fontSize: 13,
+              fill: COR.tinta,
               className: "rotulo-grafico",
             }}
           />

@@ -92,11 +92,14 @@
      escuridão é o ANEL: o degrau mais fundo ainda recebe contorno carmim
      (#be1745) com ≥3:1 de objeto gráfico quando a banda modal cair nele.
      Preenchimento claro nunca informa sozinho — rótulo com direção+magnitude
-     acompanha cada banda (a régua de tinta separa as direções). Rampa naval
-     equivalente só entra no dia em que o modelo binar magnitudes do lado
-     Flávio (hoje ele não bina; criar tokens sem uso violaria R7). */
+     acompanha cada banda (a régua de tinta separa as direções).
+     2º turno (out/2026): as bandas passaram a ser SIMÉTRICAS — duas por lado,
+     corte em 5 pontos (DECISOES.md). Entra a rampa naval espelhada e sai o
+     degrau 3 do carmim (sem uso, R7):
+       flavio-fundo-2 #becef0 · L 0,851 C 0,050 h 265° (mesma clareza do
+                      lula-fundo-2) · tinta sobre 10,90:1 · anel naval 6,12:1 */
   --color-lula-fundo-2: #f8bcc0;
-  --color-lula-fundo-3: #f4a0a7;
+  --color-flavio-fundo-2: #becef0;
 
   /* ======================================================================
      4b. DEMAIS CANDIDATOS — a escala NEUTRA de exibição (Fase 7, B1)

@@ -252,16 +252,19 @@ export function Hero({ selo }: { selo: SeloFrescor }) {
         <Colunas arranjo="principal">
           <div>
             <h2 data-testid="veredito-titulo" className="text-pergunta text-tinta">
-              {faixa === "empate" ? "Está em aberto — dá para os dois lados" : null}
-              {faixa === "leve"
+              {encerrada ? `Na véspera da votação, as pesquisas punham ${lider} na frente` : null}
+              {!encerrada && faixa === "empate" ? "Está em aberto — dá para os dois lados" : null}
+              {!encerrada && faixa === "leve"
                 ? `${lider} está na frente por pouco — e isso ainda pode mudar`
                 : null}
-              {faixa === "favorito" ? (
+              {!encerrada && faixa === "favorito" ? (
                 <>
                   {lider} está na frente — provável, mas <b>ainda pode mudar</b>
                 </>
               ) : null}
-              {faixa === "amplo" ? `${lider} está bem na frente — mas não é garantia` : null}
+              {!encerrada && faixa === "amplo"
+                ? `${lider} está bem na frente — mas não é garantia`
+                : null}
             </h2>
 
             <p className="mt-2 max-w-texto text-corpo text-tinta-media">

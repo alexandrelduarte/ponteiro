@@ -123,7 +123,7 @@ export function CenarioBase() {
   const modal = bandas[idxModal];
 
   /* Recentes de 2º turno (últimos 35 dias): quem aparece à frente em cada uma. */
-  const recentes = M.linhas.filter((l) => l.idadeDias < 35);
+  const recentes = M.linhas.filter((l) => l.idadeDias < 35 && l.w > 0); // só as que entram na média
   const recentesLider = recentes.filter((l) =>
     cen.liderLula ? l.margem2 > 0 : l.margem2 < 0,
   ).length;
@@ -136,8 +136,10 @@ export function CenarioBase() {
   const antesDaModal = bandas.slice(0, idxModal).reduce((soma, banda) => soma + banda.p, 0);
   const centroModal = (antesDaModal + modal.p / 2) * 100;
   const empateNaDireita = fronteira > 70;
+  // Piso de 14% por coluna na legenda: uma banda de 3 em 100 espremia o rótulo
+  // numa coluna de uma palavra por linha. A barra continua proporcional.
   const colunasBandas = bandas
-    .map((b) => `minmax(0, ${Math.max(b.p, 0.001).toFixed(4)}fr)`)
+    .map((b) => `minmax(0, ${Math.max(b.p, 0.14).toFixed(4)}fr)`)
     .join(" ");
 
   return (

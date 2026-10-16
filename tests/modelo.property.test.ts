@@ -224,13 +224,19 @@ describe("rodarModelo — invariantes de probabilidade e incerteza", () => {
   });
 
   it("linhas: ordenadas por meio de campo, pesos positivos e teto 1,5", () => {
-    for (const { rot, M } of CENARIOS) {
+    for (const { rot, M, hojeMs } of CENARIOS) {
+      // Entre turnos a média recomeça em 04/10: as rodadas anteriores ficam com
+      // peso 0 — e SÓ elas (DECISOES.md, 2º turno).
+      const recomeco =
+        hojeMs >= Date.parse("2026-10-04T12:00:00-03:00") &&
+        M.linhas.some((l) => l.fim >= "2026-10-04");
       for (let i = 1; i < M.linhas.length; i++)
         expect(meioCampo(M.linhas[i - 1]), `${rot}/ordem`).toBeLessThanOrEqual(
           meioCampo(M.linhas[i]),
         );
       for (const l of M.linhas) {
-        expect(l.w, `${rot}/w > 0`).toBeGreaterThan(0);
+        if (recomeco && l.fim < "2026-10-04") expect(l.w, `${rot}/w pré-1ºT`).toBe(0);
+        else expect(l.w, `${rot}/w > 0`).toBeGreaterThan(0);
         expect(l.w, `${rot}/w ≤ 1,5`).toBeLessThanOrEqual(1.5);
         expect(l.idadeDias, `${rot}/idade ≥ 0`).toBeGreaterThanOrEqual(0);
         expect(l.margem2).toBeCloseTo(l.t2.lula - l.t2.flavio, 12);
@@ -250,7 +256,7 @@ describe("rodarModelo — invariantes de probabilidade e incerteza", () => {
         for (let j = i + 1; j < M.linhas.length; j++) {
           const a = M.linhas[i],
             b = M.linhas[j];
-          if (a.n !== b.n || a.idadeDias === b.idadeDias) continue;
+          if (a.n !== b.n || a.idadeDias === b.idadeDias || a.w === 0 || b.w === 0) continue;
           pares++;
           const maisVelha = a.idadeDias > b.idadeDias ? a : b;
           const maisNova = a.idadeDias > b.idadeDias ? b : a;

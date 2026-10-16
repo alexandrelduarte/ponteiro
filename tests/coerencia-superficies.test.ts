@@ -60,3 +60,23 @@ describe("coerência entre superfícies publicadas", () => {
     expect(total).toBe(100);
   });
 });
+
+describe("entre turnos, a média do 2º turno recomeça em 04/10 (DECISOES.md)", () => {
+  const HOJE_2T = Date.parse("2026-10-16T12:00:00-03:00");
+  it("a margem com a série inteira é a mesma de só as pesquisas pós-1º turno", () => {
+    const tudo = rodarModelo(SEED, PARAMS_PADRAO, HOJE_2T)!;
+    const pos = rodarModelo(
+      SEED.filter((p) => p.fim >= "2026-10-04"),
+      PARAMS_PADRAO,
+      HOJE_2T,
+    )!;
+    expect(tudo.margem).toBeCloseTo(pos.margem, 12);
+    expect(tudo.pL2dia).toBeCloseTo(pos.pL2dia, 12);
+    // as anteriores continuam nas linhas (lista e gráfico), com peso 0
+    expect(tudo.linhas.length).toBeGreaterThan(pos.linhas.length);
+    expect(tudo.linhas.filter((l) => l.fim < "2026-10-04").every((l) => l.w === 0)).toBe(true);
+    // e a série do gráfico termina no mesmo número da média
+    const ultimo = tudo.serie2.at(-1)!;
+    expect(ultimo.l - ultimo.f).toBeCloseTo(tudo.margem, 9);
+  });
+});

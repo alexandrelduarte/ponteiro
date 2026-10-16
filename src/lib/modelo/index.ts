@@ -50,4 +50,12 @@ export {
   type PontoGrafico,
 } from "./derivados";
 
+export {
+  faseEleitoral,
+  primeiroTurnoPendente,
+  diasCorridos,
+  diasAte2T,
+  type FaseEleitoral,
+} from "./fase";
+
 export { fmt, fmtSinal, fmtData, pct } from "./formatadores";

@@ -15,7 +15,7 @@
  */
 import { ELEICAO_1T, ELEICAO_2T } from "@/data/constantes";
 import type { ParamsModelo, Pesquisa, Placar } from "@/data/tipos";
-import { primeiroTurnoPendente } from "./fase";
+import { INICIO_POS_1T, primeiroTurnoPendente } from "./fase";
 import { fmt, fmtSinal } from "./formatadores";
 
 /* ---------------------- tipos ---------------------- */
@@ -195,12 +195,22 @@ export function rodarModelo(
   const { meiaVida, sigmaSys, coefDeriva } = params;
   const vies = params.vies || 0;
 
+  /* Entre turnos, a média do 2º turno RECOMEÇA no 1º turno: só entram pesquisas
+     com campo encerrado a partir de 04/10 — feitas depois que os institutos
+     ganharam o gabarito da urna (em 2026 o 1º turno errou 4,3 pontos na
+     diferença). As anteriores continuam nas linhas com peso 0 (lista, fichas e
+     gráfico), mas não mexem na média. Sem nenhuma pesquisa pós-1ºT, vale tudo.
+     Desvio deliberado do protótipo — decisão do dono, DECISOES.md. */
+  const recomeco = !primeiroTurnoPendente(hojeMs) && com2T.some((p) => p.fim >= INICIO_POS_1T);
+  const contaNaMedia = (p: Pesquisa) => !recomeco || p.fim >= INICIO_POS_1T;
+
   const linhas: LinhaModelo[] = com2T
     .map((p) => {
       const idadeDias = Math.max(0, (hojeMs - meioCampo(p)) / 864e5);
-      const w =
-        Math.exp((-Math.LN2 * idadeDias) / meiaVida) *
-        Math.min(1.5, Math.sqrt((p.n || 1000) / 2000));
+      const w = !contaNaMedia(p)
+        ? 0
+        : Math.exp((-Math.LN2 * idadeDias) / meiaVida) *
+          Math.min(1.5, Math.sqrt((p.n || 1000) / 2000));
       const margem2 = p.t2.lula - p.t2.flavio;
       return { ...p, idadeDias, w, margem2, empate2: Math.abs(margem2) <= 2 * (p.moe || 2) };
     })
@@ -300,22 +310,30 @@ export function rodarModelo(
   };
 
   /* -------- séries para o gráfico -------- */
-  const fazSerie = (mL: Metrica, mF: Metrica): PontoSerie[] => {
+  // A série do 2º turno recomeça em 04/10 junto com a média (ver `recomeco`).
+  const posteriores = recomeco ? pesquisas.filter(contaNaMedia) : pesquisas;
+  const fonte2 = (t: number) => (recomeco && t >= ELEICAO_1T ? posteriores : pesquisas);
+  const fazSerie = (
+    mL: Metrica,
+    mF: Metrica,
+    fonte: (t: number) => readonly Pesquisa[] = () => pesquisas,
+  ): PontoSerie[] => {
     const t0 = meioCampo(linhas[0]);
     const pts: PontoSerie[] = [];
     for (let t = t0; t <= hojeMs + 1; t += 6 * 864e5) {
-      const a = mediaEm(t, pesquisas, mL, meiaVida);
-      const b = mediaEm(t, pesquisas, mF, meiaVida);
+      const a = mediaEm(t, fonte(t), mL, meiaVida);
+      const b = mediaEm(t, fonte(t), mF, meiaVida);
       if (a && b) pts.push({ x: t, l: a.valor, f: b.valor });
     }
-    const a = mediaEm(hojeMs, pesquisas, mL, meiaVida);
-    const b = mediaEm(hojeMs, pesquisas, mF, meiaVida);
+    const a = mediaEm(hojeMs, fonte(hojeMs), mL, meiaVida);
+    const b = mediaEm(hojeMs, fonte(hojeMs), mF, meiaVida);
     if (a && b) pts.push({ x: hojeMs, l: a.valor, f: b.valor });
     return pts;
   };
   const serie2 = fazSerie(
     (p) => p.t2?.lula ?? null,
     (p) => p.t2?.flavio ?? null,
+    fonte2,
   );
   const serie1 = fazSerie(
     (p) => p.t1?.lula ?? null,
@@ -345,8 +363,8 @@ export function rodarModelo(
   if (vies !== 0) {
     texto += ` Cenário com viés assumido de ${fmt(vies)} p.p. pró-direita nas pesquisas (média bruta ${fmtSinal(margem)} → margem efetiva ${fmtSinal(margemAj)}).`;
   }
-  const qtdEmpate = linhas.filter((l) => l.empate2 && l.idadeDias < 35).length;
-  const qtdRecentes = linhas.filter((l) => l.idadeDias < 35).length;
+  const qtdEmpate = linhas.filter((l) => l.empate2 && l.idadeDias < 35 && l.w > 0).length;
+  const qtdRecentes = linhas.filter((l) => l.idadeDias < 35 && l.w > 0).length;
 
   return {
     linhas,

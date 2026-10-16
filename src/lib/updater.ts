@@ -29,6 +29,16 @@ const MAX_BRUTO = 8_000;
 const MAX_URL = 500;
 /** Data mínima aceitável — protege contra "1970-01-01" e afins. */
 export const DATA_MINIMA = "2025-01-01";
+/**
+ * Janela da busca automática, em dias para trás a partir de hoje. A busca NÃO
+ * parte mais da última pesquisa publicada: ela só andava quando o admin
+ * aprovava, e uma pesquisa divulgada fora de ordem (campo mais antigo que a
+ * última aprovada) ficava rejeitada para sempre — foi assim que a série parou em
+ * agosto de 2026 (DECISOES.md, "fluxo de coleta"). A dedup cuida do resto.
+ */
+export const JANELA_BUSCA_DIAS = 21;
+/** Soma Lula+Flávio a partir da qual, sem branco/nulo informado, o par parece voto VÁLIDO. */
+const SOMA_PARECE_VALIDO = 98.5;
 
 /* ------------------------------------------------------------------ *
  * Tipos                                                              *
@@ -43,9 +53,13 @@ export interface InstitutoConhecido {
 export interface ContextoBusca {
   /** Institutos já cadastrados, para normalizar o nome vindo da IA. */
   institutos: InstitutoConhecido[];
-  /** Chaves `instituto_id|campo_fim` já existentes (publicadas E pendentes). */
+  /** Chaves `instituto_id|campo_fim` já existentes (publicadas, pendentes E rejeitadas). */
   existentes: string[];
-  /** `campo_fim` da pesquisa mais recente já na série (AAAA-MM-DD). */
+  /**
+   * Piso de `campo_fim` aceito (AAAA-MM-DD). No robô é o início da janela de
+   * busca (min(última publicada, hoje − JANELA_BUSCA_DIAS)); na inclusão manual
+   * e no lote do admin é `DATA_MINIMA` (o humano pode lançar o passado).
+   */
   ultimoFim: string;
   /** Hoje em America/Sao_Paulo (AAAA-MM-DD). */
   hoje: string;
@@ -66,8 +80,10 @@ export interface PesquisaAceita {
   bn1: number | null;
   l2: number;
   f2: number;
+  /** branco/nulo + não sabe do 2º turno (votos totais) */
+  bn2: number | null;
   fonte: string;
-  /** Item cru da IA, para forense. */
+  /** Item cru da IA, para forense (inclui `_avisos` de campos opcionais descartados). */
   bruto: Record<string, unknown>;
 }
 
@@ -81,6 +97,12 @@ export interface ResultadoProcessamento {
   encontradas: number;
   aceitas: PesquisaAceita[];
   rejeitadas: Rejeicao[];
+  /**
+   * A resposta inteira não pôde ser lida (vazia, gigante, sem lista JSON). É
+   * FALHA da coleta — nunca "não há pesquisa nova" (antes virava "a série já
+   * está em dia" no /admin).
+   */
+  falhaLeitura?: string;
 }
 
 export interface ResumoUpdater {
@@ -158,9 +180,21 @@ function paraNumero(v: unknown): unknown {
   return v;
 }
 
+/** Inteiro em grafia brasileira: "2.004" e "2,004" são dois mil e quatro, não 2,004. */
+function paraInteiro(v: unknown): unknown {
+  if (typeof v === "string" && /^\d{1,3}([.,]\d{3})+$/.test(v.trim())) {
+    return Number(v.trim().replace(/[.,]/g, ""));
+  }
+  return paraNumero(v);
+}
+
+/**
+ * Campo OPCIONAL inválido vira `null` (com aviso no forense) em vez de derrubar a
+ * pesquisa inteira: um "n" mal escrito não pode jogar fora um 2º turno bom.
+ */
 function numeroOpcional(min: number, max: number, inteiro = false) {
   const base = inteiro ? z.number().int().min(min).max(max) : z.number().min(min).max(max);
-  return z.preprocess(paraNumero, base.nullable());
+  return z.preprocess(inteiro ? paraInteiro : paraNumero, base.nullable()).catch(null);
 }
 
 function numeroObrigatorio(min: number, max: number) {
@@ -168,16 +202,18 @@ function numeroObrigatorio(min: number, max: number) {
 }
 
 function textoOpcional(max: number) {
-  return z.preprocess(
-    (v) => (v === undefined || v === null ? null : v),
-    z
-      .string()
-      .max(max * 4)
-      .transform(limparTexto)
-      .refine((s) => s.length <= max, `use até ${max} caracteres`)
-      .transform((s) => (s.length ? s : null))
-      .nullable(),
-  );
+  return z
+    .preprocess(
+      (v) => (v === undefined || v === null ? null : v),
+      z
+        .string()
+        .max(max * 4)
+        .transform(limparTexto)
+        .refine((s) => s.length <= max, `use até ${max} caracteres`)
+        .transform((s) => (s.length ? s : null))
+        .nullable(),
+    )
+    .catch(null);
 }
 
 const esquemaItem = z.object({
@@ -199,28 +235,66 @@ const esquemaItem = z.object({
   // para que "99" produza um motivo de rejeição legível.
   l2: numeroObrigatorio(-1_000, 1_000),
   f2: numeroObrigatorio(-1_000, 1_000),
+  bn2: numeroOpcional(0, 100),
+  // Válidos, quando o instituto destaca: só servem para conferir que l2/f2 são TOTAIS.
+  l2v: numeroOpcional(0, 100),
+  f2v: numeroOpcional(0, 100),
   fonte: z.string().max(MAX_URL),
 });
+
+/** Campos opcionais que, se vieram preenchidos e saíram `null`, geram aviso. */
+const OPCIONAIS = ["n", "moe", "tse", "contratante", "l1", "f1", "bn1", "bn2"] as const;
 
 /* ------------------------------------------------------------------ *
  * Extração do array JSON                                             *
  * ------------------------------------------------------------------ */
 
-/** Recorta o primeiro array JSON do texto da IA. `null` quando não há. */
+/**
+ * Fecha o array que abre em `ini`: conta colchetes FORA de strings JSON. `-1`
+ * quando não fecha. Linear no tamanho do texto (que já vem limitado).
+ */
+function fimDoArray(texto: string, ini: number): number {
+  let prof = 0;
+  let emString = false;
+  for (let i = ini; i < texto.length; i++) {
+    const c = texto[i];
+    if (emString) {
+      if (c === "\\") i++;
+      else if (c === '"') emString = false;
+      continue;
+    }
+    if (c === '"') emString = true;
+    else if (c === "[") prof++;
+    else if (c === "]" && --prof === 0) return i;
+  }
+  return -1;
+}
+
+/**
+ * Recorta o primeiro array JSON VÁLIDO do texto da IA. `null` quando não há.
+ *
+ * Testa cada "[" candidato até um que feche num array parseável — a busca na
+ * web costuma terminar a resposta com citações em markdown ("[fonte](url)") e
+ * pegar do primeiro "[" ao ÚLTIMO "]" estragava o JSON inteiro.
+ */
 export function extrairArrayJSON(texto: string): unknown[] | null {
   const limpo = texto
     .replace(/```json/gi, "")
     .replace(/```/g, "")
     .trim();
-  const ini = limpo.indexOf("[");
-  const fim = limpo.lastIndexOf("]");
-  if (ini < 0 || fim <= ini) return null;
-  try {
-    const valor: unknown = JSON.parse(limpo.slice(ini, fim + 1));
-    return Array.isArray(valor) ? valor : null;
-  } catch {
-    return null;
+  let tentativas = 0;
+  for (let ini = limpo.indexOf("["); ini >= 0; ini = limpo.indexOf("[", ini + 1)) {
+    if (++tentativas > 200) break;
+    const fim = fimDoArray(limpo, ini);
+    if (fim < 0) continue;
+    try {
+      const valor: unknown = JSON.parse(limpo.slice(ini, fim + 1));
+      if (Array.isArray(valor)) return valor;
+    } catch {
+      /* próximo candidato */
+    }
   }
+  return null;
 }
 
 /* ------------------------------------------------------------------ *
@@ -231,11 +305,17 @@ export function extrairArrayJSON(texto: string): unknown[] | null {
  * Converte o texto bruto da IA em pesquisas aceitáveis + motivos de rejeição.
  * Função pura: não toca em rede, banco nem relógio (o "hoje" vem do contexto).
  */
-export function processarRespostaIA(texto: unknown, ctx: ContextoBusca): ResultadoProcessamento {
+export function processarRespostaIA(
+  texto: unknown,
+  ctx: ContextoBusca,
+  /** teto de itens analisados — o robô usa MAX_ITENS; o lote do admin, mais */
+  maxItens: number = MAX_ITENS,
+): ResultadoProcessamento {
   const vazio = (motivo: string): ResultadoProcessamento => ({
     encontradas: 0,
     aceitas: [],
     rejeitadas: [{ motivo }],
+    falhaLeitura: motivo,
   });
 
   if (typeof texto !== "string" || texto.trim().length === 0) {
@@ -252,10 +332,10 @@ export function processarRespostaIA(texto: unknown, ctx: ContextoBusca): Resulta
   const rejeitadas: Rejeicao[] = [];
   const aceitas: PesquisaAceita[] = [];
 
-  const candidatos = itens.slice(0, MAX_ITENS);
-  if (itens.length > MAX_ITENS) {
+  const candidatos = itens.slice(0, maxItens);
+  if (itens.length > maxItens) {
     rejeitadas.push({
-      motivo: `resposta trouxe ${itens.length} itens; só os ${MAX_ITENS} primeiros foram analisados`,
+      motivo: `resposta trouxe ${itens.length} itens; só os ${maxItens} primeiros foram analisados`,
     });
   }
 
@@ -314,6 +394,26 @@ export function processarRespostaIA(texto: unknown, ctx: ContextoBusca): Resulta
       rejeitadas.push({ ...rotulo, motivo: "1º turno soma mais de 100 p.p." });
       continue;
     }
+    // O modelo trabalha com votos TOTAIS. Par de válidos misturado na média
+    // infla a diferença em ~1/(1−branco) e zera o branco/nulo publicado.
+    if (q.bn2 === null && q.l2 + q.f2 >= SOMA_PARECE_VALIDO) {
+      rejeitadas.push({
+        ...rotulo,
+        motivo: "2º turno parece voto válido (soma ≥ 98,5 sem branco/nulo) — confira e lance à mão",
+      });
+      continue;
+    }
+    if (q.bn2 !== null && Math.abs(q.l2 + q.f2 + q.bn2 - 100) > 3) {
+      rejeitadas.push({ ...rotulo, motivo: "2º turno (Lula + Flávio + branco/nulo) não soma 100" });
+      continue;
+    }
+    if (q.l2v !== null && q.f2v !== null && q.l2v === q.l2 && q.f2v === q.f2 && q.l2 + q.f2 > 95) {
+      rejeitadas.push({
+        ...rotulo,
+        motivo: "2º turno veio igual aos válidos — esperado voto total",
+      });
+      continue;
+    }
 
     // --- sanidade temporal --------------------------------------------------
     if (q.inicio > q.fim) {
@@ -327,7 +427,7 @@ export function processarRespostaIA(texto: unknown, ctx: ContextoBusca): Resulta
     if (q.fim < ultimoFim) {
       rejeitadas.push({
         ...rotulo,
-        motivo: `campo_fim anterior à última pesquisa da série (${ultimoFim})`,
+        motivo: `campo_fim anterior à janela de busca (desde ${ultimoFim})`,
       });
       continue;
     }
@@ -381,6 +481,12 @@ export function processarRespostaIA(texto: unknown, ctx: ContextoBusca): Resulta
     }
     vistos.add(chave);
 
+    const avisos = OPCIONAIS.filter((k) => {
+      const cru = (item as Record<string, unknown>)[k];
+      return cru !== undefined && cru !== null && cru !== "" && q[k] === null;
+    }).map((k) => `${k} inválido — descartado`);
+    if (avisos.length) bruto = { ...bruto, _avisos: avisos };
+
     aceitas.push({
       institutoId,
       institutoNome,
@@ -396,6 +502,7 @@ export function processarRespostaIA(texto: unknown, ctx: ContextoBusca): Resulta
       bn1: q.bn1,
       l2: q.l2,
       f2: q.f2,
+      bn2: q.bn2,
       fonte,
       bruto,
     });
@@ -448,12 +555,12 @@ const TIMEOUT_TENTATIVA_MS = 130_000;
  * tokens de pensamento — apertado demais, a resposta chega sem o JSON final.
  * Uma retentativa em falha transitória (rede/timeout/5xx/429).
  */
-async function buscarNaWeb(desde: string): Promise<string> {
+async function buscarNaWeb(desde: string, hoje: string): Promise<string> {
   const corpo = JSON.stringify({
     model: process.env.OPENAI_MODEL ?? MODELO_PADRAO,
-    max_output_tokens: 8_000,
+    max_output_tokens: 12_000,
     tools: [{ type: "web_search" }],
-    input: montarPromptBusca(desde),
+    input: montarPromptBusca(desde, hoje),
   });
 
   for (let tentativa = 1; ; tentativa++) {
@@ -508,10 +615,11 @@ async function carregarContexto(
 ): Promise<ContextoBusca> {
   const [institutos, existentes, ultima] = await Promise.all([
     supabase.from("institutos").select("id,nome,aliases").returns<InstitutoConhecido[]>(),
+    // Rejeitadas também: o que o admin recusou não volta todo dia pela porta do robô.
     supabase
       .from("pesquisas")
       .select("instituto_id,campo_fim")
-      .in("status", ["publicada", "pendente"])
+      .in("status", ["publicada", "pendente", "rejeitada"])
       .returns<{ instituto_id: string; campo_fim: string }[]>(),
     supabase
       .from("pesquisas")
@@ -527,6 +635,7 @@ async function carregarContexto(
   if (ultima.error) throw new Error(`última pesquisa: ${ultima.error.message}`);
 
   const fimBanco = ultima.data?.[0]?.campo_fim;
+  const hoje = hojeSaoPaulo();
   return {
     institutos: (institutos.data ?? []).map((i) => ({
       id: i.id,
@@ -534,9 +643,43 @@ async function carregarContexto(
       aliases: i.aliases ?? [],
     })),
     existentes: (existentes.data ?? []).map((p) => `${p.instituto_id}|${p.campo_fim}`),
-    ultimoFim: fimBanco && dataValida(fimBanco) ? fimBanco : DATA_MINIMA,
-    hoje: hojeSaoPaulo(),
+    ultimoFim: inicioJanela(fimBanco && dataValida(fimBanco) ? fimBanco : null, hoje),
+    hoje,
   };
+}
+
+/**
+ * Início da janela de busca: `min(última publicada, hoje − JANELA_BUSCA_DIAS)`.
+ * Se a série estiver atrasada, a busca recua até a última publicada; se estiver
+ * em dia, ainda olha 3 semanas para trás — pesquisa divulgada com atraso entra.
+ */
+export function inicioJanela(ultimaPublicada: string | null, hoje: string): string {
+  const [a, m, d] = hoje.split("-").map(Number);
+  const recuo = new Date(Date.UTC(a, m - 1, d) - JANELA_BUSCA_DIAS * 86_400_000)
+    .toISOString()
+    .slice(0, 10);
+  if (!ultimaPublicada) return recuo;
+  return ultimaPublicada < recuo ? ultimaPublicada : recuo;
+}
+
+/** Registra a execução da coleta (sucesso OU falha) — base do selo de frescor. */
+async function registrarColeta(ator: string, resumo: ResumoUpdater, desde: string | null) {
+  await registrarAuditoria({
+    ator,
+    acao: "coleta",
+    entidade: "coleta",
+    detalhes: {
+      ok: !resumo.erro,
+      desde,
+      encontradas: resumo.encontradas,
+      inseridas: resumo.inseridas,
+      rejeitadas: resumo.rejeitadas.length,
+      motivos: resumo.rejeitadas
+        .slice(0, 12)
+        .map((r) => [r.instituto, r.fim, r.motivo].filter(Boolean).join(" · ").slice(0, 200)),
+      ...(resumo.erro ? { erro: resumo.erro } : {}),
+    },
+  });
 }
 
 /**
@@ -546,6 +689,16 @@ async function carregarContexto(
  * @param ator quem disparou (`'cron'` ou o e-mail do admin) — vai no audit_log.
  */
 export async function rodarUpdater(ator = "cron"): Promise<ResumoUpdater> {
+  const resumo = await executarColeta(ator);
+  await registrarColeta(ator, resumo.resumo, resumo.desde).catch((erro) =>
+    console.error("[updater] falha ao registrar a coleta:", erro),
+  );
+  return resumo.resumo;
+}
+
+async function executarColeta(
+  ator: string,
+): Promise<{ resumo: ResumoUpdater; desde: string | null }> {
   const base: ResumoUpdater = {
     encontradas: 0,
     inseridas: 0,
@@ -554,11 +707,17 @@ export async function rodarUpdater(ator = "cron"): Promise<ResumoUpdater> {
   };
 
   if (!process.env.OPENAI_API_KEY) {
-    return { ...base, erro: "coletor indisponível: falta configuração da IA" };
+    return {
+      resumo: { ...base, erro: "coletor indisponível: falta configuração da IA" },
+      desde: null,
+    };
   }
   const supabase = criarClienteAdmin();
   if (!supabase) {
-    return { ...base, erro: "coletor indisponível: banco não configurado" };
+    return {
+      resumo: { ...base, erro: "coletor indisponível: banco não configurado" },
+      desde: null,
+    };
   }
 
   let ctx: ContextoBusca;
@@ -566,19 +725,27 @@ export async function rodarUpdater(ator = "cron"): Promise<ResumoUpdater> {
     ctx = await carregarContexto(supabase);
   } catch (erro) {
     console.error("[updater] falha ao carregar contexto:", erro);
-    return { ...base, erro: "coletor indisponível: falha ao ler a série atual" };
+    return {
+      resumo: { ...base, erro: "coletor indisponível: falha ao ler a série atual" },
+      desde: null,
+    };
   }
 
   let texto: string;
   try {
-    texto = await buscarNaWeb(ctx.ultimoFim);
+    texto = await buscarNaWeb(ctx.ultimoFim, ctx.hoje);
   } catch (erro) {
     console.error("[updater] falha na busca:", erro);
-    return { ...base, erro: "falha na busca automática" };
+    return { resumo: { ...base, erro: "falha na busca automática" }, desde: ctx.ultimoFim };
   }
 
-  const { encontradas, aceitas, rejeitadas } = processarRespostaIA(texto, ctx);
+  const { encontradas, aceitas, rejeitadas, falhaLeitura } = processarRespostaIA(texto, ctx);
   const resumo: ResumoUpdater = { ...base, encontradas, rejeitadas: [...rejeitadas] };
+  if (falhaLeitura) {
+    console.error("[updater] resposta ilegível:", falhaLeitura, texto.slice(0, 500));
+    resumo.erro = `resposta da IA ilegível: ${falhaLeitura}`;
+    return { resumo, desde: ctx.ultimoFim };
+  }
 
   for (const p of aceitas) {
     try {
@@ -605,7 +772,7 @@ export async function rodarUpdater(ator = "cron"): Promise<ResumoUpdater> {
           t1_bnns: p.bn1,
           t2_lula: p.l2,
           t2_flavio: p.f2,
-          t2_bnns: null,
+          t2_bnns: p.bn2,
           fonte_url: p.fonte,
           status: "pendente",
           origem: "auto",
@@ -641,6 +808,7 @@ export async function rodarUpdater(ator = "cron"): Promise<ResumoUpdater> {
           campo_fim: p.fim,
           t2_lula: p.l2,
           t2_flavio: p.f2,
+          t2_bnns: p.bn2,
           fonte: p.fonte,
         },
       });
@@ -654,5 +822,5 @@ export async function rodarUpdater(ator = "cron"): Promise<ResumoUpdater> {
     }
   }
 
-  return resumo;
+  return { resumo, desde: ctx.ultimoFim };
 }

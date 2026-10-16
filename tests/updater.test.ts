@@ -15,6 +15,7 @@ import { slugInstituto } from "@/lib/slug";
 import {
   dataValida,
   extrairArrayJSON,
+  inicioJanela,
   processarRespostaIA,
   textoDaResposta,
   type ContextoBusca,
@@ -218,13 +219,13 @@ describe("resposta maliciosa", () => {
     expect(r.rejeitadas[0].motivo).toMatch(/futuro/);
   });
 
-  it("data anterior à última pesquisa da série é barrada", () => {
+  it("data anterior à janela de busca é barrada", () => {
     const r = processarRespostaIA(
       resposta([item({ inicio: "2026-06-28", fim: "2026-07-01" })]),
       ctx(),
     );
     expect(r.aceitas).toEqual([]);
-    expect(r.rejeitadas[0].motivo).toMatch(/anterior à última/);
+    expect(r.rejeitadas[0].motivo).toMatch(/anterior à janela de busca/);
   });
 
   it("campo que termina antes de começar é barrado", () => {
@@ -285,11 +286,14 @@ describe("resposta maliciosa", () => {
     expect(nome).not.toMatch(/\p{C}/u);
   });
 
-  it("amostra e margem de erro absurdas são barradas", () => {
-    expect(processarRespostaIA(resposta([item({ n: 10 })]), ctx()).aceitas).toEqual([]);
-    expect(processarRespostaIA(resposta([item({ n: 9_000_000 })]), ctx()).aceitas).toEqual([]);
-    expect(processarRespostaIA(resposta([item({ moe: 40 })]), ctx()).aceitas).toEqual([]);
-    expect(processarRespostaIA(resposta([item({ n: 2000.5 })]), ctx()).aceitas).toEqual([]);
+  it("amostra e margem de erro absurdas viram null com aviso — sem derrubar o 2º turno", () => {
+    for (const extra of [{ n: 10 }, { n: 9_000_000 }, { moe: 40 }, { n: 2000.5 }]) {
+      const r = processarRespostaIA(resposta([item(extra)]), ctx());
+      expect(r.aceitas).toHaveLength(1);
+      const campo = Object.keys(extra)[0] as "n" | "moe";
+      expect(r.aceitas[0][campo]).toBeNull();
+      expect(r.aceitas[0].bruto._avisos).toEqual([`${campo} inválido — descartado`]);
+    }
   });
 
   it("lote gigante é truncado em vez de processado inteiro", () => {
@@ -345,5 +349,64 @@ describe("textoDaResposta (parser do formato OpenAI Responses)", () => {
     expect(
       textoDaResposta([{ type: "message", content: [{ type: "output_text", text: 99 }] }]),
     ).toBe("");
+  });
+});
+
+describe("2º turno — regras da coleta reescrita (out/2026)", () => {
+  it("lê o array mesmo com citações em markdown depois dele", () => {
+    const texto = `Aqui está:\n${resposta([item()])}\n\nFontes: [Poder360](https://www.poder360.com.br/x) [G1](https://g1.globo.com/y)`;
+    const r = processarRespostaIA(texto, ctx());
+    expect(r.falhaLeitura).toBeUndefined();
+    expect(r.aceitas).toHaveLength(1);
+  });
+
+  it("resposta sem lista JSON é FALHA de leitura, não 'série em dia'", () => {
+    const r = processarRespostaIA("Não encontrei nada, veja [aqui](https://x.com).", ctx());
+    expect(r.falhaLeitura).toMatch(/sem array JSON/);
+    expect(processarRespostaIA("[]", ctx()).falhaLeitura).toBeUndefined();
+  });
+
+  it('"2.004" entrevistas é dois mil e quatro', () => {
+    const r = processarRespostaIA(resposta([item({ n: "2.004" })]), ctx());
+    expect(r.aceitas[0].n).toBe(2004);
+  });
+
+  it("par que soma ≥ 98,5 sem branco/nulo parece voto válido e é barrado", () => {
+    const r = processarRespostaIA(resposta([item({ l2: 49, f2: 51 })]), ctx());
+    expect(r.aceitas).toEqual([]);
+    expect(r.rejeitadas[0].motivo).toMatch(/voto válido/);
+    // com o branco/nulo informado (Palver: 49 + 50 + 1) é voto total legítimo
+    const ok = processarRespostaIA(resposta([item({ l2: 49, f2: 50, bn2: 1 })]), ctx());
+    expect(ok.aceitas).toHaveLength(1);
+    expect(ok.aceitas[0].bn2).toBe(1);
+  });
+
+  it("2º turno que não fecha 100 com o branco/nulo é barrado", () => {
+    const r = processarRespostaIA(resposta([item({ l2: 45, f2: 47, bn2: 20 })]), ctx());
+    expect(r.aceitas).toEqual([]);
+    expect(r.rejeitadas[0].motivo).toMatch(/não soma 100/);
+  });
+
+  it("janela de busca: min(última publicada, hoje − 21 dias)", () => {
+    expect(inicioJanela("2026-08-02", "2026-10-16")).toBe("2026-08-02");
+    expect(inicioJanela("2026-10-15", "2026-10-16")).toBe("2026-09-25");
+    expect(inicioJanela(null, "2026-10-16")).toBe("2026-09-25");
+  });
+
+  it("pesquisa divulgada fora de ordem, dentro da janela, entra", () => {
+    // última publicada 15/10; uma rodada com campo até 10/10 chega atrasada
+    const r = processarRespostaIA(
+      resposta([
+        item({ inicio: "2026-10-08", fim: "2026-10-10", l1: null, f1: null, bn1: null, bn2: 10 }),
+      ]),
+      ctx({ ultimoFim: inicioJanela("2026-10-15", "2026-10-16"), hoje: "2026-10-16" }),
+    );
+    expect(r.aceitas).toHaveLength(1);
+  });
+
+  it("chave rejeitada pelo admin (em existentes) não volta pelo robô", () => {
+    const r = processarRespostaIA(resposta([item()]), ctx({ existentes: ["nexus|2026-08-01"] }));
+    expect(r.aceitas).toEqual([]);
+    expect(r.rejeitadas[0].motivo).toMatch(/duplicata/);
   });
 });

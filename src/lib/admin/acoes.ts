@@ -27,6 +27,8 @@ import {
   rodarUpdater,
   type ContextoBusca,
   type InstitutoConhecido,
+  type PesquisaAceita,
+  type Rejeicao,
   type ResumoUpdater,
 } from "@/lib/updater";
 import { exigirClienteAdmin, registrarAuditoria } from "@/lib/supabase/admin";
@@ -131,6 +133,11 @@ async function serieMudou(slugAfetado?: string): Promise<void> {
   revalidatePath("/pesquisas");
   revalidatePath("/pesquisas/[slug]", "page");
   revalidatePath("/sitemap.xml");
+  // Superfícies de máquina que publicam o mesmo número (DECISOES.md, 2º turno).
+  revalidatePath("/api/resumo");
+  revalidatePath("/embed");
+  revalidatePath("/llms.txt");
+  revalidatePath("/opengraph-image");
   await gravarSnapshot("aprovacao");
   await pingIndexNow([
     "/",
@@ -235,6 +242,101 @@ function valorDoForm(form: FormData | EntradaManual, campo: string): unknown {
   return (form as Record<string, unknown>)[campo] ?? null;
 }
 
+type ClienteAdmin = ReturnType<typeof exigirClienteAdmin>;
+
+/** Contexto do funil para entrada HUMANA: o passado pode ser lançado (DATA_MINIMA). */
+async function contextoAdmin(supabase: ClienteAdmin): Promise<ContextoBusca> {
+  const [institutos, existentes] = await Promise.all([
+    supabase.from("institutos").select("id,nome,aliases").returns<InstitutoConhecido[]>(),
+    supabase
+      .from("pesquisas")
+      .select("instituto_id,campo_fim")
+      .in("status", ["publicada", "pendente"])
+      .returns<{ instituto_id: string; campo_fim: string }[]>(),
+  ]);
+  if (institutos.error) throw new Error(institutos.error.message);
+  if (existentes.error) throw new Error(existentes.error.message);
+  return {
+    institutos: (institutos.data ?? []).map((i) => ({
+      id: i.id,
+      nome: i.nome,
+      aliases: i.aliases ?? [],
+    })),
+    existentes: (existentes.data ?? []).map((p) => `${p.instituto_id}|${p.campo_fim}`),
+    // O admin pode incluir uma rodada antiga que faltava: a janela de busca
+    // existe para conter a IA, não o humano.
+    ultimoFim: DATA_MINIMA,
+    hoje: hojeSaoPaulo(),
+  };
+}
+
+/**
+ * Grava UMA pesquisa já aprovada pelo funil como `publicada` (origem admin).
+ * Chave ocupada por linha REJEITADA (o robô achou com número errado e o admin
+ * recusou) é reaproveitada com os números conferidos — antes, a única saída era
+ * mexer no banco à mão. Publicada ou pendente continua barrando.
+ */
+async function gravarPublicada(
+  supabase: ClienteAdmin,
+  aceita: PesquisaAceita,
+  email: string,
+  bruto: Record<string, unknown> | null,
+): Promise<{ linha: LinhaAudit } | { erro: string }> {
+  if (aceita.institutoNovo) {
+    const { error } = await supabase
+      .from("institutos")
+      .upsert(
+        { id: aceita.institutoId, nome: aceita.institutoNome, aliases: [] },
+        { onConflict: "id" },
+      );
+    if (error) throw new Error(error.message);
+  }
+  const linha = {
+    instituto_id: aceita.institutoId,
+    contratante: aceita.contratante,
+    campo_inicio: aceita.inicio,
+    campo_fim: aceita.fim,
+    amostra: aceita.n,
+    moe: aceita.moe,
+    tse: aceita.tse,
+    t1_lula: aceita.l1,
+    t1_flavio: aceita.f1,
+    t1_bnns: aceita.bn1,
+    t2_lula: aceita.l2,
+    t2_flavio: aceita.f2,
+    t2_bnns: aceita.bn2,
+    fonte_url: aceita.fonte,
+    status: "publicada" as const,
+    origem: "admin" as const,
+    bruto,
+    publicado_em: new Date().toISOString(),
+    publicado_por: email,
+  };
+  const inserida = await supabase
+    .from("pesquisas")
+    .insert(linha)
+    .select(COLUNAS_AUDIT)
+    .maybeSingle<LinhaAudit>();
+  if (!inserida.error) {
+    return inserida.data
+      ? { linha: inserida.data }
+      : { erro: "Não foi possível gravar a pesquisa." };
+  }
+  if (inserida.error.code !== "23505") throw new Error(inserida.error.message);
+  const regravada = await supabase
+    .from("pesquisas")
+    .update(linha)
+    .eq("instituto_id", aceita.institutoId)
+    .eq("campo_fim", aceita.fim)
+    .eq("status", "rejeitada")
+    .select(COLUNAS_AUDIT)
+    .maybeSingle<LinhaAudit>();
+  if (regravada.error) throw new Error(regravada.error.message);
+  return regravada.data
+    ? { linha: regravada.data }
+    : { erro: "Já existe uma rodada deste instituto nesta data." };
+}
+
 /**
  * Inclusão consciente do admin: entra direto como `publicada` (origem
  * `admin`), mas passa pelo mesmo funil de sanidade do coletor.
@@ -261,32 +363,11 @@ export async function incluirManual(form: FormData | EntradaManual): Promise<Res
       bn1: valorDoForm(form, "bnns1"),
       l2: valorDoForm(form, "l2"),
       f2: valorDoForm(form, "f2"),
+      bn2: valorDoForm(form, "bnns2"),
       fonte: valorDoForm(form, "fonte"),
     };
 
-    const [institutos, existentes] = await Promise.all([
-      supabase.from("institutos").select("id,nome,aliases").returns<InstitutoConhecido[]>(),
-      supabase
-        .from("pesquisas")
-        .select("instituto_id,campo_fim")
-        .in("status", ["publicada", "pendente"])
-        .returns<{ instituto_id: string; campo_fim: string }[]>(),
-    ]);
-    if (institutos.error) throw new Error(institutos.error.message);
-    if (existentes.error) throw new Error(existentes.error.message);
-
-    const ctx: ContextoBusca = {
-      institutos: (institutos.data ?? []).map((i) => ({
-        id: i.id,
-        nome: i.nome,
-        aliases: i.aliases ?? [],
-      })),
-      existentes: (existentes.data ?? []).map((p) => `${p.instituto_id}|${p.campo_fim}`),
-      // O admin pode incluir uma rodada antiga que faltava: a regra "não pode
-      // ser anterior à última da série" existe para conter a IA, não o humano.
-      ultimoFim: DATA_MINIMA,
-      hoje: hojeSaoPaulo(),
-    };
+    const ctx = await contextoAdmin(supabase);
 
     const { aceitas, rejeitadas } = processarRespostaIA(JSON.stringify([item]), ctx);
     const aceita = aceitas[0];
@@ -294,50 +375,9 @@ export async function incluirManual(form: FormData | EntradaManual): Promise<Res
       return { ok: false, erro: rejeitadas[0]?.motivo ?? "Dados inválidos." };
     }
 
-    if (aceita.institutoNovo) {
-      const { error } = await supabase
-        .from("institutos")
-        .upsert(
-          { id: aceita.institutoId, nome: aceita.institutoNome, aliases: [] },
-          { onConflict: "id" },
-        );
-      if (error) throw new Error(error.message);
-    }
-
-    const agora = new Date().toISOString();
-    const { data, error } = await supabase
-      .from("pesquisas")
-      .insert({
-        instituto_id: aceita.institutoId,
-        contratante: aceita.contratante,
-        campo_inicio: aceita.inicio,
-        campo_fim: aceita.fim,
-        amostra: aceita.n,
-        moe: aceita.moe,
-        tse: aceita.tse,
-        t1_lula: aceita.l1,
-        t1_flavio: aceita.f1,
-        t1_bnns: aceita.bn1,
-        t2_lula: aceita.l2,
-        t2_flavio: aceita.f2,
-        t2_bnns: null,
-        fonte_url: aceita.fonte,
-        status: "publicada",
-        origem: "admin",
-        bruto: null,
-        publicado_em: agora,
-        publicado_por: admin.email,
-      })
-      .select(COLUNAS_AUDIT)
-      .maybeSingle<LinhaAudit>();
-
-    if (error) {
-      if (error.code === "23505") {
-        return { ok: false, erro: "Já existe uma rodada deste instituto nesta data." };
-      }
-      throw new Error(error.message);
-    }
-    if (!data) return { ok: false, erro: "Não foi possível gravar a pesquisa." };
+    const gravada = await gravarPublicada(supabase, aceita, admin.email, null);
+    if ("erro" in gravada) return { ok: false, erro: gravada.erro };
+    const data = gravada.linha;
 
     await registrarAuditoria({
       ator: admin.email,
@@ -354,6 +394,122 @@ export async function incluirManual(form: FormData | EntradaManual): Promise<Res
     return { ok: true, mensagem: `Pesquisa de ${aceita.institutoNome} incluída na série.` };
   } catch (erro) {
     return falha(erro, "Não foi possível incluir a pesquisa.");
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Importação em lote (2º turno, out/2026)                            *
+ * ------------------------------------------------------------------ */
+
+/** Teto do lote: uma leva verificada de um mês cabe com folga. */
+const MAX_LOTE = 150;
+
+export interface LinhaPreviaLote {
+  instituto: string;
+  fim: string;
+  l2: number;
+  f2: number;
+  bn2: number | null;
+  temT1: boolean;
+  avisos: string[];
+}
+
+export type ResultadoLote =
+  | { ok: true; aceitas: LinhaPreviaLote[]; rejeitadas: Rejeicao[]; mensagem?: string }
+  | { ok: false; erro: string };
+
+/** `outros1` do lote: nome → % (0–100), no máximo 20 nomes. O resto é descartado. */
+function outros1DoItem(bruto: Record<string, unknown>): Record<string, number> | null {
+  const alvo = bruto.outros1;
+  if (!alvo || typeof alvo !== "object" || Array.isArray(alvo)) return null;
+  const saida: Record<string, number> = {};
+  for (const [nome, v] of Object.entries(alvo as Record<string, unknown>).slice(0, 20)) {
+    const limpo = nome.replace(/\p{C}/gu, " ").replace(/\s+/g, " ").trim();
+    if (limpo.length < 2 || limpo.length > 60) continue;
+    if (typeof v === "number" && Number.isFinite(v) && v >= 0 && v <= 100) saida[limpo] = v;
+  }
+  return Object.keys(saida).length ? saida : null;
+}
+
+async function processarLote(texto: unknown) {
+  if (typeof texto !== "string" || texto.length > 400_000) {
+    return { erro: "Cole um array JSON (até 400 mil caracteres)." } as const;
+  }
+  const supabase = exigirClienteAdmin();
+  const ctx = await contextoAdmin(supabase);
+  const r = processarRespostaIA(texto, ctx, MAX_LOTE);
+  if (r.falhaLeitura) return { erro: `Não deu para ler o lote: ${r.falhaLeitura}.` } as const;
+  return { supabase, r } as const;
+}
+
+const paraPrevia = (a: PesquisaAceita): LinhaPreviaLote => ({
+  instituto: a.institutoNome,
+  fim: a.fim,
+  l2: a.l2,
+  f2: a.f2,
+  bn2: a.bn2,
+  temT1: a.l1 !== null && a.f1 !== null,
+  avisos: Array.isArray(a.bruto._avisos) ? (a.bruto._avisos as string[]) : [],
+});
+
+/** Prévia do lote: o MESMO funil do robô e da inclusão manual, sem gravar nada. */
+export async function previaLote(texto: unknown): Promise<ResultadoLote> {
+  try {
+    await exigirAdmin();
+    const p = await processarLote(texto);
+    if ("erro" in p) return { ok: false, erro: p.erro as string };
+    return { ok: true, aceitas: p.r.aceitas.map(paraPrevia), rejeitadas: p.r.rejeitadas };
+  } catch (erro) {
+    return falha(erro, "Não foi possível analisar o lote.");
+  }
+}
+
+/**
+ * Publica o lote. O texto é processado DE NOVO no servidor (a prévia do cliente
+ * não é confiável) e cada pesquisa vira uma linha publicada + uma linha
+ * `inclusao_manual` no audit_log. `serieMudou` roda uma vez só, no fim.
+ */
+export async function publicarLote(texto: unknown): Promise<ResultadoLote> {
+  try {
+    const admin = await exigirAdmin();
+    const p = await processarLote(texto);
+    if ("erro" in p) return { ok: false, erro: p.erro as string };
+    const publicadas: LinhaPreviaLote[] = [];
+    const rejeitadas: Rejeicao[] = [...p.r.rejeitadas];
+    for (const aceita of p.r.aceitas) {
+      const outros1 = outros1DoItem(aceita.bruto);
+      const gravada = await gravarPublicada(
+        p.supabase,
+        aceita,
+        admin.email,
+        outros1 ? { carga: "lote", outros1 } : { carga: "lote" },
+      );
+      if ("erro" in gravada) {
+        rejeitadas.push({ instituto: aceita.institutoNome, fim: aceita.fim, motivo: gravada.erro });
+        continue;
+      }
+      await registrarAuditoria({
+        ator: admin.email,
+        acao: "inclusao_manual",
+        entidade: "pesquisa",
+        entidadeId: gravada.linha.id,
+        detalhes: {
+          ...detalhesPublicaveis(gravada.linha),
+          instituto_novo: aceita.institutoNovo,
+          lote: true,
+        },
+      });
+      publicadas.push(paraPrevia(aceita));
+    }
+    if (publicadas.length) await serieMudou();
+    return {
+      ok: true,
+      aceitas: publicadas,
+      rejeitadas,
+      mensagem: `${publicadas.length} pesquisa(s) publicada(s); ${rejeitadas.length} recusada(s).`,
+    };
+  } catch (erro) {
+    return falha(erro, "Não foi possível publicar o lote.");
   }
 }
 
@@ -451,7 +607,9 @@ export async function dispararAtualizacao(): Promise<ResultadoAtualizacao> {
 
     const mensagem = resumo.inseridas
       ? `${resumo.inseridas} pesquisa(s) nova(s) na fila de aprovação.`
-      : "Nenhuma rodada nova encontrada — a série já está em dia.";
+      : resumo.encontradas
+        ? `A busca achou ${resumo.encontradas} rodada(s), mas nenhuma entrou — veja os motivos abaixo.`
+        : "A busca não achou nenhuma rodada no período.";
     return { ok: true, mensagem, resumo };
   } catch (erro) {
     return falha(erro, "Não foi possível executar a busca.");

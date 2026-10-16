@@ -5,8 +5,8 @@
  */
 import type { Candidato, CenarioVies, ParamsModelo } from "./tipos";
 
-/** Data da base editorial do protótipo (a UI de produção usa o selo de frescor do banco). */
-export const ULTIMA_ATUALIZACAO = "03/08/2026";
+/** Data da última carga verificada do seed (a UI de produção usa o selo de frescor do banco). */
+export const ULTIMA_ATUALIZACAO = "16/10/2026";
 
 /** Paleta original do protótipo — em componentes use SEMPRE os tokens de tokens.css. */
 export const CORES = {
@@ -75,12 +75,26 @@ export const PARAMS_PADRAO: ParamsModelo = {
   vies: 0,
 };
 
-/** Prompt da busca automática de pesquisas (portado do protótipo; usado só no servidor). */
+/**
+ * Prompt da busca automática de pesquisas (usado só no servidor). Reescrito para o
+ * 2º turno (DECISOES.md): data de hoje e fase da eleição explícitas, votos TOTAIS
+ * pedidos com todas as letras (o modelo não aceita válidos), branco/nulo do 2º turno
+ * e até 12 itens — o volume de pesquisas da reta final passa de 6 por semana.
+ */
 export const montarPromptBusca = (
   desde: string,
-) => `Você é um coletor de dados de pesquisas eleitorais brasileiras. Use a busca na web para localizar pesquisas NACIONAIS de intenção de voto para PRESIDENTE do Brasil 2026 (cenário Lula × Flávio Bolsonaro) divulgadas por institutos (AtlasIntel, Datafolha, Genial/Quaest, PoderData, Nexus, Gerp, Indexa, Ipec, Real Time Big Data, Paraná Pesquisas ou outros), com registro no TSE e com trabalho de campo encerrado DEPOIS de ${desde}.
+  hoje: string,
+) => `Você é um coletor de dados de pesquisas eleitorais brasileiras. Hoje é ${hoje}. A eleição presidencial de 2026 teve 1º turno em 2026-10-04 (resultado oficial do TSE: Flávio Bolsonaro 47,03% × Lula 45,16% dos votos válidos) e o 2º turno, entre Lula (PT) e Flávio Bolsonaro (PL), é em 2026-10-25.
 
-Responda APENAS com um array JSON válido, sem markdown, sem comentários, sem texto antes ou depois. Máximo de 6 itens (os mais recentes). Cada item:
-{"instituto":"...","inicio":"AAAA-MM-DD","fim":"AAAA-MM-DD","n":2000,"moe":2.0,"tse":"BR-XXXXX/2026","l1":40,"f1":32,"bn1":12,"l2":47,"f2":43,"fonte":"https://..."}
+Use a busca na web para localizar pesquisas NACIONAIS de intenção de voto para PRESIDENTE com o cenário Lula × Flávio Bolsonaro no 2º turno, divulgadas por institutos (AtlasIntel, Datafolha, Quaest, PoderData, Nexus, Gerp, Indexa, Ipec, Real Time Big Data, Paraná Pesquisas, Futura, MDA, Palver, Vox Brasil, Ideia, Ipespe, DataTrends ou outros), com registro no TSE e com trabalho de campo encerrado a partir de ${desde} (inclusive) até hoje. Prefira as páginas do Poder360, da Gazeta do Povo, do G1, da Folha ou do próprio instituto.
 
-Regras: l1/f1 = 1º turno estimulado Lula/Flávio; bn1 = branco/nulo + não sabe do 1º turno; l2/f2 = 2º turno Lula × Flávio. Use null quando o dado não foi divulgado. Inclua SOMENTE pesquisas que você realmente encontrou na busca, com a URL real da fonte — nunca invente números nem registros. Se não houver pesquisa nova após ${desde}, responda [].`;
+Responda APENAS com um array JSON válido, sem markdown, sem comentários, sem citações, sem texto antes ou depois. Máximo de 12 itens (os mais recentes). Cada item:
+{"instituto":"...","contratante":"...","inicio":"AAAA-MM-DD","fim":"AAAA-MM-DD","n":2000,"moe":2.0,"tse":"BR-XXXXX/2026","l1":null,"f1":null,"bn1":null,"l2":45,"f2":47,"bn2":8,"l2v":49,"f2v":51,"fonte":"https://..."}
+
+Regras:
+- l2/f2 = 2º turno Lula/Flávio em VOTOS TOTAIS (o número com branco, nulo e indecisos na base). NUNCA ponha votos válidos em l2/f2.
+- bn2 = branco/nulo + não sabe/indecisos do 2º turno (o que falta para 100 nos votos totais).
+- l2v/f2v = votos válidos do 2º turno, se o instituto divulgou; senão null.
+- l1/f1/bn1 = 1º turno estimulado, SÓ para pesquisas com campo encerrado antes de 2026-10-04; nas demais, null.
+- n = número inteiro de entrevistas (2004, não "2.004"). Use null quando o dado não foi divulgado.
+- Inclua SOMENTE pesquisas que você realmente encontrou na busca, com a URL real da fonte — nunca invente números nem registros. Se não houver pesquisa nova no período, responda [].`;

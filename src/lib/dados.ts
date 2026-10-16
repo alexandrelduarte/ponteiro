@@ -555,7 +555,17 @@ export async function getFrescor(): Promise<Frescor> {
   }
 
   try {
-    const [run, pesquisa] = await Promise.all([
+    const [coleta, run, pesquisa] = await Promise.all([
+      // Última coleta automática que DEU CERTO (migração 0005). O snapshot do
+      // cron é gravado mesmo quando a IA falha — por isso ele sozinho deixava o
+      // selo dizer "verificado hoje" com o coletor quebrado havia semanas.
+      supabase
+        .from("coleta_publica")
+        .select("em")
+        .eq("ok", true)
+        .order("em", { ascending: false })
+        .limit(1)
+        .returns<{ em: string }[]>(),
       supabase
         .from("model_runs")
         .select("executado_em")
@@ -574,8 +584,12 @@ export async function getFrescor(): Promise<Frescor> {
     if (run.error) throw new Error(run.error.message);
     if (pesquisa.error) throw new Error(pesquisa.error.message);
 
+    // Sem a view (migração 0005 ainda não aplicada) cai no snapshot, como antes.
+    const verificadoEm = coleta.error
+      ? (run.data?.[0]?.executado_em ?? null)
+      : (coleta.data?.[0]?.em ?? null);
     return {
-      verificadoEm: run.data?.[0]?.executado_em ?? null,
+      verificadoEm,
       ultimaPesquisaFim: pesquisa.data?.[0]?.campo_fim ?? seed,
       ultimaPesquisaEm: pesquisa.data?.[0]?.publicado_em ?? null,
       fonte: pesquisa.data?.length ? "banco" : "seed",

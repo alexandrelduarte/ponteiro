@@ -32,6 +32,7 @@ import { BotaoReconstituir } from "@/components/admin/botao-reconstituir";
 import { BotaoRemover } from "@/components/admin/botao-remover";
 import { BotaoSair } from "@/components/admin/botao-sair";
 import { FormInclusao } from "@/components/admin/form-inclusao";
+import { FormLote } from "@/components/admin/form-lote";
 import { FormLogin } from "@/components/admin/form-login";
 import { PARAMS_PADRAO } from "@/data/constantes";
 import type { Pesquisa } from "@/data/tipos";
@@ -45,6 +46,9 @@ import { instanteDoRender } from "../_lib/relogio";
 import { getAuditoria } from "./auditoria";
 
 export const dynamic = "force-dynamic";
+// A ação "Verificar agora" roda a coleta inteira (até 2 tentativas de ~130 s)
+// dentro desta rota: sem teto explícito ela herdava o padrão do plano.
+export const maxDuration = 300;
 
 export const metadata: Metadata = {
   title: "Administração",
@@ -333,6 +337,15 @@ export default async function Admin({
           <Subtitulo>Inclusão manual (entra publicada, com auditoria)</Subtitulo>
           <div className="mt-3">
             <FormInclusao />
+          </div>
+        </Bloco>
+      </Secao>
+
+      <Secao>
+        <Bloco>
+          <Subtitulo>Importação em lote (prévia antes de publicar, com auditoria)</Subtitulo>
+          <div className="mt-3">
+            <FormLote />
           </div>
         </Bloco>
       </Secao>

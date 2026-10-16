@@ -46,6 +46,15 @@ export function BotaoAtualizar() {
           </span>
         ) : null}
       </p>
+      {/* Os MOTIVOS de cada recusa — antes só a contagem chegava à tela, e uma
+          rodada boa recusada por regra errada passava despercebida. */}
+      {resultado?.ok && resultado.resumo.rejeitadas.length ? (
+        <ul className="mt-2 max-w-texto list-disc pl-5 text-micro text-tinta-media">
+          {resultado.resumo.rejeitadas.slice(0, 12).map((r, i) => (
+            <li key={i}>{[r.instituto, r.fim, r.motivo].filter(Boolean).join(" · ")}</li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }

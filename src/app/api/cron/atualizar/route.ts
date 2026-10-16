@@ -16,6 +16,7 @@
  */
 import { createHash, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
+import { faseEleitoral } from "@/lib/modelo";
 import { gravarSnapshot } from "@/lib/snapshot";
 import { rodarUpdater } from "@/lib/updater";
 import { adminConfigurado } from "@/lib/supabase/admin";
@@ -61,14 +62,21 @@ export async function GET(requisicao: Request) {
   emExecucao = true;
 
   try {
-    const coleta = await rodarUpdater("cron");
+    // Depois que as urnas fecham (17h de 25/10) não há pesquisa nova a buscar:
+    // o painel congela na última leitura antes da votação.
+    const coleta =
+      faseEleitoral(Date.now()) === "encerrada"
+        ? { encontradas: 0, inseridas: 0, rejeitadas: [], institutosNovos: [] }
+        : await rodarUpdater("cron");
     // O snapshot é gravado mesmo que a coleta falhe: a série do dia não pode
     // depender da IA estar de pé.
     const snapshot = await gravarSnapshot("cron");
 
+    // Coleta que falhou responde 500 — o painel de crons da Vercel mostra a
+    // falha em vez de um 200 enganoso (o snapshot do dia foi gravado do mesmo jeito).
     return NextResponse.json(
       {
-        ok: true,
+        ok: !coleta.erro,
         coleta: {
           encontradas: coleta.encontradas,
           inseridas: coleta.inseridas,
@@ -78,7 +86,7 @@ export async function GET(requisicao: Request) {
         },
         snapshot,
       },
-      { status: 200, headers: SEM_CACHE },
+      { status: coleta.erro ? 500 : 200, headers: SEM_CACHE },
     );
   } catch (erro) {
     console.error("[cron] falha inesperada:", erro);

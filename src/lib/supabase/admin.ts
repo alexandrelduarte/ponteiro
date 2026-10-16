@@ -59,7 +59,8 @@ export async function registrarAuditoria(entrada: {
     | "inclusao_manual"
     | "edicao"
     | "remocao"
-    | "reconstituicao";
+    | "reconstituicao"
+    | "coleta";
   entidade: string;
   entidadeId?: string | null;
   detalhes?: Record<string, unknown> | null;

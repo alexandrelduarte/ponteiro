@@ -1,6 +1,6 @@
--- 0005: 2º turno — institutos novos, CHECK de auditoria da coleta e a LEVA 1 de pesquisas.
+-- 0006: 2º turno — institutos novos, CHECK de auditoria da coleta e a LEVA 1 de pesquisas.
 --
--- Contexto (DECISOES.md, "2º turno"): a série pública parou em 02/08. Esta carga traz as
+-- Contexto (DECISOES.md, "2º turno"): roda DEPOIS da 0005 (limpeza da coleta). Traz as
 -- 17 pesquisas NACIONAIS de 2º turno (Lula × Flávio) com campo encerrado a partir de
 -- 04/10/2026, cada uma conferida em fonte de imprensa ou PDF do instituto: votos TOTAIS
 -- (nunca válidos), registro no TSE e link https. Os mesmos registros estão em
@@ -14,6 +14,9 @@
 -- verificados e publicada.
 
 -- 1) audit_log aceita o registro de cada execução da coleta automática (Marco 4).
+
+begin;
+
 alter table public.audit_log
   drop constraint audit_log_acao_check;
 alter table public.audit_log
@@ -35,7 +38,7 @@ grant select on public.coleta_publica to anon, authenticated;
 insert into public.institutos (id, nome, aliases) values
   ('atlasintel', 'AtlasIntel', array['Atlas Intel', 'Atlas', 'AtlasIntel/Bloomberg', 'Atlas/Bloomberg']::text[]),
   ('poderdata', 'PoderData', array['Poder Data', 'Poder360/PoderData', 'PoderData/Aya']::text[]),
-  ('nexus', 'Nexus', array['Nexus/BTG', 'Nexus BTG Pactual']::text[]),
+  ('nexus', 'Nexus', array['Nexus/BTG', 'Nexus BTG Pactual', 'BTG/Nexus']::text[]),
   ('datafolha', 'Datafolha', array['Data Folha', 'Instituto Datafolha', 'Datafolha/Folha']::text[]),
   ('gerp', 'Gerp', array['GERP']::text[]),
   ('indexa', 'Indexa', array['Indexa Pesquisas', 'Indexa/Broadcast']::text[]),
@@ -43,13 +46,15 @@ insert into public.institutos (id, nome, aliases) values
   ('ipec', 'Ipec', array['IPEC', 'Ipec Inteligência']::text[]),
   ('rtbd', 'Real Time Big Data', array['RTBD', 'RealTime Big Data', 'Real Time/Record']::text[]),
   ('parana', 'Paraná Pesquisas', array['Parana Pesquisas', 'Paraná']::text[]),
-  ('futura', 'Futura', array['Futura Inteligência', 'Instituto Futura', 'Futura/100% Cidades']::text[]),
+  ('futura', 'Futura', array['Futura Inteligência', 'Instituto Futura', 'Futura/100% Cidades', 'Futura Inteligência/100% Cidades', 'Futura 100% Cidades']::text[]),
   ('mda', 'MDA', array['CNT/MDA', 'MDA Pesquisa']::text[]),
   ('palver', 'Palver', array['Instituto Palver']::text[]),
   ('datatrends', 'DataTrends', array['Data Trends']::text[]),
   ('ipespe', 'Ipespe', array['IPESPE', 'Ipespe/Abrapel']::text[]),
-  ('voxbrasil', 'Vox Brasil', array['Vox', 'Instituto Vox Brasil']::text[]),
-  ('ideia', 'Ideia', array['Ideia Big Data', 'Instituto Ideia']::text[])
+  ('vox-brasil', 'Vox Brasil', array['Vox', 'Instituto Vox Brasil', 'Vox Brasil Opinião e Pesquisas']::text[]),
+  ('ideia', 'Ideia', array['Ideia Big Data', 'Instituto Ideia', 'Meio/Ideia']::text[]),
+  ('verita', 'Veritá', array['Verita', 'Instituto Veritá']::text[]),
+  ('alfa-inteligencia', 'Alfa Inteligência', array['Alfa Inteligência/TMC', 'Alfa']::text[])
 on conflict (id) do update set aliases = excluded.aliases;
 
 -- 3) Leva 1 — 2º turno, campo encerrado entre 04/10 e 15/10/2026.
@@ -123,8 +128,8 @@ with carga as (
   ('poderdata', 'Próprio instituto', '2026-10-05', '2026-10-07', 3000, 1.8, 'BR-08134/2026',
    null, null, null, 44, 49, 7, 'https://jovempan.com.br/politica/poderdata-aya-flavio-bolsonaro-tem-49-contra-44-de-lula-no-2o-turno/',
    'publicada', 'admin', '{"carga": "leva 1 — 2º turno pós-04/10 (verificada em 16/10/2026)"}'::jsonb, now(), 'carga-verificada'),
-  -- voxbrasil-2026-10-07
-  ('voxbrasil', 'Próprio instituto', '2026-10-05', '2026-10-07', 2100, 2.15, 'BR-09623/2026',
+  -- vox-brasil-2026-10-07
+  ('vox-brasil', 'Próprio instituto', '2026-10-05', '2026-10-07', 2100, 2.15, 'BR-09623/2026',
    null, null, null, 44.2, 42.7, 13.1, 'https://exame.com/brasil/pesquisa-vox-brasil-lula-tem-442-e-flavio-bolsonaro-427-no-2o-turno/',
    'publicada', 'admin', '{"carga": "leva 1 — 2º turno pós-04/10 (verificada em 16/10/2026)"}'::jsonb, now(), 'carga-verificada')
   on conflict (instituto_id, campo_fim) do update set
@@ -150,7 +155,7 @@ with carga as (
 )
 insert into public.audit_log (ator, acao, entidade, entidade_id, detalhes)
 select
-  'carga-verificada (migração 0005)', 'inclusao_manual', 'pesquisa', c.id::text,
+  'carga-verificada (migração 0006)', 'inclusao_manual', 'pesquisa', c.id::text,
   jsonb_build_object(
     'instituto_id', c.instituto_id, 'contratante', c.contratante,
     'campo_inicio', c.campo_inicio, 'campo_fim', c.campo_fim,
@@ -160,3 +165,5 @@ select
     'fonte', c.fonte_url, 'origem', c.origem
   )
 from carga c;
+
+commit;

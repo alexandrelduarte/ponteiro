@@ -1,4 +1,4 @@
--- 0006: LEVA 2 — pesquisas nacionais com campo encerrado de 03/08 a 03/10/2026.
+-- 0007: LEVA 2 — pesquisas nacionais com campo encerrado de 03/08 a 03/10/2026.
 --
 -- Fecha o buraco da série entre a última pesquisa publicada (02/08) e o 1º turno:
 -- 68 rodadas com 1º turno (estimulado, votos TOTAIS, com os demais candidatos em
@@ -7,12 +7,14 @@
 -- que medem o erro do 1º turno de 2026 (src/lib/erro-1t.ts, DECISOES.md).
 -- Excluída de propósito: American Analytics 15–20/09 (registro TSE impresso fora do
 -- padrão, "BR-032587/26" — não conferível).
--- Mesmo desenho da 0005: upsert de institutos, pesquisas publicadas com audit_log.
+-- Mesmo desenho da 0006: upsert de institutos, pesquisas publicadas com audit_log.
+
+begin;
 
 insert into public.institutos (id, nome, aliases) values
   ('atlasintel', 'AtlasIntel', array['Atlas Intel', 'Atlas', 'AtlasIntel/Bloomberg', 'Atlas/Bloomberg']::text[]),
   ('poderdata', 'PoderData', array['Poder Data', 'Poder360/PoderData', 'PoderData/Aya']::text[]),
-  ('nexus', 'Nexus', array['Nexus/BTG', 'Nexus BTG Pactual']::text[]),
+  ('nexus', 'Nexus', array['Nexus/BTG', 'Nexus BTG Pactual', 'BTG/Nexus']::text[]),
   ('datafolha', 'Datafolha', array['Data Folha', 'Instituto Datafolha', 'Datafolha/Folha']::text[]),
   ('gerp', 'Gerp', array['GERP']::text[]),
   ('indexa', 'Indexa', array['Indexa Pesquisas', 'Indexa/Broadcast']::text[]),
@@ -20,14 +22,15 @@ insert into public.institutos (id, nome, aliases) values
   ('ipec', 'Ipec', array['IPEC', 'Ipec Inteligência']::text[]),
   ('rtbd', 'Real Time Big Data', array['RTBD', 'RealTime Big Data', 'Real Time/Record']::text[]),
   ('parana', 'Paraná Pesquisas', array['Parana Pesquisas', 'Paraná']::text[]),
-  ('futura', 'Futura', array['Futura Inteligência', 'Instituto Futura', 'Futura/100% Cidades']::text[]),
+  ('futura', 'Futura', array['Futura Inteligência', 'Instituto Futura', 'Futura/100% Cidades', 'Futura Inteligência/100% Cidades', 'Futura 100% Cidades']::text[]),
   ('mda', 'MDA', array['CNT/MDA', 'MDA Pesquisa']::text[]),
   ('palver', 'Palver', array['Instituto Palver']::text[]),
   ('datatrends', 'DataTrends', array['Data Trends']::text[]),
   ('ipespe', 'Ipespe', array['IPESPE', 'Ipespe/Abrapel']::text[]),
-  ('voxbrasil', 'Vox Brasil', array['Vox', 'Instituto Vox Brasil']::text[]),
-  ('ideia', 'Ideia', array['Ideia Big Data', 'Instituto Ideia']::text[]),
-  ('verita', 'Veritá', array['Verita', 'Instituto Veritá']::text[])
+  ('vox-brasil', 'Vox Brasil', array['Vox', 'Instituto Vox Brasil', 'Vox Brasil Opinião e Pesquisas']::text[]),
+  ('ideia', 'Ideia', array['Ideia Big Data', 'Instituto Ideia', 'Meio/Ideia']::text[]),
+  ('verita', 'Veritá', array['Verita', 'Instituto Veritá']::text[]),
+  ('alfa-inteligencia', 'Alfa Inteligência', array['Alfa Inteligência/TMC', 'Alfa']::text[])
 on conflict (id) do update set aliases = excluded.aliases;
 
 with carga as (
@@ -100,8 +103,8 @@ with carga as (
   ('poderdata', 'Próprio instituto', '2026-08-23', '2026-08-26', 2400, 2.0, 'BR-04974/2026',
    38, 35, 7, 45, 44, 11, 'https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/poderdata-presidente-agosto-2026/',
    'publicada', 'admin', '{"carga": "leva 2 — 03/08 a 03/10 (verificada em 16/10/2026)", "outros1": {"Ronaldo Caiado": 4, "Renan Santos": 4, "Augusto Cury": 4, "Pablo Marçal": 3, "Romeu Zema": 2, "Hertz Dias": 2, "Edmilson Costa": 1, "Samara Martins": 1}}'::jsonb, now(), 'carga-verificada'),
-  -- voxbrasil-2026-08-27
-  ('voxbrasil', 'Próprio instituto', '2026-08-25', '2026-08-27', 2100, 2.15, 'BR-05519/2026',
+  -- vox-brasil-2026-08-27
+  ('vox-brasil', 'Próprio instituto', '2026-08-25', '2026-08-27', 2100, 2.15, 'BR-05519/2026',
    37.1, 34.8, 10.3, 44.5, 45.1, 10.4, 'https://agorarn.com.br/politica/flavio-lula-empate-segundo-turno-vox-brasil/',
    'publicada', 'admin', '{"carga": "leva 2 — 03/08 a 03/10 (verificada em 16/10/2026)", "outros1": {"Ronaldo Caiado": 5.0, "Renan Santos": 3.3, "Romeu Zema": 2.8, "Augusto Cury": 2.6, "Pablo Marçal": 2.0, "Clariana Barão": 0.8, "Edmilson Costa": 0.5, "Wilson Grassi": 0.4, "Rui Costa Pimenta": 0.2, "Hertz Dias": 0.1, "Samara Martins": 0.1}}'::jsonb, now(), 'carga-verificada'),
   -- atlasintel-2026-08-30
@@ -148,8 +151,8 @@ with carga as (
   ('atlasintel', 'Bloomberg', '2026-09-27', '2026-10-02', 4945, 1, 'BR-00999/2026',
    46.7, 43.8, 0.6, 47.6, 47.4, null, 'https://www.diariodepernambuco.com.br/politica/2026/10/11725710-atlasintel-lula-tem-47-e-flavio-bolsonaro-441-de-votos-validos-no-primeiro-turno.html',
    'publicada', 'admin', '{"carga": "leva 2 — 03/08 a 03/10 (verificada em 16/10/2026)", "outros1": {"Renan Santos": 4.6, "Augusto Cury": 2.1, "Ronaldo Caiado": 1.4, "Outros (somados)": 0.9}}'::jsonb, now(), 'carga-verificada'),
-  -- voxbrasil-2026-10-01
-  ('voxbrasil', 'Próprio instituto', '2026-09-29', '2026-10-01', 2100, 2.15, 'BR-00148/2026',
+  -- vox-brasil-2026-10-01
+  ('vox-brasil', 'Próprio instituto', '2026-09-29', '2026-10-01', 2100, 2.15, 'BR-00148/2026',
    40.4, 41.2, 10.2, 45.2, 48.2, 6.6, 'https://static.poder360.com.br/uploads/2026/10/RELATORIO-VOX-BRASIL-NACIONAL-8-02-10-2026-1-1.pdf',
    'publicada', 'admin', '{"carga": "leva 2 — 03/08 a 03/10 (verificada em 16/10/2026)", "outros1": {"Ronaldo Caiado": 3.3, "Renan Santos": 2.2, "Romeu Zema": 1.3, "Augusto Cury": 1.2, "Edmilson Costa": 0.2, "Wilson Grassi": 0, "Leonardo Avalanche": 0, "Clariana Barão": 0, "Rui Costa Pimenta": 0, "Hertz Dias": 0, "Samara Martins": 0}}'::jsonb, now(), 'carga-verificada'),
   -- datafolha-2026-10-01
@@ -168,8 +171,8 @@ with carga as (
   ('futura', 'Apex', '2026-09-25', '2026-09-29', 2000, 2.2, 'BR-01122/2026',
    39.4, 42.2, 5, 43.5, 49.0, 7.5, 'https://static.poder360.com.br/uploads/2026/09/futuracidadeparticipacoesBR-30set2026.pdf',
    'publicada', 'admin', '{"carga": "leva 2 — 03/08 a 03/10 (verificada em 16/10/2026)", "outros1": {"Ronaldo Caiado": 4.0, "Augusto Cury": 3.8, "Renan Santos": 3.2, "Romeu Zema": 1.6, "Edmilson Costa": 0.2, "Samara Martins": 0.2, "Leonardo Avalanche": 0.1, "Rui Costa Pimenta": 0.1, "Wilson Grassi": 0.1, "Hertz Dias": 0.1}}'::jsonb, now(), 'carga-verificada'),
-  -- voxbrasil-2026-09-28
-  ('voxbrasil', 'Próprio instituto', '2026-09-26', '2026-09-28', 2100, 2.15, 'BR-00895/2026',
+  -- vox-brasil-2026-09-28
+  ('vox-brasil', 'Próprio instituto', '2026-09-26', '2026-09-28', 2100, 2.15, 'BR-00895/2026',
    41.1, 37.8, 10.3, 44.7, 45.2, null, 'https://exame.com/brasil/pesquisa-vox-brasil-lula-tem-411-e-flavio-bolsonaro-378-no-1o-turno/',
    'publicada', 'admin', '{"carga": "leva 2 — 03/08 a 03/10 (verificada em 16/10/2026)", "outros1": {"Ronaldo Caiado": 3.8, "Renan Santos": 2.7, "Augusto Cury": 2.2, "Romeu Zema": 1.8, "Edmilson Costa + Wilson Grassi (somados)": 0.3}}'::jsonb, now(), 'carga-verificada'),
   -- ideia-2026-09-28
@@ -331,7 +334,7 @@ with carga as (
 )
 insert into public.audit_log (ator, acao, entidade, entidade_id, detalhes)
 select
-  'carga-verificada (migração 0006)', 'inclusao_manual', 'pesquisa', c.id::text,
+  'carga-verificada (migração 0007)', 'inclusao_manual', 'pesquisa', c.id::text,
   jsonb_build_object(
     'instituto_id', c.instituto_id, 'contratante', c.contratante,
     'campo_inicio', c.campo_inicio, 'campo_fim', c.campo_fim,
@@ -341,3 +344,5 @@ select
     'fonte', c.fonte_url, 'origem', c.origem
   )
 from carga c;
+
+commit;

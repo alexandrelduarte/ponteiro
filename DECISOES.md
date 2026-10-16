@@ -663,10 +663,20 @@ com zero pixel da v1; teste do leigo 1/4 na dobra)
 
 ## 2º turno — superfícies, dados e fluxo de coleta (out/2026)
 
-### Por que o site parou em agosto (diagnóstico)
+### Diagnóstico (corrigido depois do acesso ao banco)
 
-- A série pública parou em 02/08 (14 pesquisas) e o último deploy foi de 07/08. O coletor
-  tinha defeitos estruturais: (1) a busca partia da ÚLTIMA PUBLICADA, então só andava
+- O primeiro diagnóstico ("a série parou em 02/08") veio da URL interna do deploy da
+  Vercel, que ninguém visita e por isso nunca regenerava. Lido o banco: o robô coletou
+  bem até 03/10 (36 rodadas publicadas pelo admin; 41 de 51 linhas automáticas idênticas
+  à verificação independente), mas (a) 14 rodadas de outubro ficaram PENDENTES desde
+  08/10; (b) o mesmo instituto entrou com nomes diferentes e duplicou rodadas (BTG/Nexus ×
+  Nexus, PoderData/Aya × PoderData, CNT/MDA × MDA, três grafias de Futura); (c) duas
+  rodadas vieram em votos VÁLIDOS (AtlasIntel 02/10 publicada 50,1 × 49,9; Futura 10/10);
+  (d) três com a data de divulgação no lugar do fim do campo. A migração 0005 limpa isso
+  com auditoria (48 remoções `remocao`, todas reinseridas pela carga verificada, exceto
+  duplicatas e válidos). O id da Vox Brasil ficou `vox-brasil` (o do banco) para não
+  quebrar links; links de ids-apelido (btg-nexus-…, poderdata-aya-…) passam a 404.
+- Defeitos estruturais do coletor, que explicam (b)–(d) e o risco de travar: (1) a busca partia da ÚLTIMA PUBLICADA, então só andava
   quando o admin aprovava; (2) pesquisa com campo mais antigo que a última aprovada era
   recusada para sempre ("fim < ultimoFim"); (3) o prompt pedia no máximo 6 itens, sem data
   de hoje, sem a fase da eleição e sem dizer se queria votos totais ou válidos; (4) a

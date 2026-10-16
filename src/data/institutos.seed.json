@@ -12,7 +12,7 @@
   {
     "id": "nexus",
     "nome": "Nexus",
-    "aliases": ["Nexus/BTG", "Nexus BTG Pactual"]
+    "aliases": ["Nexus/BTG", "Nexus BTG Pactual", "BTG/Nexus"]
   },
   {
     "id": "datafolha",
@@ -59,7 +59,13 @@
   {
     "id": "futura",
     "nome": "Futura",
-    "aliases": ["Futura Inteligência", "Instituto Futura", "Futura/100% Cidades"]
+    "aliases": [
+      "Futura Inteligência",
+      "Instituto Futura",
+      "Futura/100% Cidades",
+      "Futura Inteligência/100% Cidades",
+      "Futura 100% Cidades"
+    ]
   },
   {
     "id": "mda",
@@ -82,18 +88,23 @@
     "aliases": ["IPESPE", "Ipespe/Abrapel"]
   },
   {
-    "id": "voxbrasil",
+    "id": "vox-brasil",
     "nome": "Vox Brasil",
-    "aliases": ["Vox", "Instituto Vox Brasil"]
+    "aliases": ["Vox", "Instituto Vox Brasil", "Vox Brasil Opinião e Pesquisas"]
   },
   {
     "id": "ideia",
     "nome": "Ideia",
-    "aliases": ["Ideia Big Data", "Instituto Ideia"]
+    "aliases": ["Ideia Big Data", "Instituto Ideia", "Meio/Ideia"]
   },
   {
     "id": "verita",
     "nome": "Veritá",
     "aliases": ["Verita", "Instituto Veritá"]
+  },
+  {
+    "id": "alfa-inteligencia",
+    "nome": "Alfa Inteligência",
+    "aliases": ["Alfa Inteligência/TMC", "Alfa"]
   }
 ]
